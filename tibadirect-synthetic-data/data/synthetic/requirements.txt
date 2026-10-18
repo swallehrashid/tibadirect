@@ -1,0 +1,7 @@
+reportlab>=4.0
+pypdf>=5.0
+pdf2image>=1.17
+Pillow>=10.0
+numpy>=1.26
+imagehash>=4.3
+pytesseract>=0.3   # only for validate.py --ocr

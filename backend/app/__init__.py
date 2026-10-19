@@ -27,6 +27,8 @@ def create_app(config_name: str | None = None) -> Flask:
 
     configure_logging(app)
     extensions.init_extensions(app)
+    from app import models  # noqa: F401  (registers every model with the metadata)
+
     init_request_id(app)
     register_error_handlers(app)
     _register_blueprints()

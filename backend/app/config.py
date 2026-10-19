@@ -5,10 +5,13 @@ import os
 from decimal import Decimal
 from typing import Any
 
+# Development-only key from .env.example (base64 of 32 bytes). Never valid in production.
+DEV_DATA_ENCRYPTION_KEY = "ZGV2LW9ubHkta2V5LWRvLW5vdC11c2UtaW4tcHJvZCE="
+
 # Values that must never reach production. They are the placeholders from .env.example.
 INSECURE_DEFAULTS: dict[str, set[str]] = {
     "SECRET_KEY": {"", "change-me"},
-    "DATA_ENCRYPTION_KEY": {"", "ZGV2LW9ubHkta2V5LWRvLW5vdC11c2UtaW4tcHJvZCE="},
+    "DATA_ENCRYPTION_KEY": {"", DEV_DATA_ENCRYPTION_KEY},
     "HASH_PEPPER": {"", "change-me", "change-me-too"},
 }
 
@@ -152,6 +155,7 @@ class TestConfig(BaseConfig):
         self.REDIS_URL = _env("TEST_REDIS_URL", self.REDIS_URL)
         self.PAYPAL_MODE = "mock"
         self.LLM_API_KEY = ""
+        self.DATA_ENCRYPTION_KEY = self.DATA_ENCRYPTION_KEY or DEV_DATA_ENCRYPTION_KEY
         self.LOG_LEVEL = _env("LOG_LEVEL", "WARNING").upper()
         self.SECRET_KEY = "test-secret-key"
 

@@ -6,8 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from redis import Redis
 
 from app.errors import TibaApi
+from app.models.base import Base
 
-db = SQLAlchemy()
+db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 api = TibaApi()
 

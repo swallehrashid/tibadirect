@@ -6,9 +6,13 @@ from app.models.identity import LoginCode, User
 from app.models.integration import WebhookEvent
 from app.models.ledger import LedgerEntry
 from app.models.money import Donation, FxRate, Refund, Settlement, SettlementAllocation
+from app.models.platform import AgentAction, AppealCheck, AuditLog
 from app.models.verification import Confirmation, ConfirmationRequest
 
 __all__ = [
+    "AgentAction",
+    "AppealCheck",
+    "AuditLog",
     "Case",
     "CaseDocument",
     "Confirmation",

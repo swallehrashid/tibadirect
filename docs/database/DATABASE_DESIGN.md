@@ -610,7 +610,7 @@ because the ledger service reads the next value first and the hash covers it. A 
 | payload | JSONB | NN | e.g. `{"donation_id":…, "amount_usd_minor":…}` |
 | rationale | TEXT | NN | The agent's explanation |
 | status | agent_action_status | NN, default `proposed` | |
-| decided_by_id | UUID | null, FK→users | Admin who approved/rejected |
+| decided_by_id | UUID | null, FK→users, CHECK | Admin who approved/rejected; required for every status except `proposed` |
 | decided_at | TIMESTAMPTZ | null | |
 | executed_at | TIMESTAMPTZ | null | |
 | result | JSONB | null | |
@@ -699,7 +699,8 @@ between 100 and 1,000,000; `donations.allocated_usd_minor + refunded_usd_minor <
 `confirmation_requests.purpose IN ('decision','second_approval')`; `fx_rates.rate > 0`;
 `users.preferred_language IN ('en','sw')`; a closed case must have `close_reason` and a frozen case must have
 `freeze_reason`; a resolved review item must have a resolution, resolver, time and a non-blank note; a confirmation
-needs an amount unless it is queried or rejected, and a confirmed one needs `finalized_at`.
+needs an amount unless it is queried or rejected, and a confirmed one needs `finalized_at`; an agent action
+beyond `proposed` must record the admin who decided it and when.
 
 **Foreign-key delete behaviour**: `case_documents` and `consents` cascade from `cases`; every other
 reference restricts deletion, because money and audit history must not disappear with a parent row.

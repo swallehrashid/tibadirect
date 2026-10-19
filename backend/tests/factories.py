@@ -11,6 +11,8 @@ from app.extensions import db
 from app.models.case import Case, CaseDocument, Consent, ReviewItem, TriageResult, hash_patient_ref
 from app.models.enums import (
     ActorType,
+    AgentActionType,
+    AppealInputKind,
     ConfirmationStatus,
     ConsentActor,
     ConsentScope,
@@ -35,6 +37,7 @@ from app.models.identity import LoginCode, User
 from app.models.integration import WebhookEvent
 from app.models.ledger import LedgerEntry
 from app.models.money import Donation, FxRate, Refund, Settlement
+from app.models.platform import AgentAction, AppealCheck, AuditLog
 from app.models.verification import Confirmation, ConfirmationRequest
 
 
@@ -252,3 +255,38 @@ class WebhookEventFactory(BaseFactory):
     event_type = "PAYMENT.CAPTURE.COMPLETED"
     payload = factory.LazyFunction(lambda: {"id": "WH-1", "resource": {"id": "CAP-1"}})
     signature_verified = True
+
+
+class AppealCheckFactory(BaseFactory):
+    class Meta:
+        model = AppealCheck
+
+    input_hmac = factory.Sequence(lambda n: f"{n:064x}")
+    input_kind = AppealInputKind.TEXT
+    risk_score = 80
+    risk_band = RiskBand.HIGH
+    reasons_en = factory.LazyFunction(lambda: ["It asks you to send money to a personal number."])
+    reasons_sw = factory.LazyFunction(lambda: ["Inakuomba utume pesa kwa nambari ya mtu binafsi."])
+    used_llm = False
+
+
+class AuditLogFactory(BaseFactory):
+    class Meta:
+        model = AuditLog
+
+    actor_type = ActorType.SYSTEM
+    action = "case.submitted"
+    target_type = "case"
+    target_id = factory.LazyFunction(uuid.uuid4)
+
+
+class AgentActionFactory(BaseFactory):
+    class Meta:
+        model = AgentAction
+
+    action_type = AgentActionType.REFUND
+    case = factory.SubFactory(CaseFactory)
+    payload = factory.LazyFunction(
+        lambda: {"donation_id": str(uuid.uuid4()), "amount_usd_minor": 500}
+    )
+    rationale = "The donation exceeds what the hospital needs."

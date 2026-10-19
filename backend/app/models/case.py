@@ -49,6 +49,7 @@ if TYPE_CHECKING:
     from app.models.identity import User
     from app.models.ledger import LedgerEntry
     from app.models.money import Donation, Settlement
+    from app.models.platform import AgentAction, AppealCheck
     from app.models.verification import Confirmation, ConfirmationRequest
 
 # Statuses in which a case page may be public (together with an active public_page consent).
@@ -169,6 +170,8 @@ class Case(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     ledger_entries: Mapped[list["LedgerEntry"]] = relationship(
         back_populates="case", order_by="LedgerEntry.seq"
     )
+    appeal_checks: Mapped[list["AppealCheck"]] = relationship(back_populates="matched_case")
+    agent_actions: Mapped[list["AgentAction"]] = relationship(back_populates="case")
 
     __mapper_args__ = {"version_id_col": version_id}
 

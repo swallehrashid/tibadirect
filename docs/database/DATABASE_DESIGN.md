@@ -560,7 +560,9 @@ CHECK: `allocated_usd_minor + refunded_usd_minor <= net_usd_minor`.
 | prev_hash | CHAR(64) | NN | Genesis = 64 zeros |
 | hash | CHAR(64) | NN, UQ | SHA-256 over the canonical entry payload, see [Ledger hash chain](#ledger-hash-chain) |
 
-Index `(case_id, seq)`. A trigger rejects `UPDATE`/`DELETE` (see [Migrations](#8-migrations)).
+Index `(case_id, seq)`. `prev_hash` is also unique, so two entries can never claim the same predecessor
+and the chain cannot fork. `seq` is an identity column that accepts an explicit value (`BY DEFAULT`),
+because the ledger service reads the next value first and the hash covers it. A trigger rejects `UPDATE`/`DELETE` (see [Migrations](#8-migrations)).
 
 ### webhook_events
 | Column | Type | Constraints | Notes |
@@ -674,7 +676,7 @@ stateDiagram-v2
 `donations.receipt_token`, `settlements.idempotency_key`, `(settlements.case_id, tranche_no)`,
 `refunds.paypal_refund_id`, `refunds.idempotency_key`, `webhook_events.paypal_event_id`,
 `confirmations.confirmation_request_id`, `confirmations.second_request_id`,
-`confirmations.paypal_invoice_id`, `ledger_entries.seq`, `ledger_entries.hash`.
+`confirmations.paypal_invoice_id`, `ledger_entries.seq`, `ledger_entries.hash`, `ledger_entries.prev_hash`.
 
 **Partial indexes**
 

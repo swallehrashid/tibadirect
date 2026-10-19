@@ -1,6 +1,8 @@
 """factory_boy factories. They flush into the test transaction's session and never commit."""
 
+import uuid
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 
 import factory
 from factory.alchemy import SQLAlchemyModelFactory
@@ -8,12 +10,17 @@ from factory.alchemy import SQLAlchemyModelFactory
 from app.extensions import db
 from app.models.case import Case, CaseDocument, Consent, ReviewItem, TriageResult, hash_patient_ref
 from app.models.enums import (
+    ActorType,
     ConfirmationStatus,
     ConsentActor,
     ConsentScope,
     DocumentKind,
+    LedgerAccount,
+    LedgerEntryType,
+    RefundReason,
     ReviewSource,
     RiskBand,
+    SettlementMethod,
     StaffRole,
     TriageRoute,
     UserRole,
@@ -25,6 +32,9 @@ from app.models.hospital import (
     normalize_facility_name,
 )
 from app.models.identity import LoginCode, User
+from app.models.integration import WebhookEvent
+from app.models.ledger import LedgerEntry
+from app.models.money import Donation, FxRate, Refund, Settlement
 from app.models.verification import Confirmation, ConfirmationRequest
 
 
@@ -172,3 +182,73 @@ class ConfirmationFactory(BaseFactory):
     amount_kes_minor = 8_500_000
     invoice_number = factory.Sequence(lambda n: f"INV-{n:05d}")
     finalized_at = factory.LazyFunction(lambda: datetime.now(UTC))
+
+
+class FxRateFactory(BaseFactory):
+    class Meta:
+        model = FxRate
+
+    base = "USD"
+    quote = "KES"
+    rate = Decimal("129.00000000")
+    source = "test"
+    fetched_at = factory.LazyFunction(lambda: datetime.now(UTC))
+
+
+class DonationFactory(BaseFactory):
+    class Meta:
+        model = Donation
+
+    case = factory.SubFactory(CaseFactory)
+    paypal_order_id = factory.Sequence(lambda n: f"ORDER-{n:06d}")
+    amount_usd_minor = 2500
+
+
+class SettlementFactory(BaseFactory):
+    class Meta:
+        model = Settlement
+
+    case = factory.SubFactory(CaseFactory)
+    confirmation = factory.LazyAttribute(lambda o: ConfirmationFactory(case=o.case))
+    tranche_no = 1
+    adapter = SettlementMethod.PAYPAL_PAYOUTS
+    amount_usd_minor = 20_000
+    amount_kes_minor = 2_580_000
+    fx_rate = factory.SubFactory(FxRateFactory)
+    idempotency_key = factory.Sequence(lambda n: f"settle-{n:06d}")
+
+
+class RefundFactory(BaseFactory):
+    class Meta:
+        model = Refund
+
+    donation = factory.SubFactory(DonationFactory, net_usd_minor=2500)
+    amount_usd_minor = 500
+    reason = RefundReason.EXCESS_POLICY
+    idempotency_key = factory.Sequence(lambda n: f"refund-{n:06d}")
+    requested_by = ActorType.SYSTEM
+
+
+class LedgerEntryFactory(BaseFactory):
+    class Meta:
+        model = LedgerEntry
+
+    case = factory.SubFactory(CaseFactory)
+    entry_type = LedgerEntryType.DONATION_CAPTURED
+    account = LedgerAccount.CASE_FUNDS
+    amount_minor = 2500
+    currency = "USD"
+    ref_type = "donation"
+    ref_id = factory.LazyFunction(uuid.uuid4)
+    prev_hash = factory.Sequence(lambda n: f"{n:064x}")
+    hash = factory.Sequence(lambda n: f"{n + 1_000_000:064x}")
+
+
+class WebhookEventFactory(BaseFactory):
+    class Meta:
+        model = WebhookEvent
+
+    paypal_event_id = factory.Sequence(lambda n: f"WH-{n:06d}")
+    event_type = "PAYMENT.CAPTURE.COMPLETED"
+    payload = factory.LazyFunction(lambda: {"id": "WH-1", "resource": {"id": "CAP-1"}})
+    signature_verified = True

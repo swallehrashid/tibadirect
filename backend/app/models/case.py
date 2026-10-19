@@ -47,6 +47,8 @@ from app.security import crypto
 if TYPE_CHECKING:
     from app.models.hospital import Hospital
     from app.models.identity import User
+    from app.models.ledger import LedgerEntry
+    from app.models.money import Donation, Settlement
     from app.models.verification import Confirmation, ConfirmationRequest
 
 # Statuses in which a case page may be public (together with an active public_page consent).
@@ -160,6 +162,13 @@ class Case(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     review_items: Mapped[list["ReviewItem"]] = relationship(back_populates="case")
     confirmation_requests: Mapped[list["ConfirmationRequest"]] = relationship(back_populates="case")
     confirmations: Mapped[list["Confirmation"]] = relationship(back_populates="case")
+    donations: Mapped[list["Donation"]] = relationship(back_populates="case")
+    settlements: Mapped[list["Settlement"]] = relationship(
+        back_populates="case", order_by="Settlement.tranche_no"
+    )
+    ledger_entries: Mapped[list["LedgerEntry"]] = relationship(
+        back_populates="case", order_by="LedgerEntry.seq"
+    )
 
     __mapper_args__ = {"version_id_col": version_id}
 

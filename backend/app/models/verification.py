@@ -29,6 +29,7 @@ from app.models.enums import (
 if TYPE_CHECKING:
     from app.models.case import Case, CaseDocument
     from app.models.hospital import HospitalStaff
+    from app.models.money import Settlement
 
 
 class ConfirmationRequest(db.Model, UUIDPrimaryKeyMixin, CreatedAtMixin):
@@ -140,6 +141,7 @@ class Confirmation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     second_approver: Mapped["HospitalStaff | None"] = relationship(
         back_populates="second_approvals", foreign_keys=[second_approver_staff_id]
     )
+    settlements: Mapped[list["Settlement"]] = relationship(back_populates="confirmation")
 
     def __repr__(self) -> str:
         return f"<Confirmation id={self.id} status={self.status}>"

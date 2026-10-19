@@ -47,6 +47,7 @@ from app.security import crypto
 if TYPE_CHECKING:
     from app.models.hospital import Hospital
     from app.models.identity import User
+    from app.models.verification import Confirmation, ConfirmationRequest
 
 # Statuses in which a case page may be public (together with an active public_page consent).
 PUBLIC_STATUSES = frozenset({CaseStatus.LIVE, CaseStatus.FUNDED, CaseStatus.CLOSED})
@@ -157,6 +158,8 @@ class Case(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     triage_results: Mapped[list["TriageResult"]] = relationship(back_populates="case")
     review_items: Mapped[list["ReviewItem"]] = relationship(back_populates="case")
+    confirmation_requests: Mapped[list["ConfirmationRequest"]] = relationship(back_populates="case")
+    confirmations: Mapped[list["Confirmation"]] = relationship(back_populates="case")
 
     __mapper_args__ = {"version_id_col": version_id}
 
@@ -222,6 +225,7 @@ class CaseDocument(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
 
     case: Mapped[Case] = relationship(back_populates="documents", foreign_keys=[case_id])
     triage_results: Mapped[list["TriageResult"]] = relationship(back_populates="document")
+    confirmations: Mapped[list["Confirmation"]] = relationship(back_populates="document")
 
     def __repr__(self) -> str:
         return f"<CaseDocument id={self.id} kind={self.kind}>"

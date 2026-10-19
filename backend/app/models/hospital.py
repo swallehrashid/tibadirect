@@ -15,6 +15,7 @@ from app.models.types import EncryptedBytes
 if TYPE_CHECKING:
     from app.models.case import Case
     from app.models.identity import User
+    from app.models.verification import Confirmation, ConfirmationRequest
 
 # 200,000 KES in KES cents: the default amount above which two staff members must approve.
 DEFAULT_TWO_PERSON_THRESHOLD_KES_MINOR = 20_000_000
@@ -110,6 +111,15 @@ class HospitalStaff(db.Model, UUIDPrimaryKeyMixin, CreatedAtMixin):
 
     user: Mapped["User"] = relationship(back_populates="staff_profile")
     hospital: Mapped[Hospital] = relationship(back_populates="staff")
+    confirmation_requests: Mapped[list["ConfirmationRequest"]] = relationship(
+        back_populates="requested_by"
+    )
+    confirmations: Mapped[list["Confirmation"]] = relationship(
+        back_populates="confirmed_by", foreign_keys="Confirmation.confirmed_by_staff_id"
+    )
+    second_approvals: Mapped[list["Confirmation"]] = relationship(
+        back_populates="second_approver", foreign_keys="Confirmation.second_approver_staff_id"
+    )
 
     def __repr__(self) -> str:
         return f"<HospitalStaff id={self.id} role={self.staff_role}>"

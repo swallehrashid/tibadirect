@@ -462,13 +462,13 @@ Partial unique index: `(case_id, scope) WHERE withdrawn_at IS NULL`.
 | second_approver_staff_id | UUID | null, FK→hospital_staff | CHECK ≠ confirmed_by_staff_id |
 | second_request_id | UUID | null, UQ, FK→confirmation_requests | |
 | status | confirmation_status | NN | |
-| amount_kes_minor | BIGINT | null, CHECK > 0 | Required unless status = `queried`/`rejected` |
+| amount_kes_minor | BIGINT | null, CHECK > 0, CHECK | Required unless status = `queried`/`rejected` |
 | invoice_number | VARCHAR(60) | null | |
 | is_final_bill | BOOLEAN | NN, default false | |
 | deposit_kes_minor | BIGINT | null, CHECK ≥ 0 | Optional admission deposit due first |
 | query_note | VARCHAR(500) | null | Reason for query/reject |
 | paypal_invoice_id | VARCHAR(40) | null, UQ | P1 invoicing |
-| finalized_at | TIMESTAMPTZ | null | When status became `confirmed` |
+| finalized_at | TIMESTAMPTZ | null, CHECK | When status became `confirmed`; required for `confirmed` |
 | updated_at | TIMESTAMPTZ | NN | |
 
 ### fx_rates
@@ -696,7 +696,8 @@ between 100 and 1,000,000; `donations.allocated_usd_minor + refunded_usd_minor <
 `risk_score BETWEEN 0 AND 100`; `case_documents.size_bytes BETWEEN 1 AND 10485760`;
 `confirmation_requests.purpose IN ('decision','second_approval')`; `fx_rates.rate > 0`;
 `users.preferred_language IN ('en','sw')`; a closed case must have `close_reason` and a frozen case must have
-`freeze_reason`; a resolved review item must have a resolution, resolver, time and a non-blank note.
+`freeze_reason`; a resolved review item must have a resolution, resolver, time and a non-blank note; a confirmation
+needs an amount unless it is queried or rejected, and a confirmed one needs `finalized_at`.
 
 **Foreign-key delete behaviour**: `case_documents` and `consents` cascade from `cases`; every other
 reference restricts deletion, because money and audit history must not disappear with a parent row.

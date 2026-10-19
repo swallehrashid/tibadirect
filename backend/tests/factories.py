@@ -8,6 +8,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 from app.extensions import db
 from app.models.case import Case, CaseDocument, Consent, ReviewItem, TriageResult, hash_patient_ref
 from app.models.enums import (
+    ConfirmationStatus,
     ConsentActor,
     ConsentScope,
     DocumentKind,
@@ -24,6 +25,7 @@ from app.models.hospital import (
     normalize_facility_name,
 )
 from app.models.identity import LoginCode, User
+from app.models.verification import Confirmation, ConfirmationRequest
 
 
 class BaseFactory(SQLAlchemyModelFactory):
@@ -142,3 +144,31 @@ class ReviewItemFactory(BaseFactory):
     case = factory.SubFactory(CaseFactory)
     source = ReviewSource.AI_FLAG
     reason = "Duplicate invoice flagged"
+
+
+class ConfirmationRequestFactory(BaseFactory):
+    class Meta:
+        model = ConfirmationRequest
+
+    case = factory.SubFactory(CaseFactory)
+    hospital_id = factory.LazyAttribute(lambda o: o.case.hospital_id)
+    requested_by = factory.LazyAttribute(lambda o: HospitalStaffFactory(hospital=o.case.hospital))
+    purpose = "decision"
+    destination_masked = "bil***@hospital.test"
+    otp_hmac = factory.Sequence(lambda n: f"{n:064x}")
+    expires_at = factory.LazyFunction(lambda: datetime.now(UTC) + timedelta(minutes=10))
+
+
+class ConfirmationFactory(BaseFactory):
+    class Meta:
+        model = Confirmation
+
+    case = factory.SubFactory(CaseFactory)
+    hospital_id = factory.LazyAttribute(lambda o: o.case.hospital_id)
+    document = factory.LazyAttribute(lambda o: CaseDocumentFactory(case=o.case))
+    confirmation_request = factory.LazyAttribute(lambda o: ConfirmationRequestFactory(case=o.case))
+    confirmed_by = factory.LazyAttribute(lambda o: o.confirmation_request.requested_by)
+    status = ConfirmationStatus.CONFIRMED
+    amount_kes_minor = 8_500_000
+    invoice_number = factory.Sequence(lambda n: f"INV-{n:05d}")
+    finalized_at = factory.LazyFunction(lambda: datetime.now(UTC))

@@ -10,3 +10,6 @@ One line per decision: `YYYY-MM-DD · feature · decision — reason`.
 2026-10-19 · P1-F01 · Empty directories from the layout in section 4.3 are kept with `.gitkeep`; deeper `backend/` and `frontend/` folders are created by the features that own them.
 2026-10-19 · P1-F01 · The requirements document (.docx) is added to the local `.git/info/exclude` alongside the build spec so it is never staged — it is working material, not part of the repository.
 2026-10-19 · P1-F01 · Backend uses a Python 3.12 virtual environment at `backend/.venv` — the spec pins 3.12 and the host default is newer.
+2026-10-19 · P1-F02 · The schema has 22 tables, not 21 — the spec's own table groups list 22 (2 + 3 + 5 + 2 + 6 + 1 + 3); the enumerated tables are authoritative, so the F10 check expects 22 tables plus `alembic_version`.
+2026-10-19 · P1-F02 · `cases.photo_document_id` and `case_documents.case_id` reference each other, so the foreign key from `cases` is created with `use_alter` after both tables exist — avoids a circular create and drop order in the migration.
+2026-10-19 · P1-F02 · Foreign keys restrict deletion except `case_documents` and `consents`, which cascade from `cases` — money and audit history must not vanish with a parent row.

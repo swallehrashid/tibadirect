@@ -15,7 +15,7 @@ api = TibaApi()
 
 def init_extensions(app: Flask) -> None:
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, compare_type=True)
     api.init_app(app)
 
 

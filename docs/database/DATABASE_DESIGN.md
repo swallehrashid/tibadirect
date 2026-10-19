@@ -713,6 +713,9 @@ The one exception is `cases.photo_document_id`, which is set to null if its docu
   indexes and CHECK constraints listed above, and the ledger trigger.
 - Every later schema change is a new, reviewed migration with a descriptive message.
 - CI runs upgrade, downgrade, upgrade on an empty database.
+- The initial revision is `backend/migrations/versions/0001_initial_schema.py`. It writes the enum values out
+  literally, so it never changes when a Python enum does; tests compare the database's enum labels with the
+  Python enums, and compare the migrated schema with the models so a model change without a migration fails.
 
 ### Ledger append-only trigger
 

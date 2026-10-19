@@ -1,7 +1,9 @@
 """Shared fixtures: the app, a Postgres test database and per-test rolled-back transactions."""
 
 from collections.abc import Iterator
+from pathlib import Path
 
+import flask_migrate
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
@@ -12,6 +14,8 @@ from app import create_app
 from app.extensions import db
 from tests import support
 
+MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
+
 
 @pytest.fixture(scope="session")
 def app() -> Flask:
@@ -20,18 +24,25 @@ def app() -> Flask:
     return application
 
 
+def reset_schema() -> None:
+    """Empty the test database. Refuses to touch anything not named *_test."""
+    name = db.session.execute(text("SELECT current_database()")).scalar_one()
+    assert name.endswith("_test"), f"refusing to reset {name}"
+    db.session.execute(text("DROP SCHEMA public CASCADE"))
+    db.session.execute(text("CREATE SCHEMA public"))
+    db.session.commit()
+
+
 @pytest.fixture(scope="session", autouse=True)
 def _schema(app: Flask) -> Iterator[None]:
-    """Build the schema once per run. F10 replaces create_all with the Alembic migration."""
+    """Build the schema once per run by applying the real Alembic migrations."""
     with app.app_context():
-        db.session.execute(text("CREATE EXTENSION IF NOT EXISTS citext"))
-        db.session.commit()
-        db.drop_all()
-        db.create_all()
+        reset_schema()
+        flask_migrate.upgrade(directory=str(MIGRATIONS_DIR))
     yield
     with app.app_context():
         db.session.remove()
-        db.drop_all()
+        reset_schema()
 
 
 @pytest.fixture

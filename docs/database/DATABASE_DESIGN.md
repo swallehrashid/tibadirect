@@ -345,10 +345,10 @@ Static extract of the public facility register (synthetic, fictional names for t
 | region | VARCHAR(40) | NN | County |
 | story | VARCHAR(600) | null | Validated: must not contain medical lexicon terms |
 | patient_ref_enc | BYTEA | NN | Encrypted hospital patient/admission reference |
-| patient_ref_hmac | CHAR(64) | NN, IX | Detects the same patient in two active cases |
+| patient_ref_hmac | CHAR(64) | NN, partial IX | Detects the same patient in two active cases (see the partial index below) |
 | is_minor | BOOLEAN | NN, default false | Forces guardian consent, hides photo by default |
 | show_photo | BOOLEAN | NN, default false | |
-| photo_document_id | UUID | null, FK→case_documents | P1 |
+| photo_document_id | UUID | null, FK→case_documents ON DELETE SET NULL | P1. Created after both tables exist (`use_alter`) |
 | status | case_status | NN, IX, default `draft` | See [State machines](#5-state-machines) |
 | trust_level | trust_level | NN, default `unverified` | |
 | target_kes_minor | BIGINT | null, CHECK ≥ 0 | Set from latest confirmed bill |
@@ -362,10 +362,10 @@ Static extract of the public facility register (synthetic, fictional names for t
 | refunded_usd_minor | BIGINT | NN, default 0, CHECK ≥ 0 | Cached |
 | donor_count | INTEGER | NN, default 0 | Cached |
 | submitted_at, live_at, funded_at, closed_at, frozen_at | TIMESTAMPTZ | null | Lifecycle stamps |
-| close_reason | close_reason | null | Required when status = closed |
-| freeze_reason | VARCHAR(300) | null | Required when status = frozen |
+| close_reason | close_reason | null, CHECK | Required when status = closed |
+| freeze_reason | VARCHAR(300) | null, CHECK | Required when status = frozen |
 | follow_up_until | TIMESTAMPTZ | null | Follow-up-care hold window |
-| version_id | INTEGER | NN | SQLAlchemy optimistic locking (`__mapper_args__ = {"version_id_col": ...}`) |
+| version_id | INTEGER | NN, default 1 | SQLAlchemy optimistic locking (`__mapper_args__ = {"version_id_col": ...}`) |
 | updated_at | TIMESTAMPTZ | NN | |
 
 Cached money columns are updated only inside service functions in the same transaction as the source rows; `case_service.recompute_totals(case)` recomputes from source tables and a test asserts they match.
@@ -431,7 +431,7 @@ Partial unique index: `(case_id, scope) WHERE withdrawn_at IS NULL`.
 | payload | JSONB | NN, default `{}` | Signal codes, links |
 | assigned_to_id | UUID | null, FK→users | |
 | resolution | review_resolution | null | |
-| resolution_note | VARCHAR(500) | null | Required when resolving (human reason, s.35) |
+| resolution_note | VARCHAR(500) | null, CHECK | Required and non-blank when resolving (human reason, s.35) |
 | resolved_by_id | UUID | null, FK→users | |
 | resolved_at | TIMESTAMPTZ | null | |
 | updated_at | TIMESTAMPTZ | NN | |
@@ -694,10 +694,13 @@ plus single-column indexes on every foreign key used in joins, `case_documents.s
 between 100 and 1,000,000; `donations.allocated_usd_minor + refunded_usd_minor <= net_usd_minor`;
 `confirmations.second_approver_staff_id <> confirmed_by_staff_id`; `login_codes.attempts BETWEEN 0 AND 10`;
 `risk_score BETWEEN 0 AND 100`; `case_documents.size_bytes BETWEEN 1 AND 10485760`;
-`confirmation_requests.purpose IN ('decision','second_approval')`; `fx_rates.rate > 0`.
+`confirmation_requests.purpose IN ('decision','second_approval')`; `fx_rates.rate > 0`;
+`users.preferred_language IN ('en','sw')`; a closed case must have `close_reason` and a frozen case must have
+`freeze_reason`; a resolved review item must have a resolution, resolver, time and a non-blank note.
 
 **Foreign-key delete behaviour**: `case_documents` and `consents` cascade from `cases`; every other
 reference restricts deletion, because money and audit history must not disappear with a parent row.
+The one exception is `cases.photo_document_id`, which is set to null if its document row is removed.
 
 ## 8. Migrations
 

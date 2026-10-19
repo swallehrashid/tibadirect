@@ -13,6 +13,7 @@ from app.models.enums import SettlementMethod, StaffRole, pg_enum
 from app.models.types import EncryptedBytes
 
 if TYPE_CHECKING:
+    from app.models.case import Case
     from app.models.identity import User
 
 # 200,000 KES in KES cents: the default amount above which two staff members must approve.
@@ -82,6 +83,7 @@ class Hospital(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
 
     register_entry: Mapped[FacilityRegisterEntry] = relationship(back_populates="hospital")
     staff: Mapped[list["HospitalStaff"]] = relationship(back_populates="hospital")
+    cases: Mapped[list["Case"]] = relationship(back_populates="hospital")
 
     @property
     def official_email(self) -> str:

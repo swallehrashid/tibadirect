@@ -12,6 +12,7 @@ from app.models.base import CreatedAtMixin, TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.enums import UserRole, pg_enum
 
 if TYPE_CHECKING:
+    from app.models.case import Case
     from app.models.hospital import HospitalStaff
 
 
@@ -34,6 +35,7 @@ class User(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     staff_profile: Mapped["HospitalStaff | None"] = relationship(
         back_populates="user", uselist=False
     )
+    cases: Mapped[list["Case"]] = relationship(back_populates="created_by")
 
     def __repr__(self) -> str:
         return f"<User id={self.id} role={self.role}>"

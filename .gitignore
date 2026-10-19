@@ -1,0 +1,35 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+backend/app/ai/models/*.joblib
+
+# Node
+node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
+
+# Generated data (large, reproducible from the generator)
+data/synthetic/generated/
+
+# Local tooling and editors
+.local/
+.idea/
+.vscode/
+*.swp
+.DS_Store

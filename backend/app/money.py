@@ -4,7 +4,7 @@ USD and KES both have two decimal places, so one minor unit is 1/100 of the majo
 Conversions use ``Decimal`` and ``ROUND_HALF_UP`` unless a caller asks for another mode.
 """
 
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+from decimal import ROUND_CEILING, ROUND_HALF_UP, Decimal, InvalidOperation
 from typing import Final
 
 MINOR_PER_MAJOR: Final = 100
@@ -80,3 +80,12 @@ def kes_minor_to_usd_minor(
     """Convert KES cents to US cents at ``rate`` (KES per 1 USD)."""
     converted = Decimal(kes_minor) / _positive_rate(rate)
     return int(converted.to_integral_value(rounding=rounding))
+
+
+def usd_goal_minor(target_kes_minor: int, buffer_bps: int, rate: Decimal | int | str) -> int:
+    """USD cents to ask for so the KES target is covered after the FX and fee buffer.
+
+    ``ceil(target x (1 + buffer_bps / 10000) / rate)``, rounded up so the goal never falls short.
+    """
+    padded = Decimal(target_kes_minor) * (BPS_DENOMINATOR + buffer_bps) / BPS_DENOMINATOR
+    return int((padded / _positive_rate(rate)).to_integral_value(rounding=ROUND_CEILING))

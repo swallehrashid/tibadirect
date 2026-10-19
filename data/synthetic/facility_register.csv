@@ -1,0 +1,26 @@
+register_code,name,aliases,county,facility_level,ownership,official_email,official_phone,source
+FR-EMB-2424,Mawingu Hills Hospital,Mawingu Hills|MWH,Embu,Level 4,private,billing@mawinguhills.test,+254 68 555 2424,synthetic-register-v1
+FR-GRS-2020,Chui Rocks Medical Centre,Chui Rocks|CRMC,Garissa,Level 3,public,admin@chuirocks.test,+254 46 555 2020,synthetic-register-v1
+FR-HMB-1616,Upendo Lakeside Hospital,Upendo Lakeside|ULH,Homa Bay,Level 4,faith-based,accounts@upendolakeside.test,+254 59 555 1616,synthetic-register-v1
+FR-KBU-0606,Kijani Valley Hospital,Kijani Valley|KVH,Kiambu,Level 4,private,billing@kijanivalley.test,+254 20 555 0606,synthetic-register-v1
+FR-KCH-1919,Mbega Forest Hospital,Mbega Forest|MFH,Kericho,Level 4,private,billing@mbegaforest.test,+254 52 555 1919,synthetic-register-v1
+FR-KJD-1212,Simba Plains Hospital,Simba Plains|SPH,Kajiado,Level 4,private,billing@simbaplains.test,+254 45 555 1212,synthetic-register-v1
+FR-KKG-1010,Nuru Valley Mission Hospital,Nuru Valley|NVMH,Kakamega,Level 4,faith-based,accounts@nuruvalley.test,+254 56 555 1010,synthetic-register-v1
+FR-KLF-0909,Pwani Mwangaza Hospital,Pwani Mwangaza|PMH,Kilifi,Level 4,private,billing@pwanimwangaza.test,+254 41 555 0909,synthetic-register-v1
+FR-KSI-1717,Taifa Heights Referral Hospital,Taifa Heights|THRH,Kisii,Level 5,public,revenue@taifaheights.test,+254 58 555 1717,synthetic-register-v1
+FR-KSM-0303,Ziwa Bluu General Hospital,Ziwa Bluu|ZBGH,Kisumu,Level 4,faith-based,billing@ziwabluu-hospital.test,+254 57 555 0303,synthetic-register-v1
+FR-KTU-2222,Pendo Savannah Hospital,Pendo Savannah|PSH,Kitui,Level 4,private,billing@pendosavannah.test,+254 44 555 2222,synthetic-register-v1
+FR-LKP-1515,Ndovu Springs Hospital,Ndovu Springs|NSH,Laikipia,Level 4,private,billing@ndovusprings.test,+254 62 555 1515,synthetic-register-v1
+FR-LMU-1313,Bahari Breeze Medical Centre,Bahari Breeze|BBMC,Lamu,Level 3,private,admin@baharibreeze.test,+254 42 555 1313,synthetic-register-v1
+FR-MCK-0808,Baobab Grove Medical Centre,Baobab Grove|BGMC,Machakos,Level 4,private,billing@baobabgrove.test,+254 44 555 0808,synthetic-register-v1
+FR-MRU-1414,Mwanga Hills Hospital,Mwanga Hills|MHH,Meru,Level 4,faith-based,billing@mwangahills.test,+254 64 555 1414,synthetic-register-v1
+FR-MSA-0202,Mto Mwema Hospital,Mto Mwema|MMH,Mombasa,Level 5,private,billing@mtomwema-hospital.test,+254 41 555 0202,synthetic-register-v1
+FR-NBI-0101,Kilele Mission Hospital,Kilele Mission|KMH,Nairobi,Level 5,faith-based,billing@kilele-hospital.test,+254 20 555 0101,synthetic-register-v1
+FR-NBI-1818,Zawadi Gardens Hospital,Zawadi Gardens|ZGH,Nairobi,Level 4,private,billing@zawadigardens.test,+254 20 555 1818,synthetic-register-v1
+FR-NKR-0505,Rift Heights Nursing Home,Rift Heights|RHNH,Nakuru,Level 3,private,admin@riftheights.test,+254 51 555 0505,synthetic-register-v1
+FR-NKR-2323,Safari Gate Nursing Home,Safari Gate|SGNH,Nakuru,Level 3,private,admin@safarigate.test,+254 51 555 2323,synthetic-register-v1
+FR-NRK-1111,Tembo Ridge Hospital,Tembo Ridge|TRH,Narok,Level 4,private,billing@temboridge.test,+254 50 555 1111,synthetic-register-v1
+FR-NYR-0707,Mlima Kuu Referral Hospital,Mlima Kuu|MKRH,Nyeri,Level 5,public,revenue@mlimakuu.test,+254 61 555 0707,synthetic-register-v1
+FR-SYA-2525,Nyota Bay Hospital,Nyota Bay|NBH,Siaya,Level 4,public,revenue@nyotabay.test,+254 57 555 2525,synthetic-register-v1
+FR-TTV-2121,Tai Valley Mission Hospital,Tai Valley|TVMH,Taita Taveta,Level 4,faith-based,billing@taivalley.test,+254 43 555 2121,synthetic-register-v1
+FR-UGN-0404,Highland Reed Hospital,Highland Reed|HRH,Uasin Gishu,Level 5,private,billing@highlandreed.test,+254 53 555 0404,synthetic-register-v1

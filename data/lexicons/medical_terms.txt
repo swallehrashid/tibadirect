@@ -1,0 +1,424 @@
+# Medical terms that must never leave the server unredacted (diagnoses, procedures, tests, drugs).
+# One term per line, matched case-insensitively as whole words or phrases. Lines starting with '#'
+# are comments. English plus common Swahili. Used by the redaction step (docs: SYSTEM_DESIGN.md) and by
+# the story validator that refuses medical words on public case pages.
+# Every medical string the synthetic invoices print must appear here; a test enforces it.
+# --- diagnoses and conditions (159)
+abscess
+acute appendicitis
+aids
+anaemia
+aneurysm
+appendiceal abscess
+appendicitis
+arrhythmia
+asthma
+bowel obstruction
+brain tumour
+breast cancer
+bronchiolitis
+brucellosis
+burns
+cancer
+cardiomyopathy
+cataract
+cellulitis
+cervical cancer
+chickenpox
+cholecystitis
+cholera
+cirrhosis
+cleft palate
+clubfoot
+colon cancer
+concussion
+copd
+croup
+cushing syndrome
+deep vein thrombosis
+dehydration
+diabetes
+diabetes mellitus
+diabetic ketoacidosis
+dislocation
+dysentery
+eclampsia
+ectopic pregnancy
+encephalitis
+endometriosis
+epilepsy
+femur fracture
+fibroids
+figo kushindwa kufanya kazi
+fracture
+fracture of the femur
+gallstones
+gangrene
+gastroenteritis
+glaucoma
+haemorrhoids
+head injury
+head trauma
+heart attack
+heart failure
+hepatitis b
+hepatitis c
+hernia
+hiv
+homa ya manjano
+homa ya matumbo
+homa ya uti wa mgongo
+hydrocephalus
+hyperglycaemia
+hypertension
+hypertensive crisis
+hyperthyroidism
+hypoglycaemia
+inguinal hernia
+jaundice
+kansa
+kidney failure
+kidney infection
+kidney stones
+kifafa
+kifua kikuu
+kiharusi
+kipindupindu
+kisukari
+kuungua moto
+kuvunjika mfupa
+kwashiorkor
+leishmaniasis
+leukaemia
+ligament tear
+lymphoma
+malaria
+malnutrition
+marasmus
+mawe ya figo
+measles
+meningitis
+miscarriage
+myocardial infarction
+neonatal jaundice
+neonatal sepsis
+nimonia
+normal delivery
+obstructed labour
+oesophageal cancer
+organophosphate poisoning
+osteomyelitis
+otitis media
+ovarian cyst
+pancreatitis
+peptic ulcer
+peritonitis
+pneumonia
+poisoning
+postpartum haemorrhage
+pre-eclampsia
+preterm birth
+prostate cancer
+prostatitis
+pulmonary embolism
+pulmonary tuberculosis
+pumu
+pyelonephritis
+rabies
+renal failure
+rheumatic heart disease
+road traffic injury
+road traffic injury with head trauma
+saratani
+schistosomiasis
+seizure
+sepsis
+septic shock
+severe malaria
+severe pneumonia
+shinikizo la damu
+shinikizo la juu la damu
+sickle cell disease
+sinusitis
+snake bite
+spina bifida
+spinal injury
+spontaneous vaginal delivery
+stroke
+tetanus
+thyroid goitre
+tibia fracture
+tonsillitis
+trachoma
+tuberculosis
+typhoid
+typhoid fever
+uchungu pingamizi
+ugonjwa wa kisukari
+ugonjwa wa moyo
+ukimwi
+upungufu wa damu
+ureteric calculus
+urinary tract infection
+utapiamlo
+virusi vya ukimwi
+whooping cough
+# --- procedures, tests and investigations (115)
+abdominal ultrasound
+adenoidectomy
+amputation
+angiography
+angioplasty
+appendectomy
+appendicectomy
+arterial blood gas
+biopsy
+blood culture
+blood grouping
+blood transfusion
+bone marrow biopsy
+bronchoscopy
+bypass surgery
+c-reactive protein
+c-section
+caesarean section
+cardiac catheterisation
+casting
+cataract surgery
+cd4 count
+cesarean section
+chemotherapy
+chest drain
+chest x-ray
+cholecystectomy
+circumcision
+clinical notes
+colonoscopy
+corneal transplant
+craniotomy
+crossmatch
+ct scan
+cystoscopy
+debridement
+decompressive craniotomy
+dialysis
+dilatation and curettage
+ecg
+echocardiogram
+eeg
+electrocardiogram
+endoscopy
+episiotomy
+evacuation of retained products
+exchange transfusion
+external fixation
+full haemogram
+gastroscopy
+haemodialysis
+hernia repair
+herniorrhaphy
+hip replacement
+hiv test
+hysterectomy
+insulin infusion
+intravenous antibiotic therapy
+intravenous antimalarial therapy
+intravenous fluids
+intubation
+joint replacement
+kangaroo mother care
+kidney transplant
+knee replacement
+kujifungua
+kuongezewa damu
+kusafisha figo
+laparoscopy
+laparotomy
+lithotripsy
+liver function tests
+lumbar puncture
+malaria parasite test
+mammogram
+mastectomy
+mechanical ventilation
+mri
+mri scan
+myomectomy
+nephrectomy
+obstetric ultrasound
+open reduction and internal fixation
+orif
+oxygen therapy
+pacemaker insertion
+pap smear
+paracentesis
+peritoneal dialysis
+phototherapy
+plaster of paris
+pregnancy test
+prostatectomy
+radiotherapy
+random blood glucose
+resuscitation
+skin graft
+spinal fusion
+stent insertion
+suturing
+thoracentesis
+thyroidectomy
+tonsillectomy
+tracheostomy
+ultrasound
+upasuaji
+urea, electrolytes and creatinine
+ureteroscopic lithotripsy
+ureteroscopy
+valve replacement
+viral load
+vitrectomy
+ward round
+wound toilet
+x-ray
+# --- drugs and treatments (142)
+acyclovir
+adrenaline
+albumin
+amiodarone
+amitriptyline
+amlodipine
+amoxicillin
+amoxicillin-clavulanate
+amphotericin
+ampicillin
+anti-snake venom
+artemether
+artesunate
+aspirin
+atenolol
+atorvastatin
+atropine
+azithromycin
+bcg vaccine
+bendroflumethiazide
+benzylpenicillin
+bisacodyl
+bupivacaine
+carbamazepine
+carbimazole
+cefotaxime
+ceftriaxone
+cefuroxime
+chloramphenicol
+chlorhexidine
+chlorpromazine
+ciprofloxacin
+cisplatin
+clindamycin
+clopidogrel
+cloxacillin
+co-trimoxazole
+cotrimoxazole
+cyclophosphamide
+dawa ya malaria
+dexamethasone
+diazepam
+diclofenac
+digoxin
+dobutamine
+dolutegravir
+dopamine
+doxorubicin
+doxycycline
+efavirenz
+enalapril
+enoxaparin
+erythromycin
+erythropoietin
+ethambutol
+fentanyl
+ferrous sulphate
+flucloxacillin
+fluconazole
+fluoxetine
+folic acid
+furosemide
+gentamicin
+glibenclamide
+gliclazide
+haloperidol
+halothane
+heparin
+hydrochlorothiazide
+hydrocortisone
+hydroxycarbamide
+hydroxyurea
+ibuprofen
+imipenem
+insulin
+iron sucrose
+isoniazid
+ketamine
+lactulose
+lamivudine
+levofloxacin
+levothyroxine
+lignocaine
+loperamide
+losartan
+lumefantrine
+magnesium sulphate
+mannitol
+meropenem
+metformin
+methotrexate
+methyldopa
+metoclopramide
+metronidazole
+midazolam
+morphine
+naloxone
+neostigmine
+nevirapine
+nifedipine
+nitrofurantoin
+noradrenaline
+omeprazole
+ondansetron
+oral rehydration salts
+oxytocin
+paclitaxel
+pantoprazole
+paracetamol
+penicillin
+pethidine
+phenobarbital
+phenytoin
+polio vaccine
+povidone iodine
+prednisolone
+propofol
+pyrazinamide
+quinine
+rabies vaccine
+ranitidine
+rifampicin
+risperidone
+rocuronium
+salbutamol
+sevoflurane
+simvastatin
+sindano ya insulini
+sodium valproate
+soluble insulin
+spironolactone
+suxamethonium
+tamoxifen
+tenofovir
+tetanus toxoid
+tramadol
+vancomycin
+vincristine
+vitamin k
+warfarin
+zidovudine
+zinc sulphate

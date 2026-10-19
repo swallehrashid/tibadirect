@@ -7,7 +7,8 @@ import flask_migrate
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import scoped_session
 
 from app import create_app
@@ -72,3 +73,40 @@ def db_session(app: Flask) -> Iterator[scoped_session]:
 @pytest.fixture
 def client(app: Flask, db_session: scoped_session) -> FlaskClient:
     return app.test_client()
+
+
+SCRATCH_DB = "tibadirect_scratch_test"
+
+
+@pytest.fixture
+def scratch_app(app: Flask, monkeypatch: pytest.MonkeyPatch) -> Iterator[Flask]:
+    """An app bound to a brand-new empty database that is dropped afterwards.
+
+    For tests that commit for real (CLI commands) or that run migrations up and down, so the
+    shared test database is never touched.
+    """
+    base_url = make_url(app.config["SQLALCHEMY_DATABASE_URI"])
+    scratch_url = base_url.set(database=SCRATCH_DB).render_as_string(hide_password=False)
+    admin = create_engine(base_url.set(database="postgres"), isolation_level="AUTOCOMMIT")
+    with admin.connect() as connection:
+        connection.execute(text(f'DROP DATABASE IF EXISTS "{SCRATCH_DB}" WITH (FORCE)'))
+        connection.execute(text(f'CREATE DATABASE "{SCRATCH_DB}"'))
+
+    monkeypatch.setenv("TEST_DATABASE_URL", scratch_url)
+    application = create_app("test")
+    try:
+        yield application
+    finally:
+        with application.app_context():
+            db.session.remove()
+            db.engine.dispose()
+        with admin.connect() as connection:
+            connection.execute(text(f'DROP DATABASE IF EXISTS "{SCRATCH_DB}" WITH (FORCE)'))
+        admin.dispose()
+
+
+@pytest.fixture
+def migrated_scratch_app(scratch_app: Flask) -> Flask:
+    with scratch_app.app_context():
+        flask_migrate.upgrade(directory=str(MIGRATIONS_DIR))
+    return scratch_app

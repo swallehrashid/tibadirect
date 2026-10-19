@@ -1,0 +1,110 @@
+# Phrases used by the appeal checker's rule features (docs: SYSTEM_DESIGN.md, appeal checker).
+# Format: category: phrase. Matched case-insensitively. Lines starting with '#' are comments.
+# Categories: urgency, personal_payee, send_to_number, advance_fee, secrecy, verification_refusal,
+# impersonation, pressure_to_share, vague_story.
+# English, Swahili and Sheng-style code-switching. Swahili and Sheng entries need native review.
+
+urgency: please help urgently
+urgency: very urgent
+urgency: before 5pm
+urgency: today only
+urgency: must be settled today
+urgency: patient will be discharged
+urgency: patient will be sent home
+urgency: running out of time
+urgency: last chance
+urgency: hurry
+urgency: immediately
+urgency: haraka sana
+urgency: urgent!!
+urgency: tuma pesa sasa
+urgency: hakuna time ya kuuliza
+urgency: no time to ask questions
+urgency: leo tu
+urgency: kabla ya saa kumi na moja
+urgency: tafadhali haraka
+urgency: ni dharura
+urgency: wasee haraka
+
+personal_payee: send to my personal number
+personal_payee: payments from many people
+personal_payee: haikubali payments
+personal_payee: so my cousin
+personal_payee: so my brother is receiving
+personal_payee: please send to my
+personal_payee: send to my m-pesa
+personal_payee: my cousin is paying on our behalf
+personal_payee: send to our agent
+personal_payee: send to the agent
+personal_payee: pay to my till
+personal_payee: use my number
+personal_payee: tuma kwa namba yangu
+personal_payee: tuma kwa binamu yangu
+personal_payee: tuma kwa wakala wetu
+personal_payee: tuma kwa mpesa yangu
+personal_payee: lipa kwa namba hii
+
+send_to_number: send any amount to
+send_to_number: send to m-pesa
+send_to_number: m-pesa number
+send_to_number: send money to this number
+send_to_number: kindly send to
+send_to_number: tuma mchango kwa
+send_to_number: tuma pesa kwa
+send_to_number: tuma chochote kwa
+send_to_number: tuma kwa
+send_to_number: paybill
+send_to_number: till number
+
+advance_fee: processing fee
+advance_fee: release the funds
+advance_fee: send a fee to receive
+advance_fee: registration fee to claim
+advance_fee: ada ya usindikaji
+advance_fee: ili kutoa pesa
+advance_fee: donor has approved
+
+secrecy: do not tell anyone
+secrecy: keep this private
+secrecy: just trust me
+secrecy: do not call the hospital
+secrecy: cannot say more here
+secrecy: siwezi explain hapa
+secrecy: usipige simu hospitali
+secrecy: niaminini tu
+
+verification_refusal: calling the hospital will only delay
+verification_refusal: do not call the main line
+verification_refusal: the line is overloaded
+verification_refusal: hospital accounts system is offline
+verification_refusal: accounts system is offline
+verification_refusal: system is offline this week
+verification_refusal: told not to share hospital details
+verification_refusal: kupiga simu hospitali kutachelewesha
+verification_refusal: usipige simu ya hospitali
+verification_refusal: mfumo wa malipo haufanyi kazi
+
+impersonation: billing office:
+impersonation: send payment to our agent
+impersonation: send it to our agent
+impersonation: hospital accounts:
+impersonation: official account
+impersonation: hospital management
+
+pressure_to_share: share with 10 groups
+pressure_to_share: forward to everyone
+pressure_to_share: share to 10 groups
+pressure_to_share: sambaza kwa makundi
+pressure_to_share: tuma kwa watu wengi
+
+vague_story: my family is in a very bad situation
+vague_story: the hospital needs a lot of money
+vague_story: very sick in hospital
+vague_story: single mother
+vague_story: knocked down by a motorbike
+vague_story: needs an operation
+vague_story: nimekwama sana
+vague_story: god bless you
+vague_story: even kes 100 will help
+vague_story: mungu awabariki
+vague_story: nimekwama sana

@@ -3,55 +3,19 @@
 These tests build their own throwaway database so the shared test database is never downgraded.
 """
 
-import os
-from collections.abc import Iterator
 from pathlib import Path
 
 import flask_migrate
-import pytest
 from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from flask import Flask
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import make_url
+from sqlalchemy import text
 
-from app import create_app
 from app.extensions import db
 from app.models.enums import ALL_ENUMS
 
 MIGRATIONS_DIR = str(Path(__file__).resolve().parents[1] / "migrations")
-SCRATCH_DB = "tibadirect_migrations_test"
 EXPECTED_TABLES = 22
-
-
-def _admin_engine(test_url: str):
-    admin_url = make_url(test_url).set(database="postgres")
-    return create_engine(admin_url, isolation_level="AUTOCOMMIT")
-
-
-@pytest.fixture
-def scratch_app(monkeypatch: pytest.MonkeyPatch) -> Iterator[Flask]:
-    base_url = make_url(
-        os.environ.get("TEST_DATABASE_URL")
-        or "postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect_test"
-    )
-    scratch_url = base_url.set(database=SCRATCH_DB).render_as_string(hide_password=False)
-    admin = _admin_engine(base_url.render_as_string(hide_password=False))
-    with admin.connect() as connection:
-        connection.execute(text(f'DROP DATABASE IF EXISTS "{SCRATCH_DB}" WITH (FORCE)'))
-        connection.execute(text(f'CREATE DATABASE "{SCRATCH_DB}"'))
-
-    monkeypatch.setenv("TEST_DATABASE_URL", scratch_url)
-    application = create_app("test")
-    try:
-        yield application
-    finally:
-        with application.app_context():
-            db.session.remove()
-            db.engine.dispose()
-        with admin.connect() as connection:
-            connection.execute(text(f'DROP DATABASE IF EXISTS "{SCRATCH_DB}" WITH (FORCE)'))
-        admin.dispose()
 
 
 def _tables(application: Flask) -> set[str]:

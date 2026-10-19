@@ -6,6 +6,7 @@ from dotenv import find_dotenv, load_dotenv
 from flask import Flask
 
 from app import extensions
+from app.cli import register_cli
 from app.config import get_config
 from app.errors import register_error_handlers
 from app.logging import configure_logging
@@ -31,6 +32,7 @@ def create_app(config_name: str | None = None) -> Flask:
 
     init_request_id(app)
     register_error_handlers(app)
+    register_cli(app)
     _register_blueprints()
     return app
 

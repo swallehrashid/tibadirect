@@ -90,3 +90,23 @@ def test_conversion_never_uses_floats() -> None:
     # 0.1 + 0.2 style drift cannot occur: 3 x $0.10 at rate 1.1 stays exact.
     total = sum(money.usd_minor_to_kes_minor(10, Decimal("1.1")) for _ in range(3))
     assert total == 33
+
+
+def test_usd_goal_covers_the_target_plus_the_buffer_rounded_up() -> None:
+    # KES 240,000 + 5% = KES 252,000 at 129.00 = $1,953.488..., so $1,953.49
+    assert money.usd_goal_minor(24_000_000, 500, Decimal("129.00")) == 195_349
+
+
+def test_usd_goal_never_falls_short_by_a_fraction_of_a_cent() -> None:
+    goal = money.usd_goal_minor(10_000, 0, Decimal("3"))
+    assert goal == 3_334  # 3,333.33... rounds up
+    assert money.usd_minor_to_kes_minor(goal, Decimal("3")) >= 10_000
+
+
+def test_usd_goal_with_no_buffer_is_the_plain_conversion() -> None:
+    assert money.usd_goal_minor(12_900, 0, Decimal("129")) == 100
+
+
+def test_usd_goal_needs_a_positive_rate() -> None:
+    with pytest.raises(MoneyError):
+        money.usd_goal_minor(100, 500, 0)

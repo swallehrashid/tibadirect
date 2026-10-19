@@ -57,6 +57,7 @@ PUBLIC_STATUSES = frozenset({CaseStatus.LIVE, CaseStatus.FUNDED, CaseStatus.CLOS
 
 # Separates patient-reference hashes from every other use of the pepper.
 PATIENT_REF_CONTEXT = "patient_ref"
+INVOICE_FINGERPRINT_CONTEXT = "invoice_fingerprint"
 
 MAX_UPLOAD_BYTES = 10_485_760
 
@@ -70,6 +71,13 @@ JSONB_NOT_NULL = JSONB(none_as_null=True)
 def hash_patient_ref(reference: str) -> str:
     """Keyed hash used to detect the same patient in two active cases."""
     return crypto.lookup_hash(reference, context=PATIENT_REF_CONTEXT)
+
+
+def hash_invoice_fingerprint(facility: str, invoice_number: str, total_kes: int) -> str:
+    """Keyed hash of facility, invoice number and total: catches a reused invoice in any layout."""
+    return crypto.lookup_hash(
+        f"{facility}|{invoice_number}|{total_kes}", context=INVOICE_FINGERPRINT_CONTEXT
+    )
 
 
 class Case(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):

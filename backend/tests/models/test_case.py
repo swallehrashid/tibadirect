@@ -262,3 +262,19 @@ def test_two_owners_and_hospitals_stay_separate(db_session) -> None:
     db_session.flush()
     assert first.created_by.cases == [first]
     assert second.hospital.cases == [second]
+
+
+def test_invoice_fingerprint_ignores_case_and_spacing_but_not_the_figures(db_session) -> None:
+    from app.models.case import hash_invoice_fingerprint
+
+    base = hash_invoice_fingerprint("Kilele Mission Hospital", "KMH/26/000123", 85_000)
+    assert hash_invoice_fingerprint(" kilele  mission hospital", "kmh/26/000123", 85_000) == base
+    assert hash_invoice_fingerprint("Kilele Mission Hospital", "KMH/26/000124", 85_000) != base
+    assert hash_invoice_fingerprint("Kilele Mission Hospital", "KMH/26/000123", 85_001) != base
+    assert re.fullmatch(r"[0-9a-f]{64}", base)
+
+
+def test_invoice_fingerprint_and_patient_hash_never_collide_for_equal_text(db_session) -> None:
+    from app.models.case import hash_invoice_fingerprint, hash_patient_ref
+
+    assert hash_patient_ref("x|y|1") != hash_invoice_fingerprint("x", "y", 1)

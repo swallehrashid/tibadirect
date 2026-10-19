@@ -17,7 +17,8 @@ known-first-party = ["app", "tests"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-addopts = "-ra --strict-markers"
+addopts = "-ra --strict-markers -m 'not slow'"
+markers = ["slow: takes about a minute; CI runs it separately with -m slow"]
 
 [tool.coverage.run]
 source = ["app"]

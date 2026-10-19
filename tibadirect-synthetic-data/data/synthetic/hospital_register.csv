@@ -1,9 +1,0 @@
-id,name,aliases,register_code,county,level,official_phone,official_email,paypal_merchant_id,settlement_method
-1,Savannah Crest Medical Centre,Savannah Crest MC|SCMC,FR-NBI-0101,Nairobi,5,+254 20 555 0101,billing@savannahcrest.example,SANDBOX_MERCHANT_A,paypal_payouts
-2,Pwani Sands Hospital,Pwani Sands|PSH,FR-MSA-0202,Mombasa,5,+254 41 555 0202,accounts@pwanisands.example,SANDBOX_MERCHANT_B,paypal_payouts
-3,Ziwa Bright Hospital,Ziwa Bright|ZBH,FR-KSM-0303,Kisumu,4,+254 57 555 0303,finance@ziwabright.example,,mock_partner
-4,Highland Reed Hospital,Highland Reed|HRH,FR-UGN-0404,Uasin Gishu,5,+254 53 555 0404,billing@highlandreed.example,,jenga_stub
-5,Rift Heights Nursing Home,Rift Heights|RHNH,FR-NKR-0505,Nakuru,3,+254 51 555 0505,admin@riftheights.example,,mock_partner
-6,Kijani Valley Hospital,Kijani Valley|KVH,FR-KBU-0606,Kiambu,4,+254 20 555 0606,billing@kijanivalley.example,,jenga_stub
-7,Mlima Kuu Referral Hospital,Mlima Kuu|MKRH,FR-NYR-0707,Nyeri,5,+254 61 555 0707,revenue@mlimakuu.example,,mock_partner
-8,Baobab Grove Medical Centre,Baobab Grove|BGMC,FR-MCK-0808,Machakos,4,+254 44 555 0808,billing@baobabgrove.example,,jenga_stub

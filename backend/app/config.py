@@ -3,6 +3,7 @@
 import json
 import os
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 # Development-only key from .env.example (base64 of 32 bytes). Never valid in production.
@@ -15,6 +16,7 @@ INSECURE_DEFAULTS: dict[str, set[str]] = {
     "HASH_PEPPER": {"", "change-me", "change-me-too"},
 }
 
+DEFAULT_SYNTHETIC_DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "synthetic"
 DEFAULT_DATABASE_URL = "postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect"
 DEFAULT_TEST_DATABASE_URL = "postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect_test"
 
@@ -128,6 +130,9 @@ class BaseConfig:
         self.REFUND_MIN_USD_MINOR = _env_int("REFUND_MIN_USD_MINOR", 100)
         self.FOLLOW_UP_HOLD_DAYS = _env_int("FOLLOW_UP_HOLD_DAYS", 14)
         self.TWO_PERSON_THRESHOLD_KES = _env_int("TWO_PERSON_THRESHOLD_KES", 200000)
+
+        self.SYNTHETIC_DATA_DIR = _env("SYNTHETIC_DATA_DIR") or str(DEFAULT_SYNTHETIC_DATA_DIR)
+        self.SEED_HOSPITAL_PAYOUT_EMAILS = _env_json("SEED_HOSPITAL_PAYOUT_EMAILS", {})
 
         self.RAW_DOC_RETENTION_HOURS = _env_int("RAW_DOC_RETENTION_HOURS", 24)
         self.AGENT_ENABLED = _env_bool("AGENT_ENABLED", False)

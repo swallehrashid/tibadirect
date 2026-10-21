@@ -66,7 +66,9 @@ Everything in `data/` is invented: no real patients, documents, hospitals or mon
 - **Appeals:** 100 forwarded fundraising messages (50 genuine, 50 scam) in English, Swahili and
   code-switched text.
 
-`make synthetic` rebuilds the dataset; the same seed reproduces every file byte for byte.
+`make synthetic` rebuilds the dataset. The same seed reproduces every PDF and data file byte for
+byte; the photo and scan images can differ very slightly between machines because the system's PDF
+renderer draws them.
 `flask synthetic validate` (from `backend/`) runs the dataset's consistency checks.
 
 ## Licence

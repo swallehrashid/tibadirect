@@ -214,9 +214,18 @@ def test_scam_phrases_separate_the_labelled_appeals() -> None:
 
 # ---- reproducibility (about a minute, so it runs separately: pytest -m slow) ----
 
+# Everything the generator computes itself (PDFs, ground truth, appeals, register, labels) is
+# rebuilt byte for byte on any machine; it all comes from one seeded random stream, so any drift in
+# generation shows up there. Raster images (phone photos, scans, screenshots) are drawn by the
+# system's poppler and fonts, which differ between machines: on the CI runner they differ by up to
+# 8 of 64 perceptual-hash bits. They must keep their size and mode and stay within a loose bound
+# that only catches a broken render. The hash columns in labels.csv are derived from them.
+RASTER_SUFFIXES = {".png", ".jpg"}
+RASTER_DERIVED_COLUMNS = {"phash", "phash_dist_to_original"}
+MAX_RASTER_PHASH_DISTANCE = 16
 
-@pytest.mark.slow
-def test_the_same_seed_rebuilds_the_committed_dataset_byte_for_byte(tmp_path: Path) -> None:
+
+def _rebuild(tmp_path: Path) -> Path:
     result = subprocess.run(
         [sys.executable, "generate.py", "--out", str(tmp_path), "--seed", "42"],
         cwd=GENERATOR,
@@ -225,15 +234,58 @@ def test_the_same_seed_rebuilds_the_committed_dataset_byte_for_byte(tmp_path: Pa
         check=False,
     )
     assert result.returncode == 0, result.stderr[-2000:]
+    return tmp_path
 
-    def digests(base: Path) -> dict[str, str]:
-        files = [p for p in base.rglob("*") if p.is_file() and "__pycache__" not in p.parts]
-        return {
-            str(p.relative_to(base)): hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in files
-            if p.suffix in {".csv", ".jsonl", ".pdf", ".png", ".jpg"}
-        }
 
-    rebuilt, committed = digests(tmp_path), digests(DATA)
-    assert rebuilt.keys() == committed.keys()
-    assert {k for k in rebuilt if rebuilt[k] != committed[k]} == set()
+def _outputs(base: Path) -> dict[str, Path]:
+    suffixes = {".csv", ".jsonl", ".pdf"} | RASTER_SUFFIXES
+    return {
+        str(p.relative_to(base)): p
+        for p in base.rglob("*")
+        if p.is_file() and p.suffix in suffixes and "generator" not in p.parts
+    }
+
+
+def _labels_without_raster_columns(path: Path) -> list[dict[str, str]]:
+    with open(path, newline="", encoding="utf-8") as handle:
+        return [
+            {k: v for k, v in row.items() if k not in RASTER_DERIVED_COLUMNS}
+            for row in csv.DictReader(handle)
+        ]
+
+
+def compare_rebuild(rebuilt: Path, committed: Path) -> dict[str, list[str]]:
+    """Differences between a rebuild and the committed dataset, grouped by kind (empty = same)."""
+    import imagehash
+    from PIL import Image
+
+    new, old = _outputs(rebuilt), _outputs(committed)
+    problems: dict[str, list[str]] = {
+        "missing": sorted(old.keys() - new.keys()),
+        "extra": sorted(new.keys() - old.keys()),
+        "bytes": [],
+        "images": [],
+    }
+    for name in sorted(old.keys() & new.keys()):
+        if name == "labels.csv":
+            if _labels_without_raster_columns(new[name]) != _labels_without_raster_columns(
+                old[name]
+            ):
+                problems["bytes"].append(name)
+        elif new[name].suffix in RASTER_SUFFIXES:
+            distance = imagehash.phash(Image.open(new[name])) - imagehash.phash(
+                Image.open(old[name])
+            )
+            if distance > MAX_RASTER_PHASH_DISTANCE:
+                problems["images"].append(f"{name} (distance {distance})")
+        elif (
+            hashlib.sha256(new[name].read_bytes()).digest()
+            != hashlib.sha256(old[name].read_bytes()).digest()
+        ):
+            problems["bytes"].append(name)
+    return {kind: items for kind, items in problems.items() if items}
+
+
+@pytest.mark.slow
+def test_the_same_seed_rebuilds_the_committed_dataset(tmp_path: Path) -> None:
+    assert compare_rebuild(_rebuild(tmp_path), DATA) == {}

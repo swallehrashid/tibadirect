@@ -150,3 +150,24 @@ def browser_for(app: Flask, db_session: scoped_session, csrf_on: None) -> Callab
         return browser
 
     return make
+
+
+@pytest.fixture
+def redis_clean(app: Flask) -> Iterator[None]:
+    """Empty the test Redis database (number 15) before and after a test that uses queues."""
+    with app.app_context():
+        from app.jobs.queue import get_connection
+
+        connection = get_connection()
+        assert connection.connection_pool.connection_kwargs["db"] == 15, "refusing to flush"
+        connection.flushdb()
+        yield
+        connection.flushdb()
+
+
+@pytest.fixture
+def async_jobs(app: Flask, redis_clean: None) -> Iterator[None]:
+    """Jobs wait on the queue for a worker, as in production, instead of running inline."""
+    app.config["JOBS_ASYNC"] = True
+    yield
+    app.config["JOBS_ASYNC"] = False

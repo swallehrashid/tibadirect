@@ -6,6 +6,7 @@ from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit, urlunsplit
 
 # Development-only key from .env.example (base64 of 32 bytes). Never valid in production.
 DEV_DATA_ENCRYPTION_KEY = "ZGV2LW9ubHkta2V5LWRvLW5vdC11c2UtaW4tcHJvZCE="
@@ -32,6 +33,12 @@ def normalize_database_url(url: str) -> str:
         if url.startswith(prefix):
             return "postgresql+psycopg://" + url[len(prefix) :]
     return url
+
+
+def with_redis_database(url: str, database: int) -> str:
+    """The same Redis URL pointing at another numbered database."""
+    parts = urlsplit(url)
+    return urlunsplit(parts._replace(path=f"/{database}"))
 
 
 def _env(name: str, default: str = "") -> str:
@@ -124,6 +131,8 @@ class BaseConfig:
         self.SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
         self.REDIS_URL = _env("REDIS_URL", "redis://localhost:6379/0")
         self.RATELIMIT_STORAGE_URI = self.REDIS_URL
+        # False runs jobs inline when they are enqueued (tests); workers need True.
+        self.JOBS_ASYNC = _env_bool("JOBS_ASYNC", True)
         self.CORS_ORIGINS = _env_list("CORS_ORIGINS", list(self.DEFAULT_CORS_ORIGINS))
         self.PROXY_FIX_COUNT = _env_int("PROXY_FIX_COUNT", 0)
 
@@ -193,7 +202,9 @@ class TestConfig(BaseConfig):
         if not database.endswith("_test"):
             raise ConfigError("TEST_DATABASE_URL must point at a database whose name ends in _test")
         self.SQLALCHEMY_DATABASE_URI = test_url
-        self.REDIS_URL = _env("TEST_REDIS_URL", self.REDIS_URL)
+        # Redis database 15 is the test database: tests flush it, so it must never be database 0.
+        self.REDIS_URL = _env("TEST_REDIS_URL", with_redis_database(self.REDIS_URL, 15))
+        self.JOBS_ASYNC = False
         # Counters live in memory so a test run never reads limits left in Redis by an earlier one.
         self.RATELIMIT_STORAGE_URI = "memory://"
         # Tests that exercise CSRF switch this on for the app under test.

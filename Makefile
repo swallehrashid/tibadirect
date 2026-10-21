@@ -4,7 +4,7 @@ COMPOSE ?= docker compose
 VENV    ?= $(CURDIR)/backend/.venv
 BIN     := $(VENV)/bin
 
-.PHONY: help up down up-app migrate seed reset-demo test lint fmt gen-api synthetic eval e2e
+.PHONY: help up down up-app worker scheduler migrate seed reset-demo test lint fmt gen-api synthetic eval e2e
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -18,6 +18,12 @@ down: ## Stop local infrastructure (data volumes are kept)
 
 up-app: ## Start infrastructure plus the application services (profile "app")
 	$(COMPOSE) --profile app up -d --build
+
+worker: ## Run a background job worker (all queues) in this terminal
+	cd backend && $(BIN)/python -m app.jobs.worker
+
+scheduler: ## Run the periodic job scheduler in this terminal
+	cd backend && $(BIN)/python -m app.jobs.scheduler
 
 migrate: ## Apply database migrations
 	cd backend && $(BIN)/flask --app wsgi db upgrade

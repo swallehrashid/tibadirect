@@ -16,3 +16,12 @@ class PublicConfigSchema(ma.Schema):
     currency = ma.fields.String(metadata={"description": "Donations are always in USD"})
     demo_banner = ma.fields.Boolean(metadata={"description": "Show the sandbox money banner"})
     features = ma.fields.Nested(FeatureFlagsSchema)
+
+
+class PublicStatsSchema(ma.Schema):
+    public_cases = ma.fields.Integer(metadata={"description": "Cases with a public page"})
+    open_cases = ma.fields.Integer(metadata={"description": "Of those, still taking donations"})
+    pledged_kes_minor = ma.fields.Integer()
+    settled_kes_minor = ma.fields.Integer(metadata={"description": "Already paid to hospitals"})
+    donations = ma.fields.Integer()
+    hospitals = ma.fields.Integer()

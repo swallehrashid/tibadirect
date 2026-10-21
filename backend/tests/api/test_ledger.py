@@ -232,7 +232,7 @@ def test_the_admin_sees_the_whole_chain_and_the_check_is_audited(
     browser_for: BrowserFor, world, db_session
 ) -> None:  # type: ignore[no-untyped-def]
     admin = UserFactory(role=UserRole.ADMIN)
-    total = db_session.execute(select(LedgerEntry)).scalars().all()
+    total = db_session.execute(select(LedgerEntry).order_by(LedgerEntry.seq)).scalars().all()
     body = browser_for(admin).get("/api/admin/ledger/verify").get_json()
     assert body["valid"] is True
     assert body["entries_checked"] == len(total)

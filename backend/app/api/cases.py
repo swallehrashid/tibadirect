@@ -11,6 +11,7 @@ from app.extensions import db, limiter
 from app.models.case import Case
 from app.models.enums import UserRole
 from app.pagination import PaginationArgsSchema, page_of, paginate
+from app.schemas.admin import ReviewRequestedSchema, ReviewRequestSchema
 from app.schemas.cases import (
     CreateCaseSchema,
     FamilyCaseListItemSchema,
@@ -18,7 +19,7 @@ from app.schemas.cases import (
     UpdateCaseSchema,
 )
 from app.security.permissions import current_account, get_owned_case_or_404
-from app.services import case_service
+from app.services import case_service, review_service
 
 blp = TibaBlueprint("cases", __name__, url_prefix="/api/cases", description="My cases")
 
@@ -81,3 +82,18 @@ class CaseDetail(MethodView):
         case_service.delete_draft(get_owned_case_or_404(case_id, user), user)
         db.session.commit()
         return ""
+
+
+@blp.route("/<uuid:case_id>/review-request")
+class ReviewRequest(MethodView):
+    @blp.secured(UserRole.FAMILY)
+    @blp.arguments(ReviewRequestSchema)
+    @blp.response(201, ReviewRequestedSchema)
+    @blp.alt_response(409, description="Already asked, or the case is not in play")
+    def post(self, payload: dict, case_id: uuid.UUID) -> object:
+        """Ask for a person to look at your case. One open request at a time."""
+        user = current_account()
+        case = get_owned_case_or_404(case_id, user)
+        item = review_service.request_review(db.session, case, user, payload["message"])
+        db.session.commit()
+        return item

@@ -415,3 +415,39 @@ def get_public_case_or_404(session: Session, slug: str) -> Case:
     if case is None or not case.is_publicly_visible:
         raise NotFound("Case not found.", code="case_not_found")
     return case
+
+
+def public_totals(session: Session) -> dict[str, int]:
+    """Landing-page totals over public cases only, so a private case never shows in a number."""
+    visible = (
+        select(Case.id)
+        .where(
+            Case.status.in_([CaseStatus.LIVE, CaseStatus.FUNDED, CaseStatus.CLOSED]),
+            exists().where(
+                Consent.case_id == Case.id,
+                Consent.scope == ConsentScope.PUBLIC_PAGE,
+                Consent.withdrawn_at.is_(None),
+            ),
+        )
+        .subquery()
+    )
+    row = session.execute(
+        select(
+            func.count(Case.id),
+            func.count(Case.id).filter(Case.status.in_([CaseStatus.LIVE, CaseStatus.FUNDED])),
+            func.coalesce(func.sum(Case.pledged_kes_minor), 0),
+            func.coalesce(func.sum(Case.settled_kes_minor), 0),
+            func.coalesce(func.sum(Case.donor_count), 0),
+        ).where(Case.id.in_(select(visible.c.id)))
+    ).one()
+    hospitals = session.execute(
+        select(func.count()).select_from(Hospital).where(Hospital.is_active.is_(True))
+    ).scalar_one()
+    return {
+        "public_cases": int(row[0]),
+        "open_cases": int(row[1]),
+        "pledged_kes_minor": int(row[2]),
+        "settled_kes_minor": int(row[3]),
+        "donations": int(row[4]),
+        "hospitals": int(hospitals),
+    }

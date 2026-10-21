@@ -12,7 +12,7 @@ from app.models.ledger import GENESIS_HASH
 from app.pagination import PaginationArgsSchema, page_of, paginate
 from app.schemas.cases import PublicCaseSchema, PublicCasesQuerySchema
 from app.schemas.ledger import CaseVerificationSchema, PublicLedgerRowSchema
-from app.schemas.public import PublicConfigSchema
+from app.schemas.public import PublicConfigSchema, PublicStatsSchema
 from app.services import case_service, ledger_service
 
 blp = TibaBlueprint(
@@ -39,6 +39,16 @@ class PublicConfig(MethodView):
                 "appeal_checker": config["APPEAL_CHECKER_ENABLED"],
             },
         }
+
+
+@blp.route("/stats")
+class PublicStats(MethodView):
+    decorators = [limiter.limit(PUBLIC_READ_LIMIT, scope="public_stats")]
+
+    @blp.response(200, PublicStatsSchema)
+    def get(self) -> dict:
+        """Totals for the landing page, counted over public cases only."""
+        return case_service.public_totals(db.session)
 
 
 @blp.route("/cases")

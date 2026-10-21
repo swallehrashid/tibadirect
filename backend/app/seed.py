@@ -71,8 +71,10 @@ from app.models.verification import Confirmation, ConfirmationRequest
 from app.money import apply_bps, kes_minor_to_usd_minor, usd_goal_minor, usd_minor_to_kes_minor
 from app.security import crypto
 from app.security.masking import mask_email
+from app.security.uploads import ALLOWED_TYPES
 from app.services import ledger_service
 from app.services.ledger_service import NewEntry
+from app.services.storage_service import DEMO_PREFIX, document_key
 from app.synthetic_data import DEFAULT_DATA_DIR, DatasetDocument, load_documents, load_register
 
 ADMIN_EMAIL = "admin@tibadirect.test"
@@ -411,7 +413,8 @@ def _add_document(
     world.session.add(document)
     world.session.flush()
     if raw_kept:
-        document.storage_key = f"demo/cases/{case.id}/{document.id}"
+        extension = ALLOWED_TYPES.get(doc.mime_type, ("bin", frozenset()))[0]
+        document.storage_key = DEMO_PREFIX + document_key(case.id, document.id, extension)
     else:
         document.raw_deleted_at = uploaded + timedelta(hours=24)
     if status is DocumentStatus.TRIAGED:

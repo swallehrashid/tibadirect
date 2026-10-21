@@ -352,6 +352,8 @@ def test_production_config_is_secure_by_default(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setenv("HASH_PEPPER", "a-real-pepper-for-this-test-only")
     monkeypatch.setenv("DATA_ENCRYPTION_KEY", base64.b64encode(os.urandom(32)).decode())
     monkeypatch.setenv("DATABASE_URL", "postgres://u:p@localhost:5432/db")
+    monkeypatch.setenv("S3_ACCESS_KEY_ID", "bucket-user-for-this-test")
+    monkeypatch.setenv("S3_SECRET_ACCESS_KEY", "bucket-password-for-this-test")
     monkeypatch.delenv("CORS_ORIGINS", raising=False)
     config = get_config("production")
     assert config.SESSION_COOKIE_SECURE is True

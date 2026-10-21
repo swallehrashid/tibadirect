@@ -7,6 +7,7 @@ import flask_migrate
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
+from moto import mock_aws
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import scoped_session
@@ -171,3 +172,30 @@ def async_jobs(app: Flask, redis_clean: None) -> Iterator[None]:
     app.config["JOBS_ASYNC"] = True
     yield
     app.config["JOBS_ASYNC"] = False
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _no_real_object_storage() -> Iterator[None]:
+    """Every S3 call in the test run goes to moto's in-memory service, never to a real server."""
+    with mock_aws():
+        yield
+
+
+@pytest.fixture
+def s3(app: Flask) -> Iterator[None]:
+    """An empty private bucket for the test, emptied and removed afterwards.
+
+    No application context stays open during the test: Flask's CLI reuses an open context, which
+    would point commands run against a scratch app at this app's database.
+    """
+    from app.services import storage_service
+
+    with app.app_context():
+        storage_service.ensure_bucket()
+    yield
+    with app.app_context():
+        client = storage_service._client()
+        bucket = app.config["S3_BUCKET"]
+        for key in list(storage_service._keys_under("")):
+            client.delete_object(Bucket=bucket, Key=key)
+        client.delete_bucket(Bucket=bucket)

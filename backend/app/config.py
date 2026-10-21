@@ -16,6 +16,8 @@ INSECURE_DEFAULTS: dict[str, set[str]] = {
     "SECRET_KEY": {"", "change-me"},
     "DATA_ENCRYPTION_KEY": {"", DEV_DATA_ENCRYPTION_KEY},
     "HASH_PEPPER": {"", "change-me", "change-me-too"},
+    "S3_ACCESS_KEY_ID": {"", "tibadirect-dev"},
+    "S3_SECRET_ACCESS_KEY": {"", "tibadirect-dev-secret"},
 }
 
 DEFAULT_SYNTHETIC_DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "synthetic"
@@ -105,6 +107,9 @@ class BaseConfig:
     SESSION_COOKIE_SECURE = False
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
 
+    # Largest request body Flask will read: a 10 MB file plus the form around it.
+    MAX_CONTENT_LENGTH = 12 * 1024 * 1024
+
     # CSRF: the token lives as long as the session, and arrives in the X-CSRFToken header.
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
@@ -141,8 +146,13 @@ class BaseConfig:
 
         self.S3_ENDPOINT_URL = _env("S3_ENDPOINT_URL", "http://localhost:9000")
         self.S3_BUCKET = _env("S3_BUCKET", "tibadirect-uploads")
-        self.S3_ACCESS_KEY_ID = _env("S3_ACCESS_KEY_ID")
-        self.S3_SECRET_ACCESS_KEY = _env("S3_SECRET_ACCESS_KEY")
+        # The defaults match docker-compose's MinIO, which is local only.
+        self.S3_ACCESS_KEY_ID = _env("S3_ACCESS_KEY_ID", "tibadirect-dev")
+        self.S3_SECRET_ACCESS_KEY = _env("S3_SECRET_ACCESS_KEY", "tibadirect-dev-secret")
+        # Where browsers reach the bucket when it differs from the server's own address.
+        self.S3_PUBLIC_ENDPOINT_URL = _env("S3_PUBLIC_ENDPOINT_URL")
+        # "AES256" asks S3 to encrypt at rest; empty for MinIO, which has no key service locally.
+        self.S3_SERVER_SIDE_ENCRYPTION = _env("S3_SERVER_SIDE_ENCRYPTION")
         self.S3_REGION = _env("S3_REGION", "us-east-1")
 
         self.MAIL_BACKEND = _env("MAIL_BACKEND", "smtp")
@@ -210,6 +220,12 @@ class TestConfig(BaseConfig):
         # Tests that exercise CSRF switch this on for the app under test.
         self.WTF_CSRF_ENABLED = False
         self.PAYPAL_MODE = "mock"
+        # No endpoint: boto3 uses the AWS address, which moto intercepts in every test, so a test
+        # can never reach the MinIO that may be running on a developer's machine.
+        self.S3_ENDPOINT_URL = ""
+        self.S3_BUCKET = "tibadirect-test-uploads"
+        self.S3_PUBLIC_ENDPOINT_URL = ""
+        self.S3_SERVER_SIDE_ENCRYPTION = ""
         self.MAIL_BACKEND = "memory"
         self.LLM_API_KEY = ""
         self.DATA_ENCRYPTION_KEY = self.DATA_ENCRYPTION_KEY or DEV_DATA_ENCRYPTION_KEY

@@ -9,6 +9,8 @@ from flask.cli import with_appcontext
 
 from app.extensions import db
 from app.seed import is_seeded, reset_database, seed_all
+from app.services import demo_files
+from app.services.storage_service import StorageError
 
 
 def _seed_options() -> dict:
@@ -16,6 +18,16 @@ def _seed_options() -> dict:
         "data_dir": Path(current_app.config["SYNTHETIC_DATA_DIR"]),
         "payout_emails": current_app.config["SEED_HOSPITAL_PAYOUT_EMAILS"],
     }
+
+
+def _upload_demo_files() -> None:
+    """Put the seeded bills in the bucket. The demo still works without them, so this only warns."""
+    try:
+        count = demo_files.upload_seed_documents(db.session, _seed_options()["data_dir"])
+    except StorageError as exc:
+        click.echo(f"Warning: demo bill files were not uploaded ({exc.message})", err=True)
+        return
+    click.echo(f"Uploaded {count} demo bill files.")
 
 
 @click.command("seed")
@@ -29,6 +41,7 @@ def seed_command() -> None:
     summary = seed_all(db.session, **_seed_options())
     db.session.commit()
     click.echo(f"Seeded in {time.perf_counter() - started:.1f}s: {summary}")
+    _upload_demo_files()
 
 
 @click.command("reset-demo")
@@ -43,7 +56,12 @@ def reset_demo_command(yes: bool) -> None:
     if not yes:
         click.confirm("This deletes every row in every table. Continue?", abort=True)
     started = time.perf_counter()
+    try:
+        demo_files.clear_demo_files()
+    except StorageError as exc:
+        click.echo(f"Warning: could not clear old demo files ({exc.message})", err=True)
     reset_database(db.session)
     summary = seed_all(db.session, **_seed_options())
     db.session.commit()
     click.echo(f"Reset in {time.perf_counter() - started:.1f}s: {summary}")
+    _upload_demo_files()

@@ -38,6 +38,9 @@ def create_app(config_name: str | None = None) -> Flask:
 
 
 def _register_blueprints() -> None:
+    from app.api.auth import blp as auth_blp
     from app.api.health import blp as health_blp
+    from app.api.public import blp as public_blp
 
-    extensions.api.register_blueprint(health_blp)
+    for blueprint in (health_blp, auth_blp, public_blp):
+        extensions.api.register_blueprint(blueprint)

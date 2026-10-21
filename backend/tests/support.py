@@ -5,9 +5,13 @@ from flask import Blueprint as FlaskBlueprint
 from flask import Flask
 from flask.views import MethodView
 from flask_smorest import Blueprint
+from sqlalchemy import select
 
 from app import extensions
 from app.errors import Conflict, NotFound, PermissionDenied
+from app.extensions import db
+from app.models.hospital import FacilityRegisterEntry
+from app.pagination import PaginationArgsSchema, page_of, paginate
 
 
 class EchoSchema(ma.Schema):
@@ -24,6 +28,33 @@ class Echo(MethodView):
     @smorest_bp.response(200, EchoSchema)
     def post(self, payload: dict) -> dict:
         return payload
+
+
+class RegisterEntrySchema(ma.Schema):
+    register_code = ma.fields.String()
+    name = ma.fields.String()
+
+
+@smorest_bp.route("/pages")
+class Pages(MethodView):
+    @smorest_bp.arguments(PaginationArgsSchema, location="query")
+    @smorest_bp.response(200, page_of(RegisterEntrySchema))
+    def get(self, args: dict) -> dict:
+        statement = select(FacilityRegisterEntry).order_by(FacilityRegisterEntry.register_code)
+        return paginate(db.session, statement, args)
+
+
+@smorest_bp.route("/limited")
+class Limited(MethodView):
+    decorators = [extensions.limiter.limit("2 per minute")]
+
+    @smorest_bp.response(200)
+    def get(self) -> dict:
+        return {"ok": True}
+
+    @smorest_bp.response(200)
+    def post(self) -> dict:
+        return {"ok": True}
 
 
 plain_bp = FlaskBlueprint("test_plain", __name__, url_prefix="/api/_test")

@@ -2,6 +2,7 @@
 
 import json
 import os
+from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -54,6 +55,13 @@ def _env_bool(name: str, default: bool) -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_list(name: str, default: list[str]) -> list[str]:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
 def _env_json(name: str, default: dict[str, Any]) -> dict[str, Any]:
     raw = os.environ.get(name)
     if raw is None or raw.strip() == "":
@@ -80,6 +88,28 @@ class BaseConfig:
     OPENAPI_VERSION = "3.0.3"
     OPENAPI_URL_PREFIX = "/api"
     OPENAPI_JSON_PATH = "openapi.json"
+    OPENAPI_SWAGGER_UI_PATH = "docs"
+    OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/"
+
+    # Session cookie: HttpOnly, SameSite=Lax, seven days. Production adds Secure.
+    SESSION_COOKIE_NAME = "td_session"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SECURE = False
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+
+    # CSRF: the token lives as long as the session, and arrives in the X-CSRFToken header.
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_TIME_LIMIT = None
+    WTF_CSRF_HEADERS = ["X-CSRFToken"]
+
+    # Rate limits. Production and development share Redis; if it is down each worker counts alone.
+    RATELIMIT_HEADERS_ENABLED = True
+    RATELIMIT_IN_MEMORY_FALLBACK_ENABLED = True
+
+    # Origins allowed to call the API from a browser. Only the local Vite server by default,
+    # and nobody in production, where the app and the API share one origin.
+    DEFAULT_CORS_ORIGINS = ("http://localhost:5173", "http://127.0.0.1:5173")
 
     def __init__(self) -> None:
         self.SECRET_KEY = _env("SECRET_KEY", "change-me")
@@ -93,6 +123,9 @@ class BaseConfig:
         )
         self.SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
         self.REDIS_URL = _env("REDIS_URL", "redis://localhost:6379/0")
+        self.RATELIMIT_STORAGE_URI = self.REDIS_URL
+        self.CORS_ORIGINS = _env_list("CORS_ORIGINS", list(self.DEFAULT_CORS_ORIGINS))
+        self.PROXY_FIX_COUNT = _env_int("PROXY_FIX_COUNT", 0)
 
         self.DATA_ENCRYPTION_KEY = _env("DATA_ENCRYPTION_KEY")
         self.HASH_PEPPER = _env("HASH_PEPPER", "change-me-too")
@@ -136,6 +169,8 @@ class BaseConfig:
 
         self.RAW_DOC_RETENTION_HOURS = _env_int("RAW_DOC_RETENTION_HOURS", 24)
         self.AGENT_ENABLED = _env_bool("AGENT_ENABLED", False)
+        # The checker itself ships in Phase 3, which turns this on by default.
+        self.APPEAL_CHECKER_ENABLED = _env_bool("APPEAL_CHECKER_ENABLED", False)
         self.APPEAL_CHECKER_USE_LLM = _env_bool("APPEAL_CHECKER_USE_LLM", False)
 
 
@@ -158,6 +193,10 @@ class TestConfig(BaseConfig):
             raise ConfigError("TEST_DATABASE_URL must point at a database whose name ends in _test")
         self.SQLALCHEMY_DATABASE_URI = test_url
         self.REDIS_URL = _env("TEST_REDIS_URL", self.REDIS_URL)
+        # Counters live in memory so a test run never reads limits left in Redis by an earlier one.
+        self.RATELIMIT_STORAGE_URI = "memory://"
+        # Tests that exercise CSRF switch this on for the app under test.
+        self.WTF_CSRF_ENABLED = False
         self.PAYPAL_MODE = "mock"
         self.LLM_API_KEY = ""
         self.DATA_ENCRYPTION_KEY = self.DATA_ENCRYPTION_KEY or DEV_DATA_ENCRYPTION_KEY
@@ -169,6 +208,8 @@ class ProductionConfig(BaseConfig):
     """Refuses to start with placeholder secrets."""
 
     APP_ENV = "production"
+    SESSION_COOKIE_SECURE = True
+    DEFAULT_CORS_ORIGINS = ()
 
     def __init__(self) -> None:
         super().__init__()

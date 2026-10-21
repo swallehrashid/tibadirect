@@ -13,6 +13,7 @@ from typing import Any
 
 from flask import Flask, g
 from flask_smorest import Api
+from flask_wtf.csrf import CSRFError
 from werkzeug.exceptions import HTTPException
 
 from app.schemas.errors import ErrorEnvelopeSchema
@@ -133,6 +134,11 @@ def register_error_handlers(app: Flask) -> None:
     @app.errorhandler(AppError)
     def _handle_app_error(error: AppError) -> tuple[dict[str, Any], int]:
         return error_payload(error.code, error.message, error.details), error.status_code
+
+    @app.errorhandler(CSRFError)
+    def _handle_csrf_error(error: CSRFError) -> tuple[dict[str, Any], int]:
+        message = "The request could not be verified. Reload the page and try again."
+        return error_payload("csrf_failed", message), 403
 
     @app.errorhandler(Exception)
     def _handle_unexpected(error: Exception) -> tuple[dict[str, Any], int]:

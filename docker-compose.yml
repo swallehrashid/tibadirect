@@ -32,8 +32,10 @@ services:
       timeout: 3s
       retries: 10
 
+  # MinIO's own images left Docker Hub in September 2026; Chainguard publishes free rebuilds
+  # of the same server (with the mc client inside), which also serve the bucket bootstrap below.
   minio:
-    image: minio/minio:latest
+    image: cgr.dev/chainguard/minio:latest
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:-tibadirect-dev}
@@ -51,7 +53,7 @@ services:
 
   # One-shot: creates the private upload bucket, then exits.
   minio-init:
-    image: minio/mc:latest
+    image: cgr.dev/chainguard/minio:latest
     depends_on:
       minio:
         condition: service_healthy

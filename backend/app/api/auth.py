@@ -3,7 +3,7 @@
 from flask import Response, make_response, request, session
 from flask.views import MethodView
 from flask_limiter.util import get_remote_address
-from flask_login import login_user, logout_user
+from flask_login import current_user, login_user, logout_user
 from flask_wtf.csrf import generate_csrf
 
 from app.api.base import TibaBlueprint
@@ -21,7 +21,7 @@ from app.schemas.auth import (
 )
 from app.security import crypto
 from app.security.permissions import active_staff_profile, current_account
-from app.services import auth_service
+from app.services import audit_service, auth_service
 
 blp = TibaBlueprint("auth", __name__, url_prefix="/api/auth", description="Sign-in and sessions")
 
@@ -91,10 +91,14 @@ class Verify(MethodView):
     @blp.alt_response(401, description="The code is wrong, expired, used or locked")
     def post(self, payload: dict) -> dict:
         """Check a code and sign in. The first successful sign-in creates a family account."""
-        user, _created = auth_service.verify_code(db.session, payload["email"], payload["code"])
+        user, created = auth_service.verify_code(db.session, payload["email"], payload["code"])
         session.clear()  # a new session on sign-in, so a planted cookie cannot be reused
         login_user(user)
         session.permanent = True
+        if created:
+            audit_service.record("user.created", user, actor=user, details={"role": user.role})
+        audit_service.record("auth.login", user, actor=user)
+        db.session.commit()
         return {"user": serialize_user(user)}
 
 
@@ -103,6 +107,10 @@ class Logout(MethodView):
     @blp.response(204)
     def post(self) -> str:
         """End the session. Safe to call when already signed out."""
+        if current_user.is_authenticated:
+            user = current_account()
+            audit_service.record("auth.logout", user, actor=user)
+            db.session.commit()
         logout_user()
         session.clear()
         return ""
@@ -124,5 +132,6 @@ class Me(MethodView):
         user = current_account()
         for field, value in payload.items():
             setattr(user, field, value)
+        audit_service.record("user.updated", user, actor=user, details={"fields": sorted(payload)})
         db.session.commit()
         return serialize_user(user)

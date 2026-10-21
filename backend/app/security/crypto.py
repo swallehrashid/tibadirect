@@ -82,6 +82,11 @@ def lookup_hash(value: str, *, context: str = "", pepper: str | None = None) -> 
     return hmac.new(pepper.encode(), message.encode(), hashlib.sha256).hexdigest()
 
 
+def hash_ip(ip: str | None) -> str | None:
+    """Keyed hash of a client address: enough to spot repeats, useless for locating anyone."""
+    return lookup_hash(ip, context="ip") if ip else None
+
+
 def hashes_match(left: str, right: str) -> bool:
     """Constant-time comparison of two hex digests."""
     return hmac.compare_digest(left.encode(), right.encode())

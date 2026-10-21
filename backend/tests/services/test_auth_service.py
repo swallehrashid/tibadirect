@@ -56,7 +56,7 @@ def test_an_unknown_address_gets_a_code_in_english(app, db_session) -> None:  # 
 def test_the_ip_is_kept_only_as_a_hash(app, db_session) -> None:  # type: ignore[no-untyped-def]
     _issue(db_session, ip="203.0.113.7")
     stored = db_session.execute(select(LoginCode)).scalars().one()
-    assert stored.ip_hmac == auth_service.hash_ip("203.0.113.7")
+    assert stored.ip_hmac == crypto.hash_ip("203.0.113.7")
     assert "203.0.113.7" not in stored.ip_hmac
 
 

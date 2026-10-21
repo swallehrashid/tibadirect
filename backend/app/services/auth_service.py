@@ -27,7 +27,6 @@ CODE_TTL = timedelta(minutes=10)
 MAX_ATTEMPTS = 5
 
 _CODE_CONTEXT = "login_code"
-_IP_CONTEXT = "ip"
 _DISPLAY_NAME_MAX = 80
 
 
@@ -54,10 +53,6 @@ def normalize_email(email: str) -> str:
 def _code_hmac(email: str, code: str) -> str:
     # The code is bound to the address it was sent to, so it cannot be replayed for another.
     return crypto.lookup_hash(f"{email}|{code}", context=_CODE_CONTEXT)
-
-
-def hash_ip(ip: str | None) -> str | None:
-    return crypto.lookup_hash(ip, context=_IP_CONTEXT) if ip else None
 
 
 def _now() -> datetime:
@@ -90,7 +85,7 @@ def request_code(
             email=email,
             code_hmac=_code_hmac(email, code),
             expires_at=now + CODE_TTL,
-            ip_hmac=hash_ip(ip),
+            ip_hmac=crypto.hash_ip(ip),
         )
     )
     session.commit()

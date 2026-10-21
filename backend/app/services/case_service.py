@@ -5,19 +5,34 @@ machine, keeps ``trust_level`` and the timestamps in step, and writes the audit 
 and editing drafts, totals and the public views are added by the case endpoints (P2-F07).
 """
 
+import re
+import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from app.errors import Conflict
-from app.models.case import Case
+from flask import current_app
+from sqlalchemy import Select, exists, func, select
+from sqlalchemy.orm import Session
+
+from app import lexicon
+from app.errors import Conflict, NotFound, ValidationFailed
+from app.logging import scrub
+from app.models.case import Case, Consent, TriageResult
 from app.models.enums import (
     ActorType,
     CaseStatus,
     CloseReason,
+    ConsentActor,
     ConsentScope,
+    DonationStatus,
+    SettlementStatus,
     TrustLevel,
 )
+from app.models.hospital import Hospital
 from app.models.identity import User
+from app.models.platform import AuditLog
+from app.models.verification import Confirmation
+from app.money import apply_bps, usd_minor_to_kes_minor
 from app.services import audit_service
 
 S = CaseStatus
@@ -125,4 +140,270 @@ def transition(
     if reason and to != S.FROZEN:
         details["reason"] = reason
     audit_service.record("case.transitioned", case, actor=actor, approver=approver, details=details)
+    return case
+
+
+# --------------------------------------------------------------------------- drafts
+
+
+ALIAS_LENGTH = (2, 40)
+REGION_LENGTH = (2, 40)
+STORY_MAX = 600
+PATIENT_REF_LENGTH = (3, 60)
+_PATIENT_REF_CHARS = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 /._#-]*$")
+_REGION_CHARS = re.compile(r"^[^\W\d_][^\W\d_ '’.-]*(?:[ '’.-]+[^\W\d_][^\W\d_ '’.-]*)*$")
+
+EDITABLE_FIELDS = ("alias", "region", "story", "is_minor", "patient_reference", "show_photo")
+
+
+def _field_error(field: str, message: str, code: str, **extra: Any) -> ValidationFailed:
+    """A 422 shaped like a schema error (``details.json.<field>``) with a specific code."""
+    return ValidationFailed(message, code=code, details={"json": {field: [message]}, **extra})
+
+
+def clean_alias(value: str) -> str:
+    """The public name of the case: short, and free of personal data and medical words."""
+    alias = " ".join(value.split())
+    if not ALIAS_LENGTH[0] <= len(alias) <= ALIAS_LENGTH[1]:
+        raise _field_error("alias", "Use between 2 and 40 characters.", "alias_length")
+    if scrub(alias) != alias:
+        raise _field_error(
+            "alias",
+            "Do not put an email address or phone number in the alias.",
+            "alias_personal_data",
+        )
+    if terms := lexicon.find_medical_terms(alias):
+        raise _field_error(
+            "alias",
+            "Do not describe the illness in the alias.",
+            "alias_medical_terms",
+            terms=terms,
+        )
+    return alias
+
+
+def clean_region(value: str) -> str:
+    region = " ".join(value.split())
+    if not REGION_LENGTH[0] <= len(region) <= REGION_LENGTH[1] or not _REGION_CHARS.match(region):
+        raise _field_error("region", "Enter a county or town, 2 to 40 letters.", "region_invalid")
+    return region
+
+
+def clean_patient_reference(value: str) -> str:
+    """The hospital's admission or patient number, as printed on the bill."""
+    reference = " ".join(value.split())
+    if not PATIENT_REF_LENGTH[0] <= len(reference) <= PATIENT_REF_LENGTH[1] or not (
+        _PATIENT_REF_CHARS.match(reference)
+    ):
+        raise _field_error(
+            "patient_reference",
+            "Enter the admission or patient number from the bill (3 to 60 characters).",
+            "patient_reference_invalid",
+        )
+    return reference
+
+
+def clean_story(value: str | None) -> str | None:
+    """The family's words on the public page: no medical terms, no contact details."""
+    story = (value or "").strip()
+    if not story:
+        return None
+    if len(story) > STORY_MAX:
+        raise _field_error("story", f"Use at most {STORY_MAX} characters.", "story_length")
+    if scrub(story) != story:
+        raise _field_error(
+            "story",
+            "Do not put an email address, phone number or long number in the story.",
+            "story_personal_data",
+        )
+    if terms := lexicon.find_medical_terms(story):
+        raise _field_error(
+            "story",
+            "Please leave out medical words. The hospital bill already shows the care given.",
+            "story_medical_terms",
+            terms=terms[:10],
+        )
+    return story
+
+
+def _active_hospital(session: Session, hospital_id: uuid.UUID) -> Hospital:
+    hospital = session.get(Hospital, hospital_id)
+    if hospital is None or not hospital.is_active:
+        raise _field_error("hospital_id", "Choose a hospital from the list.", "hospital_not_found")
+    return hospital
+
+
+def create_draft(
+    session: Session,
+    user: User,
+    *,
+    hospital_id: uuid.UUID,
+    alias: str,
+    region: str,
+    patient_reference: str,
+    is_minor: bool = False,
+) -> Case:
+    """Start a new draft case for ``user``. The caller commits."""
+    hospital = _active_hospital(session, hospital_id)
+    case = Case(
+        created_by=user,
+        hospital=hospital,
+        alias=clean_alias(alias),
+        region=clean_region(region),
+        is_minor=is_minor,
+        status=CaseStatus.DRAFT,
+        buffer_bps=current_app.config["BUFFER_BPS_DEFAULT"],
+    )
+    case.set_patient_ref(clean_patient_reference(patient_reference))
+    session.add(case)
+    session.flush()
+    audit_service.record("case.created", case, actor=user, details={"hospital_id": hospital.id})
+    return case
+
+
+def update_draft(session: Session, case: Case, user: User, changes: dict[str, Any]) -> Case:
+    """Apply the family's edits to a draft. Only drafts are editable; the caller commits."""
+    if case.status != CaseStatus.DRAFT:
+        raise Conflict("Only a draft can be edited.", code="case_not_editable")
+    if not changes:
+        return case
+
+    cleaners = {
+        "alias": clean_alias,
+        "region": clean_region,
+        "story": clean_story,
+        "patient_reference": clean_patient_reference,
+    }
+    values = {
+        field: cleaners[field](value) if field in cleaners else value
+        for field, value in changes.items()
+    }
+
+    is_minor = values.get("is_minor", case.is_minor)
+    if values.get("is_minor") is True and not case.is_minor:
+        for consent in case.consents:
+            if consent.withdrawn_at is None and consent.actor != ConsentActor.GUARDIAN:
+                raise Conflict(
+                    "A child's case needs the parent or guardian's consent. Withdraw the consent "
+                    "already given and give it again as the guardian.",
+                    code="guardian_consent_required",
+                )
+    if is_minor and values.get("show_photo") is True:
+        raise _field_error(
+            "show_photo",
+            "A child's photo is never shown on the public page.",
+            "photo_not_allowed_for_minor",
+        )
+
+    for field, value in values.items():
+        if field == "patient_reference":
+            case.set_patient_ref(value)
+        else:
+            setattr(case, field, value)
+    if is_minor:
+        case.show_photo = False
+    session.flush()
+    audit_service.record("case.updated", case, actor=user, details={"fields": sorted(changes)})
+    return case
+
+
+def delete_draft(case: Case, user: User) -> Case:
+    """Cancel a draft the family no longer wants. Only drafts can be deleted."""
+    if case.status != CaseStatus.DRAFT:
+        raise Conflict("Only a draft can be deleted.", code="case_not_draft")
+    return transition(case, CaseStatus.CANCELLED, user, "draft_deleted")
+
+
+# --------------------------------------------------------------------------- money
+
+
+def recompute_totals(case: Case) -> None:
+    """Set the cached money columns from the donations and settlements that back them.
+
+    Money moves through donation, settlement and refund code that updates these columns as it
+    goes; this recomputes them from the rows, and tests compare the two after every operation.
+    """
+    counted = {DonationStatus.CAPTURED, DonationStatus.PARTIALLY_REFUNDED, DonationStatus.REFUNDED}
+    donations = [d for d in case.donations if d.status in counted]
+    case.captured_net_usd_minor = sum(d.net_usd_minor for d in donations)
+    case.refunded_usd_minor = sum(d.refunded_usd_minor for d in donations)
+    case.pledged_kes_minor = sum(
+        usd_minor_to_kes_minor(d.net_usd_minor - d.refunded_usd_minor, d.fx_rate.rate)
+        for d in donations
+    )
+    done = [s for s in case.settlements if s.status == SettlementStatus.SUCCEEDED]
+    case.settled_usd_minor = sum(s.amount_usd_minor for s in done)
+    case.settled_kes_minor = sum(s.amount_kes_minor for s in done)
+    case.donor_count = len(donations)
+
+
+def goal_kes_minor(case: Case) -> int | None:
+    """What the case may raise in KES: the confirmed target plus its FX and fee buffer."""
+    if case.target_kes_minor is None:
+        return None
+    return apply_bps(case.target_kes_minor, 10_000 + case.buffer_bps)
+
+
+def is_accepting_donations(case: Case) -> bool:
+    """Live, with a confirmed target, and not yet pledged up to target plus buffer."""
+    goal = goal_kes_minor(case)
+    return case.status == CaseStatus.LIVE and goal is not None and case.pledged_kes_minor < goal
+
+
+# --------------------------------------------------------------------------- reading
+
+
+def status_timeline(session: Session, case: Case) -> list[dict[str, Any]]:
+    """Each status the case has been in and when it got there, oldest first."""
+    entries = session.execute(
+        select(AuditLog)
+        .where(
+            AuditLog.target_type == "case",
+            AuditLog.target_id == case.id,
+            AuditLog.action == "case.transitioned",
+        )
+        .order_by(AuditLog.created_at, AuditLog.id)
+    ).scalars()
+    timeline = [{"status": CaseStatus.DRAFT.value, "at": case.created_at}]
+    timeline.extend({"status": entry.details["to"], "at": entry.created_at} for entry in entries)
+    return timeline
+
+
+def latest_triage(case: Case) -> TriageResult | None:
+    """The newest triage result across the case's documents, if any."""
+    return max(case.triage_results, key=lambda result: result.created_at, default=None)
+
+
+def confirmations_newest_first(case: Case) -> list[Confirmation]:
+    return sorted(
+        case.confirmations, key=lambda confirmation: confirmation.created_at, reverse=True
+    )
+
+
+def public_cases(county: str | None = None) -> Select[tuple[Case]]:
+    """Cases that may appear in the public list: live or funded, with the public page consent."""
+    statement = (
+        select(Case)
+        .join(Hospital, Case.hospital_id == Hospital.id)
+        .where(
+            Case.status.in_([CaseStatus.LIVE, CaseStatus.FUNDED]),
+            exists().where(
+                Consent.case_id == Case.id,
+                Consent.scope == ConsentScope.PUBLIC_PAGE,
+                Consent.withdrawn_at.is_(None),
+            ),
+        )
+    )
+    if county and county.strip():
+        statement = statement.where(func.lower(Hospital.county) == county.strip().lower())
+    return statement.order_by(Case.live_at.desc().nulls_last(), Case.id)
+
+
+def get_public_case_or_404(session: Session, slug: str) -> Case:
+    """A case by its public slug, only if its page is public. Otherwise it does not exist."""
+    case = session.execute(
+        select(Case).where(Case.public_slug == slug.lower())
+    ).scalar_one_or_none()
+    if case is None or not case.is_publicly_visible:
+        raise NotFound("Case not found.", code="case_not_found")
     return case

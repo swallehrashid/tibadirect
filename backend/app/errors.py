@@ -14,6 +14,7 @@ from typing import Any
 from flask import Flask, g
 from flask_smorest import Api
 from flask_wtf.csrf import CSRFError
+from sqlalchemy.orm.exc import StaleDataError
 from werkzeug.exceptions import HTTPException
 
 from app.schemas.errors import ErrorEnvelopeSchema
@@ -134,6 +135,12 @@ def register_error_handlers(app: Flask) -> None:
     @app.errorhandler(AppError)
     def _handle_app_error(error: AppError) -> tuple[dict[str, Any], int]:
         return error_payload(error.code, error.message, error.details), error.status_code
+
+    @app.errorhandler(StaleDataError)
+    def _handle_stale_data(error: StaleDataError) -> tuple[dict[str, Any], int]:
+        # Another request changed the same row first (cases use a version column).
+        message = "This was changed by someone else a moment ago. Reload and try again."
+        return error_payload("conflict", message), 409
 
     @app.errorhandler(CSRFError)
     def _handle_csrf_error(error: CSRFError) -> tuple[dict[str, Any], int]:

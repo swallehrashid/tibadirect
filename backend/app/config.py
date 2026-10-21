@@ -21,6 +21,7 @@ INSECURE_DEFAULTS: dict[str, set[str]] = {
 }
 
 DEFAULT_SYNTHETIC_DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "synthetic"
+DEFAULT_LEXICON_DIR = Path(__file__).resolve().parents[2] / "data" / "lexicons"
 DEFAULT_DATABASE_URL = "postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect"
 DEFAULT_TEST_DATABASE_URL = "postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect_test"
 
@@ -184,6 +185,8 @@ class BaseConfig:
         self.FOLLOW_UP_HOLD_DAYS = _env_int("FOLLOW_UP_HOLD_DAYS", 14)
         self.TWO_PERSON_THRESHOLD_KES = _env_int("TWO_PERSON_THRESHOLD_KES", 200000)
 
+        # Word lists (medical terms, scam phrases); the repository's data/lexicons by default.
+        self.LEXICON_DIR = _env("LEXICON_DIR") or str(DEFAULT_LEXICON_DIR)
         self.SYNTHETIC_DATA_DIR = _env("SYNTHETIC_DATA_DIR") or str(DEFAULT_SYNTHETIC_DATA_DIR)
         self.SEED_HOSPITAL_PAYOUT_EMAILS = _env_json("SEED_HOSPITAL_PAYOUT_EMAILS", {})
 

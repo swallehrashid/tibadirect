@@ -9,6 +9,7 @@ caller's address and a ``details`` object that never holds personal data: forbid
 import re
 import uuid
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 
 from flask import g, has_request_context, request
@@ -145,6 +146,9 @@ def record(
         details=_clean_details(details or {}),
         request_id=request_id or current_request_id(),
         ip_hmac=ip_hmac,
+        # Stamped here, not by the database, which would give every row of one transaction the
+        # same time and leave the order of a case's history undefined.
+        created_at=datetime.now(UTC),
     )
     (session or db.session).add(entry)
     (session or db.session).flush()

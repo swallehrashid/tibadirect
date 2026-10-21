@@ -1,0 +1,5 @@
+Hospitali imethibitisha bili ya "{{ alias }}", na ukurasa wako sasa uko hewani.
+
+Shiriki kiungo hiki na familia na marafiki: {{ url }}
+
+Michango hulipwa kwa hospitali kwa awamu, na kila malipo huonyeshwa kwenye ukurasa.

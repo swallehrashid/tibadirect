@@ -1,0 +1,7 @@
+Your TibaDirect confirmation code for {{ hospital }} is {{ code }}.
+
+{{ requested_by }} on your billing team asked for it to {{ purpose_text }} for the case "{{ alias }}".
+
+It works once and expires in {{ minutes }} minutes. If nobody at your hospital asked for this, do not use the code: ignore this email and tell TibaDirect.
+
+TibaDirect never asks for this code by phone or message.

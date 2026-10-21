@@ -10,6 +10,17 @@ from flask import Flask
 
 from app.services import mail_service
 
+# Every value any template uses, so one test can render all of them.
+TEMPLATE_CONTEXT = {
+    "code": "123456",
+    "minutes": 10,
+    "alias": "Baby Zawadi",
+    "hospital": "Kilele Mission Hospital",
+    "requested_by": "A. Clerk",
+    "purpose_text": "confirm a bill",
+    "url": "https://tibadirect.example/cases/abc",
+}
+
 
 @pytest.fixture(autouse=True)
 def _clean_outbox() -> None:
@@ -54,9 +65,7 @@ def test_every_template_exists_in_both_languages(app: Flask) -> None:
     with app.app_context():
         for template in mail_service.SUBJECTS:
             for language in mail_service.SUPPORTED_LANGUAGES:
-                rendered = mail_service.render(
-                    template, language=language, code="123456", minutes=10
-                )
+                rendered = mail_service.render(template, language=language, **TEMPLATE_CONTEXT)
                 assert rendered.text.strip()
                 assert rendered.html.strip()
 

@@ -84,7 +84,13 @@ class MoneySummarySchema(ma.Schema):
 class ConfirmationSummarySchema(ma.Schema):
     status = ma.fields.Function(lambda c: c.status.value)
     amount_kes_minor = ma.fields.Integer(allow_none=True)
+    invoice_number = ma.fields.String(allow_none=True)
     is_final_bill = ma.fields.Boolean()
+    query_note = ma.fields.String(
+        allow_none=True,
+        metadata={"description": "The hospital's message when it queried or rejected"},
+    )
+    created_at = ma.fields.DateTime()
     finalized_at = ma.fields.DateTime(allow_none=True)
 
 

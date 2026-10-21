@@ -1,0 +1,5 @@
+The hospital confirmed the bill for "{{ alias }}", and your page is now live.
+
+Share this link with family and friends: {{ url }}
+
+Donations are paid to the hospital in steps, and every payment is shown on the page.

@@ -1,0 +1,5 @@
+Tumepokea kesi yako "{{ alias }}".
+
+Tunakagua bili sasa. Baada ya hapo tunaiomba idara ya malipo ya hospitali kuithibitisha. Tutakutumia barua pepe tena kuna mabadiliko.
+
+Hakuna kinachochapishwa hadi hospitali ithibitishe bili.

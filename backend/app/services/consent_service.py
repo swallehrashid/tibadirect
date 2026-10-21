@@ -18,7 +18,7 @@ from app.models.case import Case, Consent
 from app.models.enums import CaseStatus, ConsentActor, ConsentScope
 from app.models.identity import User
 from app.security import crypto
-from app.services import audit_service, case_service
+from app.services import audit_service, case_service, confirmation_service
 
 TEXTS_DIR = Path(__file__).resolve().parents[1] / "consent_texts"
 LANGUAGES = ("en", "sw")
@@ -147,6 +147,9 @@ def grant(
             "language": language,
         },
     )
+    if scope == ConsentScope.PUBLIC_PAGE:
+        # The hospital may have confirmed while the page consent was missing.
+        confirmation_service.go_live_if_ready(session, case)
     return consent
 
 

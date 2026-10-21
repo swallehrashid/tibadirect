@@ -10,6 +10,7 @@ import logging
 import uuid
 from datetime import UTC, datetime, timedelta
 
+from flask import current_app
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -17,6 +18,7 @@ from app.errors import Conflict, NotFound
 from app.jobs import queue as jobs
 from app.models.case import Case, CaseDocument
 from app.models.enums import (
+    ActorType,
     CaseStatus,
     ConsentScope,
     DocumentKind,
@@ -24,7 +26,13 @@ from app.models.enums import (
 )
 from app.models.identity import User
 from app.security import uploads
-from app.services import audit_service, case_service, storage_service
+from app.services import (
+    audit_service,
+    case_service,
+    confirmation_service,
+    notification_service,
+    storage_service,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -176,6 +184,7 @@ def submit_case(session: Session, case: Case, user: User) -> list[CaseDocument]:
     case_service.transition(case, CaseStatus.PENDING_TRIAGE, user)
     audit_service.record("case.submitted", case, actor=user, details={"documents": len(bills)})
     session.flush()
+    notification_service.notify_family(case, "case_submitted")
     return bills
 
 
@@ -212,3 +221,44 @@ def documents_waiting_for_triage(
         .order_by(CaseDocument.created_at)
     )
     return list(session.execute(statement).scalars())
+
+
+def sweep_raw_documents(session: Session, now: datetime | None = None) -> int:
+    """Delete original files held past the retention period. Returns how many were deleted.
+
+    The clock starts when the hospital confirms the bill, or when a case is cancelled. Only the
+    original file goes: the hash, size, type and redacted text stay as the record of what was
+    checked. A file that cannot be deleted now is left for the next sweep.
+    """
+    now = now or datetime.now(UTC)
+    cutoff = now - timedelta(hours=current_app.config["RAW_DOC_RETENTION_HOURS"])
+    held = session.execute(
+        select(CaseDocument).where(
+            CaseDocument.storage_key.is_not(None), CaseDocument.raw_deleted_at.is_(None)
+        )
+    ).scalars()
+    deleted = 0
+    for document in held:
+        case = document.case
+        confirmation = confirmation_service.confirmed(case)
+        confirmed_at = confirmation.finalized_at if confirmation else None
+        cancelled_at = case.updated_at if case.status == CaseStatus.CANCELLED else None
+        started = confirmed_at or cancelled_at
+        if started is None or started > cutoff or document.storage_key is None:
+            continue
+        try:
+            storage_service.delete_object(document.storage_key)
+        except storage_service.StorageError:
+            continue
+        reason = "confirmed" if confirmed_at else "cancelled"
+        document.storage_key = None
+        document.raw_deleted_at = now
+        audit_service.record(
+            "document.raw_deleted",
+            case,
+            actor=ActorType.SYSTEM,
+            details={"document_id": document.id, "reason": reason},
+        )
+        deleted += 1
+    session.flush()
+    return deleted

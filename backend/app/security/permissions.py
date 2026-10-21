@@ -34,6 +34,11 @@ HOSPITAL_VISIBLE_STATUSES = frozenset(
 )
 
 
+# After the hospital has queried or rejected a bill the case leaves these statuses, but the
+# hospital keeps seeing it: it made the decision.
+HOSPITAL_VISIBLE_IF_DECIDED = frozenset({CaseStatus.IN_REVIEW, CaseStatus.CANCELLED})
+
+
 def login_required[**P, R](view: Callable[P, R]) -> Callable[P, R]:
     """Reject anonymous callers with 401 and the standard error envelope."""
 
@@ -109,7 +114,8 @@ def get_owned_case_or_404(case_id: uuid.UUID, user: User) -> Case:
 def get_hospital_case_or_404(case_id: uuid.UUID, staff: HospitalStaff) -> Case:
     """A case at the staff member's own hospital, once the bill has reached the hospital.
 
-    A cancelled case stays visible only if the hospital had already been asked to confirm it.
+    A case in review or cancelled stays visible only if the hospital had already recorded a
+    decision on it (a query or a rejection).
     """
     case = db.session.execute(
         select(Case).where(Case.id == case_id, Case.hospital_id == staff.hospital_id)
@@ -122,7 +128,7 @@ def get_hospital_case_or_404(case_id: uuid.UUID, staff: HospitalStaff) -> Case:
 def _hospital_may_see(case: Case) -> bool:
     if case.status in HOSPITAL_VISIBLE_STATUSES:
         return True
-    if case.status == CaseStatus.CANCELLED:
+    if case.status in HOSPITAL_VISIBLE_IF_DECIDED:
         return bool(
             db.session.execute(select(exists().where(Confirmation.case_id == case.id))).scalar_one()
         )

@@ -11,6 +11,9 @@ from app.jobs import scheduler
 from app.jobs.scheduler import PeriodicJob
 from app.jobs.worker import make_worker
 
+# Periodic jobs the real schedule puts on the default queue (each is queued once on first run).
+DEFAULT_QUEUE_JOBS = sum(1 for job in scheduler.PERIODIC_JOBS if job.queue == jobs.QUEUE_DEFAULT)
+
 SCHEDULE = [
     PeriodicJob("quick", "tests.job_fixtures.add", jobs.QUEUE_DEFAULT, 60),
     PeriodicJob("slow", "tests.job_fixtures.add", jobs.QUEUE_PAYMENTS, 3600),
@@ -28,7 +31,11 @@ def _counter(limit: int) -> Callable[[], bool]:
 
 
 def test_the_heartbeat_is_in_the_real_schedule() -> None:
-    assert [job.name for job in scheduler.PERIODIC_JOBS] == ["heartbeat", "sweep_pending_triage"]
+    assert [job.name for job in scheduler.PERIODIC_JOBS] == [
+        "heartbeat",
+        "sweep_pending_triage",
+        "retention_sweep",
+    ]
 
 
 def test_a_job_is_enqueued_once_per_period(app: Flask, async_jobs: None) -> None:
@@ -63,7 +70,9 @@ def test_the_scheduler_takes_the_lock_enqueues_and_lets_go(app: Flask, async_job
     with app.app_context():
         redis = get_redis()
         assert ticks == [5, 5]
-        assert jobs.get_queue(jobs.QUEUE_DEFAULT).count == 1  # the heartbeat, once
+        assert (
+            jobs.get_queue(jobs.QUEUE_DEFAULT).count == DEFAULT_QUEUE_JOBS
+        )  # each periodic job once
         assert redis.get(scheduler.LOCK_KEY) is None
 
 
@@ -95,7 +104,7 @@ def test_a_waiting_scheduler_takes_over_when_the_lock_is_released(
 
     scheduler.run(app, tick_seconds=1, sleep=release_then_wait, should_stop=_counter(4))
     with app.app_context():
-        assert jobs.get_queue(jobs.QUEUE_DEFAULT).count == 1
+        assert jobs.get_queue(jobs.QUEUE_DEFAULT).count == DEFAULT_QUEUE_JOBS
 
 
 def test_losing_the_lock_makes_the_scheduler_stand_by_instead_of_crashing(

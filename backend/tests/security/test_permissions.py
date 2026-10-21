@@ -167,6 +167,19 @@ def test_staff_never_see_another_hospitals_case(db_session) -> None:  # type: ig
         permissions.get_hospital_case_or_404(case.id, mine)
 
 
+@pytest.mark.parametrize("status", [CaseStatus.IN_REVIEW, CaseStatus.CANCELLED])
+def test_a_case_in_review_or_cancelled_stays_visible_only_after_the_hospital_decided(
+    db_session, status: CaseStatus
+) -> None:  # type: ignore[no-untyped-def]
+    staff = HospitalStaffFactory()
+    undecided = CaseFactory(hospital=staff.hospital, status=status)
+    decided = CaseFactory(hospital=staff.hospital, status=status)
+    ConfirmationFactory(case=decided, confirmation_request__requested_by=staff)
+    with pytest.raises(permissions.NotFound):
+        permissions.get_hospital_case_or_404(undecided.id, staff)
+    assert permissions.get_hospital_case_or_404(decided.id, staff).id == decided.id
+
+
 def test_a_cancelled_case_is_visible_only_if_the_hospital_had_been_asked(db_session) -> None:  # type: ignore[no-untyped-def]
     staff = HospitalStaffFactory()
     never_asked = CaseFactory(hospital=staff.hospital, status=CaseStatus.CANCELLED)

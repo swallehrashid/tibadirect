@@ -37,3 +37,12 @@ def sweep_pending_triage() -> int:
 
     waiting = document_service.documents_waiting_for_triage(db.session)
     return document_service.enqueue_triage(waiting)
+
+
+def retention_sweep() -> int:
+    """Delete original bill files held past the retention period (24 hours after confirmation)."""
+    from app.services import document_service
+
+    deleted = document_service.sweep_raw_documents(db.session)
+    db.session.commit()
+    return deleted

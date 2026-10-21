@@ -41,6 +41,7 @@ PERIODIC_JOBS: list[PeriodicJob] = [
     PeriodicJob(
         "sweep_pending_triage", "app.jobs.tasks.sweep_pending_triage", jobs.QUEUE_TRIAGE, 300
     ),
+    PeriodicJob("retention_sweep", "app.jobs.tasks.retention_sweep", jobs.QUEUE_DEFAULT, 3600),
 ]
 
 

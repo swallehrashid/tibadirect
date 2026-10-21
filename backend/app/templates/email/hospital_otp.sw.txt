@@ -1,0 +1,7 @@
+Msimbo wako wa uthibitisho wa TibaDirect kwa {{ hospital }} ni {{ code }}.
+
+{{ requested_by }} wa timu yako ya malipo ameuomba ili {{ purpose_text }} kwa kesi "{{ alias }}".
+
+Unatumika mara moja na unaisha baada ya dakika {{ minutes }}. Kama hakuna mtu hospitalini kwako aliyeuomba, usiutumie: puuza barua pepe hii na uiarifu TibaDirect.
+
+TibaDirect haiombi msimbo huu kwa simu wala kwa ujumbe.

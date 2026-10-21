@@ -26,6 +26,26 @@ SUBJECTS: dict[str, dict[str, str]] = {
         "en": "Your TibaDirect sign-in code",
         "sw": "Msimbo wako wa kuingia TibaDirect",
     },
+    "hospital_otp": {
+        "en": "Your TibaDirect confirmation code",
+        "sw": "Msimbo wako wa uthibitisho wa TibaDirect",
+    },
+    "case_submitted": {
+        "en": "We received your case",
+        "sw": "Tumepokea kesi yako",
+    },
+    "case_live": {
+        "en": "Your TibaDirect page is live",
+        "sw": "Ukurasa wako wa TibaDirect uko hewani",
+    },
+    "case_queried": {
+        "en": "The hospital has a question about your bill",
+        "sw": "Hospitali ina swali kuhusu bili yako",
+    },
+    "case_rejected": {
+        "en": "The hospital could not confirm your bill",
+        "sw": "Hospitali haikuweza kuthibitisha bili yako",
+    },
 }
 
 
@@ -47,13 +67,14 @@ class OutgoingEmail:
 outbox: list[OutgoingEmail] = []
 
 
-def _language(requested: str | None) -> str:
+def resolve_language(requested: str | None) -> str:
+    """``requested`` if it is a supported language, otherwise English."""
     return requested if requested in SUPPORTED_LANGUAGES else DEFAULT_LANGUAGE
 
 
 def render(template: str, *, language: str, **context: Any) -> OutgoingEmail:
     """Render both parts of a template. The recipient is filled in by ``send``."""
-    language = _language(language)
+    language = resolve_language(language)
     return OutgoingEmail(
         to="",
         subject=SUBJECTS[template][language],

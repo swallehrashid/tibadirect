@@ -28,7 +28,7 @@ def _counter(limit: int) -> Callable[[], bool]:
 
 
 def test_the_heartbeat_is_in_the_real_schedule() -> None:
-    assert [job.name for job in scheduler.PERIODIC_JOBS] == ["heartbeat"]
+    assert [job.name for job in scheduler.PERIODIC_JOBS] == ["heartbeat", "sweep_pending_triage"]
 
 
 def test_a_job_is_enqueued_once_per_period(app: Flask, async_jobs: None) -> None:

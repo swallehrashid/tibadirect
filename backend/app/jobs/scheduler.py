@@ -38,6 +38,9 @@ class PeriodicJob:
 # Later features add their jobs here (FX rates, retention sweep, follow-up holds, ...).
 PERIODIC_JOBS: list[PeriodicJob] = [
     PeriodicJob("heartbeat", "app.jobs.tasks.heartbeat", jobs.QUEUE_DEFAULT, 300),
+    PeriodicJob(
+        "sweep_pending_triage", "app.jobs.tasks.sweep_pending_triage", jobs.QUEUE_TRIAGE, 300
+    ),
 ]
 
 

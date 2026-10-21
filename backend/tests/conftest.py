@@ -155,15 +155,23 @@ def browser_for(app: Flask, db_session: scoped_session, csrf_on: None) -> Callab
 
 @pytest.fixture
 def redis_clean(app: Flask) -> Iterator[None]:
-    """Empty the test Redis database (number 15) before and after a test that uses queues."""
-    with app.app_context():
-        from app.jobs.queue import get_connection
+    """Empty the test Redis database (number 15) before and after a test that uses queues.
 
-        connection = get_connection()
-        assert connection.connection_pool.connection_kwargs["db"] == 15, "refusing to flush"
-        connection.flushdb()
-        yield
-        connection.flushdb()
+    No application context stays open during the test, so it never swaps the database session
+    that other fixtures and factories are using.
+    """
+
+    def flush() -> None:
+        with app.app_context():
+            from app.jobs.queue import get_connection
+
+            connection = get_connection()
+            assert connection.connection_pool.connection_kwargs["db"] == 15, "refusing to flush"
+            connection.flushdb()
+
+    flush()
+    yield
+    flush()
 
 
 @pytest.fixture

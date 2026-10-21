@@ -4,9 +4,12 @@ Each later feature adds its own jobs here and to the schedule in ``scheduler.py`
 """
 
 import logging
+import uuid
 from datetime import UTC, datetime
 
-from app.extensions import get_redis
+from app.ai import pipeline
+from app.extensions import db, get_redis
+from app.jobs.queue import job_request_id
 
 logger = logging.getLogger(__name__)
 
@@ -20,3 +23,17 @@ def heartbeat() -> str:
     get_redis().set(HEARTBEAT_KEY, stamp, ex=HEARTBEAT_TTL_SECONDS)
     logger.info("heartbeat job ran")
     return stamp
+
+
+def triage_document(document_id: str | uuid.UUID) -> str | None:
+    """Check one uploaded bill. Takes an ID only, so no personal data reaches the job log."""
+    result = pipeline.process_document(uuid.UUID(str(document_id)), request_id=job_request_id())
+    return str(result.id) if result is not None else None
+
+
+def sweep_pending_triage() -> int:
+    """Queue triage again for bills a submission left waiting (for example, Redis was down)."""
+    from app.services import document_service
+
+    waiting = document_service.documents_waiting_for_triage(db.session)
+    return document_service.enqueue_triage(waiting)

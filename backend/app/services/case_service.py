@@ -88,6 +88,7 @@ def transition(
     *,
     close_reason: CloseReason | None = None,
     approver: User | None = None,
+    request_id: str | None = None,
     now: datetime | None = None,
 ) -> Case:
     """Move ``case`` to ``to`` and audit it. The caller commits.
@@ -139,7 +140,14 @@ def transition(
     details: dict[str, Any] = {"from": current, "to": to}
     if reason and to != S.FROZEN:
         details["reason"] = reason
-    audit_service.record("case.transitioned", case, actor=actor, approver=approver, details=details)
+    audit_service.record(
+        "case.transitioned",
+        case,
+        actor=actor,
+        approver=approver,
+        details=details,
+        request_id=request_id,
+    )
     return case
 
 

@@ -1,4 +1,5 @@
-# Local infrastructure for TibaDirect: Postgres, Redis, MinIO and Mailpit.
+# Local infrastructure for TibaDirect: Postgres, Redis, MinIO and Mailpit, plus the application
+# services (api, worker, scheduler) under the "app" profile: docker compose --profile app up -d --build
 # Host ports are configurable through .env because other services may already hold the defaults.
 name: tibadirect
 
@@ -79,6 +80,63 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # --- Application services (profile "app"). One image; the commands differ. ---
+  api:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tibadirect-app
+    env_file:
+      - path: .env
+        required: false
+    environment: &app-env
+      APP_ENV: development
+      DATABASE_URL: postgresql+psycopg://tiba:tiba@postgres:5432/tibadirect
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_PUBLIC_ENDPOINT_URL: http://localhost:${MINIO_API_HOST_PORT:-9000}
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SERVE_SPA: "true"
+    command: >
+      sh -c "flask --app wsgi db upgrade &&
+      exec flask --app wsgi run --host 0.0.0.0 --port 5000"
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-5000}:5000"
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      minio-init: {condition: service_completed_successfully}
+      mailpit: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:5000/api/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  worker:
+    profiles: ["app"]
+    image: tibadirect-app
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-env
+    command: ["python", "-m", "app.jobs.worker"]
+    depends_on:
+      api: {condition: service_healthy}
+
+  scheduler:
+    profiles: ["app"]
+    image: tibadirect-app
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-env
+    command: ["python", "-m", "app.jobs.scheduler"]
+    depends_on:
+      api: {condition: service_healthy}
 
 volumes:
   postgres_data:

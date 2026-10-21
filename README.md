@@ -29,7 +29,9 @@ family or with TibaDirect.
 │   │   └── generator/       scripts that build and validate the dataset
 │   └── lexicons/            medical terms, editor software, scam phrases
 ├── docker/                  container init scripts
-├── docker-compose.yml       local PostgreSQL, Redis, MinIO and Mailpit
+├── Dockerfile               one image for the web service, worker and scheduler
+├── render.yaml              Render Blueprint
+├── docker-compose.yml       local PostgreSQL, Redis, MinIO and Mailpit (+ app services)
 ├── Makefile                 shortcuts for the commands below
 └── .env.example             every setting, with safe development defaults
 ```
@@ -54,6 +56,17 @@ Mailpit (captured emails) is at http://localhost:8025 and the MinIO console at h
 Seed accounts sign in with an emailed code (read it in Mailpit): `admin@tibadirect.test`,
 `family1@example.test` to `family4@example.test`, `clerk@kilele-hospital.test` and
 `supervisor@kilele-hospital.test`. The hospital's register email is `billing@kilele-hospital.test`.
+
+## Run in containers
+
+```bash
+cp .env.example .env
+docker compose --profile app up -d --build   # adds the API, worker and scheduler to the stack
+docker compose exec api flask seed
+```
+
+The API is then at http://localhost:5000 (`/api/docs` for the interactive documentation).
+`render.yaml` is the Render Blueprint for a hosted deployment.
 
 ## Synthetic data
 

@@ -1,0 +1,4512 @@
+{
+  "paths": {
+    "/api/health": {
+      "get": {
+        "responses": {
+          "503": {
+            "description": "The database is unreachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Report the service version and whether the database and Redis are reachable.",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/auth/csrf": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsrfToken"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Issue a CSRF token for the current session. Fetch a new one after signing in or out.",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/request-code": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCode"
+              }
+            }
+          }
+        },
+        "summary": "Email a six-digit sign-in code. The answer never reveals whether an account exists.",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/verify": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "401": {
+            "description": "The code is wrong, expired, used or locked"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCode"
+              }
+            }
+          }
+        },
+        "summary": "Check a code and sign in. The first successful sign-in creates a family account.",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "End the session. Safe to call when already signed out.",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The signed-in user, with their role and hospital if they are staff.",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "patch": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMe"
+              }
+            }
+          }
+        },
+        "summary": "Change the display name or the language used in emails and the interface.",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/public/config": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicConfig"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Settings the browser needs before anything else, with no secrets in them.",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/public/stats": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicStats"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Totals for the landing page, counted over public cases only.",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/public/cases": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "county",
+            "schema": {
+              "type": "string",
+              "default": null,
+              "maxLength": 40,
+              "nullable": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCasePage"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Live and funded cases whose families agreed to a public page. ``?county=`` narrows\nby the hospital's county.",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/public/cases/{slug}": {
+      "get": {
+        "responses": {
+          "404": {
+            "description": "No such public case"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCase"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "One public case. A case that is not public is reported as not found.",
+        "tags": [
+          "public"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "slug",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "/api/public/cases/{slug}/ledger": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "404": {
+            "description": "No such public case"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicLedgerRowPage"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Every money movement on a public case, oldest first, with shortened hashes and\nreferences. A donor's name shows only if they gave one and did not ask to be anonymous.",
+        "tags": [
+          "public"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "slug",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "/api/public/cases/{slug}/ledger/verify": {
+      "get": {
+        "responses": {
+          "404": {
+            "description": "No such public case"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseVerification"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Recompute the hash chain and report whether this case's ledger is intact.",
+        "tags": [
+          "public"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "slug",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "/api/admin/jobs": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobsOverview"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Queue lengths, failed jobs and whether the scheduler is alive.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/jobs/{job_id}/retry": {
+      "post": {
+        "responses": {
+          "409": {
+            "description": "The job has not failed"
+          },
+          "404": {
+            "description": "No such job"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetriedJob"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Put a failed job back on its queue.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "job_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "/api/admin/ledger/verify": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainVerification"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Recompute the whole hash chain. If it is broken, names the first entry that fails.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/stats": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStats"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Cases by status, money totals, what is waiting for a person and the queue sizes.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/review-items": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "default": null,
+              "enum": [
+                "open",
+                "resolved",
+                null
+              ],
+              "nullable": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The review queue. Open items come first, the longest waiting on top.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/review-items/{item_id}/resolve": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "Already resolved, or the case cannot take that decision"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveReview"
+              }
+            }
+          }
+        },
+        "summary": "Resolve an item with a decision and a written reason (the reason is required).",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "item_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/admin/cases": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "default": null,
+              "enum": [
+                "draft",
+                "pending_triage",
+                "in_review",
+                "pending_confirmation",
+                "live",
+                "funded",
+                "closed",
+                "cancelled",
+                "frozen",
+                null
+              ],
+              "nullable": true
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "description": "Text in the alias, slug, hospital name or the owner's email",
+            "schema": {
+              "type": "string",
+              "default": null,
+              "maxLength": 80,
+              "nullable": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCaseListItemPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "All cases, newest first. Filter by ``status`` and ``q`` (alias, slug, hospital).",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/cases/{case_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Everything about one case. Opening it is written to the audit log.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/admin/cases/{case_id}/freeze": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "The case cannot be frozen from its current status"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Freeze"
+              }
+            }
+          }
+        },
+        "summary": "Pause a case: it stops being public and stops taking money at once.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/admin/audit-log": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "target_type",
+            "schema": {
+              "type": "string",
+              "default": null,
+              "maxLength": 40,
+              "nullable": true
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "target_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "default": null,
+              "nullable": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditEntryPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The audit log, newest first. Filter with ``target_type`` and ``target_id``.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/hospitals": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "schema": {
+              "type": "string",
+              "default": null,
+              "maxLength": 80,
+              "nullable": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HospitalListItemPage"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Active hospitals by name, for the case wizard. ``?query=`` narrows by name or county.",
+        "tags": [
+          "hospitals"
+        ]
+      }
+    },
+    "/api/consents/texts": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string",
+              "default": "en",
+              "enum": [
+                "en",
+                "sw"
+              ]
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentTexts"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The current wording and version of every consent, in English or Swahili.",
+        "tags": [
+          "consents"
+        ]
+      }
+    },
+    "/api/cases/{case_id}/consents": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Active and withdrawn consents on this case.",
+        "tags": [
+          "consents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "Outdated wording, already given, guardian needed or case closed"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantConsent"
+              }
+            }
+          }
+        },
+        "summary": "Give consent to the current wording of one scope.",
+        "tags": [
+          "consents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/cases/{case_id}/consents/{scope}": {
+      "delete": {
+        "responses": {
+          "404": {
+            "description": "No active consent for that scope"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Withdraw a consent. Withdrawing the public page hides it at once; withdrawing hospital\nverification before the hospital confirms cancels the case.",
+        "tags": [
+          "consents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "scope",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "/api/cases": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCaseListItemPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "My cases, newest first.",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCase"
+              }
+            }
+          }
+        },
+        "summary": "Start a draft case for a hospital bill.",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/cases/{case_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "One of my cases, with its timeline, latest checks, confirmations and money.",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "patch": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "Only a draft can be edited"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCase"
+              }
+            }
+          }
+        },
+        "summary": "Edit a draft: alias, region, story, patient reference, minor flag, photo choice.",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "delete": {
+        "responses": {
+          "409": {
+            "description": "Only a draft can be deleted"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Delete a draft (it becomes cancelled).",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/cases/{case_id}/review-request": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "Already asked, or the case is not in play"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewRequested"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewRequest"
+              }
+            }
+          }
+        },
+        "summary": "Ask for a person to look at your case. One open request at a time.",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/cases/{case_id}/documents": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The case's bills: type, size, status and a short-lived link to your own upload.",
+        "tags": [
+          "documents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "kind",
+            "schema": {
+              "enum": [
+                "invoice",
+                "estimate",
+                "final_bill",
+                "photo"
+              ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "415": {
+            "description": "Not a PDF, PNG or JPEG"
+          },
+          "413": {
+            "description": "The file is larger than 10 MB"
+          },
+          "409": {
+            "description": "Case is not a draft, too many bills or a duplicate file"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFile"
+              }
+            }
+          }
+        },
+        "summary": "Upload a bill (PDF, PNG or JPEG, up to 10 MB). The file name is never kept.",
+        "tags": [
+          "documents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/cases/{case_id}/documents/{document_id}": {
+      "delete": {
+        "responses": {
+          "404": {
+            "description": "No such document on this case"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Remove a bill from a draft case.",
+        "tags": [
+          "documents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "in": "path",
+          "name": "document_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/cases/{case_id}/submit": {
+      "post": {
+        "responses": {
+          "409": {
+            "description": "A consent or the bill is missing, or the case is not a draft"
+          },
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Send the case for checking. Needs both required consents and at least one bill.",
+        "tags": [
+          "documents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/cases/{case_id}/triage": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriageStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The latest result of the automatic checks, in plain language. Never a raw score.",
+        "tags": [
+          "documents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/hospital/queue": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Queue"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Bills waiting for the hospital's decision, and bills waiting for a second approval.",
+        "tags": [
+          "hospital_portal"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/hospital/cases/{case_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HospitalCaseDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Bill details: the original while it exists, what the checks found and the history.",
+        "tags": [
+          "hospital_portal"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/hospital/cases/{case_id}/otp": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "503": {
+            "description": "The email could not be sent"
+          },
+          "409": {
+            "description": "The case is not waiting for that step"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtpSent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OtpRequest"
+              }
+            }
+          }
+        },
+        "summary": "Email a one-time code to the hospital's official address from the facility register.",
+        "tags": [
+          "hospital_portal"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/hospital/cases/{case_id}/decision": {
+      "post": {
+        "responses": {
+          "422": {
+            "description": "Wrong or expired code, or invalid amounts"
+          },
+          "409": {
+            "description": "Not waiting for a decision, or the invoice number is used"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Decision"
+              }
+            }
+          }
+        },
+        "summary": "Confirm, query or reject a bill, with the one-time code from the register address.",
+        "tags": [
+          "hospital_portal"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/hospital/confirmations/{confirmation_id}/approve": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "404": {
+            "description": "No such confirmation at this hospital"
+          },
+          "403": {
+            "description": "Not a supervisor, or the same person who confirmed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Approve"
+              }
+            }
+          }
+        },
+        "summary": "A different supervisor gives the second approval, with a fresh code.",
+        "tags": [
+          "hospital_portal"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "confirmation_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/hospital/settlements": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementItemPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Payments this hospital has received, newest first.",
+        "tags": [
+          "hospital_portal"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "TibaDirect API",
+    "version": "v1"
+  },
+  "tags": [
+    {
+      "name": "health",
+      "description": "Service health"
+    },
+    {
+      "name": "auth",
+      "description": "Sign-in and sessions"
+    },
+    {
+      "name": "public",
+      "description": "Public pages and data"
+    },
+    {
+      "name": "admin",
+      "description": "Admin console"
+    },
+    {
+      "name": "hospitals",
+      "description": "Hospitals"
+    },
+    {
+      "name": "consents",
+      "description": "Consent"
+    },
+    {
+      "name": "cases",
+      "description": "My cases"
+    },
+    {
+      "name": "documents",
+      "description": "Bills and checks"
+    },
+    {
+      "name": "hospital_portal",
+      "description": "Hospital portal"
+    }
+  ],
+  "openapi": "3.0.3",
+  "components": {
+    "schemas": {
+      "ErrorBody": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Stable machine-readable error code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable summary"
+          },
+          "details": {
+            "type": "object",
+            "description": "Extra structured information",
+            "additionalProperties": {}
+          },
+          "request_id": {
+            "type": "string",
+            "description": "Echo of X-Request-ID for support",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaginationMetadata": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "Total number of items."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "Total number of pages."
+          },
+          "first_page": {
+            "type": "integer",
+            "description": "First available page number."
+          },
+          "last_page": {
+            "type": "integer",
+            "description": "Last available page number."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current page number."
+          },
+          "previous_page": {
+            "type": "integer",
+            "description": "Previous page number."
+          },
+          "next_page": {
+            "type": "integer",
+            "description": "Next page number."
+          }
+        },
+        "additionalProperties": false
+      },
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "ok, degraded or error"
+          },
+          "version": {
+            "type": "string"
+          },
+          "db": {
+            "type": "string",
+            "description": "up or down"
+          },
+          "redis": {
+            "type": "string",
+            "description": "up or down"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CsrfToken": {
+        "type": "object",
+        "properties": {
+          "csrf_token": {
+            "type": "string",
+            "description": "Send this in the X-CSRFToken header of every POST, PATCH and DELETE"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RequestCode": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "additionalProperties": false
+      },
+      "Accepted": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyCode": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\s*\\d{6}\\s*$"
+          }
+        },
+        "required": [
+          "code",
+          "email"
+        ],
+        "additionalProperties": false
+      },
+      "HospitalSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "county": {
+            "type": "string"
+          },
+          "staff_role": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "preferred_language": {
+            "type": "string"
+          },
+          "hospital": {
+            "anyOf": [
+              {
+                "type": "object",
+                "nullable": true
+              },
+              {
+                "$ref": "#/components/schemas/HospitalSummary"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateMe": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "preferred_language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "sw"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "FeatureFlags": {
+        "type": "object",
+        "properties": {
+          "agent": {
+            "type": "boolean"
+          },
+          "appeal_checker": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicConfig": {
+        "type": "object",
+        "properties": {
+          "paypal_client_id": {
+            "type": "string",
+            "description": "Public PayPal client ID for the JS SDK; empty in mock mode"
+          },
+          "paypal_mode": {
+            "type": "string",
+            "description": "sandbox or mock"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Donations are always in USD"
+          },
+          "demo_banner": {
+            "type": "boolean",
+            "description": "Show the sandbox money banner"
+          },
+          "features": {
+            "$ref": "#/components/schemas/FeatureFlags"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicStats": {
+        "type": "object",
+        "properties": {
+          "public_cases": {
+            "type": "integer",
+            "description": "Cases with a public page"
+          },
+          "open_cases": {
+            "type": "integer",
+            "description": "Of those, still taking donations"
+          },
+          "pledged_kes_minor": {
+            "type": "integer"
+          },
+          "settled_kes_minor": {
+            "type": "integer",
+            "description": "Already paid to hospitals"
+          },
+          "donations": {
+            "type": "integer"
+          },
+          "hospitals": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicCase": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "hospital_name": {
+            "readOnly": true
+          },
+          "trust_level": {
+            "readOnly": true
+          },
+          "status": {
+            "readOnly": true
+          },
+          "story": {
+            "type": "string",
+            "nullable": true
+          },
+          "photo_url": {
+            "readOnly": true
+          },
+          "is_estimate": {
+            "type": "boolean"
+          },
+          "target_kes_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "target_kes": {
+            "readOnly": true
+          },
+          "pledged_kes_minor": {
+            "type": "integer"
+          },
+          "pledged_kes": {
+            "readOnly": true
+          },
+          "settled_kes_minor": {
+            "type": "integer"
+          },
+          "settled_kes": {
+            "readOnly": true
+          },
+          "usd_goal_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "usd_goal": {
+            "readOnly": true
+          },
+          "donor_count": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "live_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicCasePage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicCase"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicLedgerRow": {
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "entry_type": {
+            "type": "string"
+          },
+          "account": {
+            "type": "string"
+          },
+          "amount_minor": {
+            "type": "integer",
+            "description": "Signed minor units: positive into the account, negative out"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "hash_short": {
+            "type": "string",
+            "description": "First 12 characters of the entry hash"
+          },
+          "reference": {
+            "type": "string",
+            "description": "PayPal or payout reference, shortened",
+            "nullable": true
+          },
+          "donor_name": {
+            "type": "string",
+            "description": "Only on the donation line, and only if the donor gave a name",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicLedgerRowPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicLedgerRow"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CaseVerification": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "description": "True only if the whole chain is intact and has this case's entries"
+          },
+          "entries_checked": {
+            "type": "integer",
+            "description": "This case's entries"
+          },
+          "last_hash": {
+            "type": "string",
+            "description": "Hash of this case's newest entry (zeros if it has none)"
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "QueueStats": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "queued": {
+            "type": "integer"
+          },
+          "started": {
+            "type": "integer"
+          },
+          "scheduled": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FailedJob": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "queue": {
+            "type": "string"
+          },
+          "function": {
+            "type": "string"
+          },
+          "enqueued_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "failed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "retries_left": {
+            "type": "integer"
+          },
+          "request_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "description": "Last line of the error, personal data removed"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SchedulerStatus": {
+        "type": "object",
+        "properties": {
+          "last_heartbeat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "age_seconds": {
+            "type": "integer",
+            "nullable": true
+          },
+          "healthy": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "JobsOverview": {
+        "type": "object",
+        "properties": {
+          "queues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueueStats"
+            }
+          },
+          "failed_jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FailedJob"
+            }
+          },
+          "scheduler": {
+            "$ref": "#/components/schemas/SchedulerStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RetriedJob": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "queue": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChainVerification": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "entries_checked": {
+            "type": "integer"
+          },
+          "last_hash": {
+            "type": "string"
+          },
+          "first_bad_seq": {
+            "type": "integer",
+            "nullable": true
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MoneyTotals": {
+        "type": "object",
+        "properties": {
+          "captured_net_usd_minor": {
+            "type": "integer"
+          },
+          "refunded_usd_minor": {
+            "type": "integer"
+          },
+          "settled_usd_minor": {
+            "type": "integer"
+          },
+          "pledged_kes_minor": {
+            "type": "integer"
+          },
+          "settled_kes_minor": {
+            "type": "integer"
+          },
+          "donations": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Waiting": {
+        "type": "object",
+        "properties": {
+          "open_review_items": {
+            "type": "integer"
+          },
+          "awaiting_second_approval": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminStats": {
+        "type": "object",
+        "properties": {
+          "cases_by_status": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "cases_total": {
+            "type": "integer"
+          },
+          "money": {
+            "$ref": "#/components/schemas/MoneyTotals"
+          },
+          "waiting": {
+            "$ref": "#/components/schemas/Waiting"
+          },
+          "users": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "ledger_entries": {
+            "type": "integer"
+          },
+          "queues": {
+            "type": "array",
+            "description": "Null if the queue server cannot be reached",
+            "items": {
+              "$ref": "#/components/schemas/QueueStats"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReviewItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "case_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "case_alias": {
+            "readOnly": true
+          },
+          "case_status": {
+            "readOnly": true
+          },
+          "source": {
+            "readOnly": true
+          },
+          "status": {
+            "readOnly": true
+          },
+          "reason": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "resolution": {
+            "readOnly": true
+          },
+          "resolution_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReviewItemPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResolveReview": {
+        "type": "object",
+        "properties": {
+          "resolution": {
+            "enum": [
+              "approved_for_confirmation",
+              "kept_unverified",
+              "case_cancelled",
+              "no_action"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "description": "Why, in 10 to 500 characters. Required."
+          }
+        },
+        "required": [
+          "note",
+          "resolution"
+        ],
+        "additionalProperties": false
+      },
+      "AdminCaseListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "public_slug": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "trust_level": {
+            "readOnly": true
+          },
+          "hospital_name": {
+            "readOnly": true
+          },
+          "owner_email": {
+            "readOnly": true
+          },
+          "target_kes_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "pledged_kes_minor": {
+            "type": "integer"
+          },
+          "settled_kes_minor": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminCaseListItemPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCaseListItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminOwner": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminCase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "public_slug": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "story": {
+            "type": "string",
+            "nullable": true
+          },
+          "patient_reference": {
+            "type": "string"
+          },
+          "is_minor": {
+            "type": "boolean"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "trust_level": {
+            "readOnly": true
+          },
+          "close_reason": {
+            "readOnly": true
+          },
+          "freeze_reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "owner": {
+            "$ref": "#/components/schemas/AdminOwner"
+          },
+          "hospital": {
+            "readOnly": true
+          },
+          "money": {
+            "readOnly": true
+          },
+          "documents": {
+            "readOnly": true
+          },
+          "triage": {
+            "readOnly": true
+          },
+          "consents": {
+            "readOnly": true
+          },
+          "confirmations": {
+            "readOnly": true
+          },
+          "donations": {
+            "readOnly": true
+          },
+          "settlements": {
+            "readOnly": true
+          },
+          "refunds": {
+            "readOnly": true
+          },
+          "review_items": {
+            "readOnly": true
+          },
+          "audit_trail": {
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "live_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "closed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "frozen_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Freeze": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 300,
+            "description": "Why the case is being paused (10 to 300 characters)"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "AuditEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor_type": {
+            "readOnly": true
+          },
+          "actor_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "action": {
+            "type": "string"
+          },
+          "target_type": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "request_id": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuditEntryPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditEntry"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HospitalListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "county": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HospitalListItemPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HospitalListItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConsentText": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string",
+            "description": "Send this back when granting"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConsentTexts": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsentText"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Consent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "wording_version": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "granted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "withdrawn_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConsentList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Consent"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "GrantConsent": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "enum": [
+              "hospital_verification",
+              "public_page",
+              "ai_processing_abroad",
+              "receipt_sharing"
+            ]
+          },
+          "actor": {
+            "enum": [
+              "self",
+              "guardian",
+              "administrator"
+            ]
+          },
+          "wording_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "sw"
+            ]
+          }
+        },
+        "required": [
+          "actor",
+          "language",
+          "scope",
+          "wording_version"
+        ],
+        "additionalProperties": false
+      },
+      "HospitalName": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "county": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FamilyCaseListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "public_slug": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "trust_level": {
+            "readOnly": true
+          },
+          "hospital": {
+            "$ref": "#/components/schemas/HospitalName"
+          },
+          "is_publicly_visible": {
+            "type": "boolean"
+          },
+          "money": {
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FamilyCaseListItemPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FamilyCaseListItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCase": {
+        "type": "object",
+        "properties": {
+          "hospital_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "alias": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "region": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "patient_reference": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "is_minor": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "alias",
+          "hospital_id",
+          "patient_reference",
+          "region"
+        ],
+        "additionalProperties": false
+      },
+      "FamilyCase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "public_slug": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "trust_level": {
+            "readOnly": true
+          },
+          "hospital": {
+            "$ref": "#/components/schemas/HospitalName"
+          },
+          "is_publicly_visible": {
+            "type": "boolean"
+          },
+          "money": {
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "story": {
+            "type": "string",
+            "nullable": true
+          },
+          "patient_reference": {
+            "type": "string"
+          },
+          "is_minor": {
+            "type": "boolean"
+          },
+          "show_photo": {
+            "type": "boolean"
+          },
+          "consents": {
+            "readOnly": true
+          },
+          "timeline": {
+            "readOnly": true
+          },
+          "triage": {
+            "readOnly": true
+          },
+          "confirmations": {
+            "readOnly": true
+          },
+          "is_accepting_donations": {
+            "readOnly": true
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "live_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "closed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateCase": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "region": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "story": {
+            "type": "string",
+            "maxLength": 2000,
+            "nullable": true
+          },
+          "patient_reference": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "is_minor": {
+            "type": "boolean"
+          },
+          "show_photo": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReviewRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": false
+      },
+      "ReviewRequested": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "readOnly": true
+          },
+          "status": {
+            "readOnly": true
+          },
+          "mime_type": {
+            "type": "string"
+          },
+          "size_bytes": {
+            "type": "integer"
+          },
+          "page_count": {
+            "type": "integer",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "raw_available": {
+            "readOnly": true
+          },
+          "preview_url": {
+            "readOnly": true,
+            "description": "A five-minute link to your own upload while the original exists"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadFile": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "description": "A PDF, PNG or JPEG of at most 10 MB",
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "additionalProperties": false
+      },
+      "TriageStatus": {
+        "type": "object",
+        "properties": {
+          "ready": {
+            "type": "boolean",
+            "description": "False until the automatic checks have run"
+          },
+          "risk_band": {
+            "type": "string",
+            "nullable": true
+          },
+          "route": {
+            "type": "string",
+            "nullable": true
+          },
+          "reasons_en": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reasons_sw": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QueueCase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "risk_band": {
+            "type": "string",
+            "nullable": true
+          },
+          "bills": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Confirmation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "amount_kes_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "amount_kes": {
+            "readOnly": true
+          },
+          "invoice_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_final_bill": {
+            "type": "boolean"
+          },
+          "deposit_kes_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "confirmed_by": {
+            "readOnly": true
+          },
+          "second_approver": {
+            "readOnly": true
+          },
+          "query_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finalized_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Queue": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueueCase"
+            }
+          },
+          "awaiting_second_approval": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Confirmation"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "HospitalCaseDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "patient_reference": {
+            "type": "string"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "bills": {
+            "readOnly": true
+          },
+          "triage": {
+            "readOnly": true
+          },
+          "confirmations": {
+            "readOnly": true
+          },
+          "two_person_threshold_kes_minor": {
+            "readOnly": true
+          },
+          "otp_destination_masked": {
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OtpRequest": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "decision",
+              "second_approval"
+            ]
+          }
+        },
+        "required": [
+          "purpose"
+        ],
+        "additionalProperties": false
+      },
+      "OtpSent": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destination_masked": {
+            "type": "string",
+            "description": "The register's official address, masked. Codes go nowhere else."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Decision": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "otp": {
+            "type": "string",
+            "pattern": "^\\s*\\d{6}\\s*$"
+          },
+          "decision": {
+            "enum": [
+              "awaiting_second_approval",
+              "confirmed",
+              "queried",
+              "rejected"
+            ],
+            "description": "confirmed, queried or rejected"
+          },
+          "amount_kes": {
+            "type": "number",
+            "default": null,
+            "nullable": true
+          },
+          "invoice_number": {
+            "type": "string",
+            "default": null,
+            "nullable": true
+          },
+          "is_final_bill": {
+            "type": "boolean",
+            "default": false
+          },
+          "deposit_kes": {
+            "type": "number",
+            "default": null,
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "default": null,
+            "maxLength": 500,
+            "description": "Shown to the family. Do not include medical details.",
+            "nullable": true
+          }
+        },
+        "required": [
+          "decision",
+          "otp",
+          "request_id"
+        ],
+        "additionalProperties": false
+      },
+      "DecisionResult": {
+        "type": "object",
+        "properties": {
+          "confirmation": {
+            "$ref": "#/components/schemas/Confirmation"
+          },
+          "case_status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Approve": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "otp": {
+            "type": "string",
+            "pattern": "^\\s*\\d{6}\\s*$"
+          }
+        },
+        "required": [
+          "otp",
+          "request_id"
+        ],
+        "additionalProperties": false
+      },
+      "SettlementItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "case_alias": {
+            "readOnly": true
+          },
+          "tranche_no": {
+            "type": "integer"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "amount_kes_minor": {
+            "type": "integer"
+          },
+          "amount_kes": {
+            "readOnly": true
+          },
+          "external_reference": {
+            "readOnly": true
+          },
+          "requested_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SettlementItemPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettlementItem"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "responses": {
+      "DEFAULT_ERROR": {
+        "description": "Default error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      },
+      "UNPROCESSABLE_ENTITY": {
+        "description": "Unprocessable Entity",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "td_session"
+      },
+      "csrfToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-CSRFToken"
+      }
+    }
+  }
+}

@@ -360,3 +360,20 @@ def test_production_config_is_secure_by_default(monkeypatch: pytest.MonkeyPatch)
     assert config.CORS_ORIGINS == []
     monkeypatch.setenv("CORS_ORIGINS", "https://a.example, https://b.example")
     assert get_config("production").CORS_ORIGINS == ["https://a.example", "https://b.example"]
+
+
+def test_the_health_probe_is_not_redirected_to_https_but_everything_else_is(
+    production_flask: Flask,
+) -> None:
+    production_flask.add_url_rule(
+        "/api/health", endpoint="health.Health", view_func=lambda: {"status": "ok"}
+    )
+    web.exempt_health_from_https_redirect(production_flask)
+    client = production_flask.test_client()
+    probe = client.get("/api/health")
+    assert (probe.status_code, probe.get_json()) == (200, {"status": "ok"})
+    assert client.get("/api/ping").status_code == 302
+
+
+def test_the_real_app_marks_the_health_route_as_exempt(app: Flask) -> None:
+    assert app.view_functions["health.Health"].talisman_view_options["force_https"] is False  # type: ignore[attr-defined]

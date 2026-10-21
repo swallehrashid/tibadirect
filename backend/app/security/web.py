@@ -41,6 +41,9 @@ DOCS_CONTENT_SECURITY_POLICY: dict[str, Any] = {
     "object-src": "'none'",
 }
 _DOCS_ENDPOINT = "api-docs.openapi_swagger_ui"
+# The platform's health probe calls the service directly over plain HTTP, with no forwarded scheme.
+# A redirect there could be read as unhealthy, so only this route skips the HTTPS redirect.
+_HEALTH_ENDPOINT = "health.Health"
 
 CSRF_HEADER = "X-CSRFToken"
 
@@ -79,20 +82,32 @@ def init_security_headers(app: Flask, talisman: Talisman) -> None:
     _relax_policy_for_docs(app)
 
 
-def _relax_policy_for_docs(app: Flask) -> None:
-    view = app.view_functions.get(_DOCS_ENDPOINT)
+def _set_view_options(app: Flask, endpoint: str, **options: Any) -> None:
+    """Give one view its own Talisman options (the view function must be a plain function)."""
+    view = app.view_functions.get(endpoint)
     if view is None:
         return
 
     @functools.wraps(view)
-    def docs_view(*args: Any, **kwargs: Any) -> Any:
+    def wrapped(*args: Any, **kwargs: Any) -> Any:
         return view(*args, **kwargs)
 
-    docs_view.talisman_view_options = {  # type: ignore[attr-defined]
-        "content_security_policy": DOCS_CONTENT_SECURITY_POLICY,
-        "content_security_policy_nonce_in": [],
-    }
-    app.view_functions[_DOCS_ENDPOINT] = docs_view
+    wrapped.talisman_view_options = options  # type: ignore[attr-defined]
+    app.view_functions[endpoint] = wrapped
+
+
+def _relax_policy_for_docs(app: Flask) -> None:
+    _set_view_options(
+        app,
+        _DOCS_ENDPOINT,
+        content_security_policy=DOCS_CONTENT_SECURITY_POLICY,
+        content_security_policy_nonce_in=[],
+    )
+
+
+def exempt_health_from_https_redirect(app: Flask) -> None:
+    """Call after the routes exist: the health probe must not be redirected to HTTPS."""
+    _set_view_options(app, _HEALTH_ENDPOINT, force_https=False)
 
 
 def init_cors(app: Flask) -> None:

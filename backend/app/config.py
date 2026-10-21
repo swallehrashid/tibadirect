@@ -156,6 +156,9 @@ class BaseConfig:
         self.S3_SERVER_SIDE_ENCRYPTION = _env("S3_SERVER_SIDE_ENCRYPTION")
         self.S3_REGION = _env("S3_REGION", "us-east-1")
 
+        # Flask serves the built web app in production; in development Vite does.
+        self.SERVE_SPA = _env_bool("SERVE_SPA", self.APP_ENV == "production")
+        self.FRONTEND_DIST_DIR = _env("FRONTEND_DIST_DIR")
         self.MAIL_BACKEND = _env("MAIL_BACKEND", "smtp")
         self.SMTP_HOST = _env("SMTP_HOST", "localhost")
         self.SMTP_PORT = _env_int("SMTP_PORT", 1025)

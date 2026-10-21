@@ -11,6 +11,8 @@ from app.config import get_config
 from app.errors import register_error_handlers
 from app.logging import configure_logging
 from app.request_id import init_request_id
+from app.security import web
+from app.spa import init_spa
 
 __version__ = "0.1.0"
 
@@ -34,6 +36,8 @@ def create_app(config_name: str | None = None) -> Flask:
     register_error_handlers(app)
     register_cli(app)
     _register_blueprints()
+    web.exempt_health_from_https_redirect(app)
+    init_spa(app)
     return app
 
 

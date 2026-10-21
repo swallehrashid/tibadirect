@@ -1,17 +1,22 @@
 """Routes that exist only in tests, to exercise error handling and validation."""
 
+import uuid
+
 import marshmallow as ma
 from flask import Blueprint as FlaskBlueprint
-from flask import Flask
+from flask import Flask, g
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from sqlalchemy import select
 
 from app import extensions
+from app.api.base import TibaBlueprint
 from app.errors import Conflict, NotFound, PermissionDenied
 from app.extensions import db
+from app.models.enums import UserRole
 from app.models.hospital import FacilityRegisterEntry
 from app.pagination import PaginationArgsSchema, page_of, paginate
+from app.security.permissions import current_account, current_staff, get_case_for_user_or_404
 
 
 class EchoSchema(ma.Schema):
@@ -57,6 +62,57 @@ class Limited(MethodView):
         return {"ok": True}
 
 
+secured_bp = TibaBlueprint("test_secured", __name__, url_prefix="/api/_test/secured")
+
+
+@secured_bp.route("/anyone")
+class Anyone(MethodView):
+    @secured_bp.secured()
+    @secured_bp.response(200)
+    def get(self) -> dict:
+        return {"user": current_account().email}
+
+
+@secured_bp.route("/family")
+class FamilyOnly(MethodView):
+    @secured_bp.secured(UserRole.FAMILY)
+    @secured_bp.response(200)
+    def get(self) -> dict:
+        return {"ok": True}
+
+
+@secured_bp.route("/staff")
+class StaffOnly(MethodView):
+    @secured_bp.secured(UserRole.HOSPITAL_STAFF)
+    @secured_bp.response(200)
+    def get(self) -> dict:
+        return {"hospital_id": str(current_staff().hospital_id)}
+
+
+@secured_bp.route("/admin")
+class AdminOnly(MethodView):
+    @secured_bp.secured(UserRole.ADMIN)
+    @secured_bp.response(200)
+    def post(self) -> dict:
+        return {"ok": True}
+
+
+@secured_bp.route("/family-or-admin")
+class FamilyOrAdmin(MethodView):
+    @secured_bp.secured(UserRole.FAMILY, UserRole.ADMIN)
+    @secured_bp.response(200)
+    def get(self) -> dict:
+        return {"ok": True}
+
+
+@secured_bp.route("/cases/<uuid:case_id>")
+class CaseByRole(MethodView):
+    @secured_bp.secured()
+    @secured_bp.response(200)
+    def get(self, case_id: uuid.UUID) -> dict:
+        return {"id": str(get_case_for_user_or_404(case_id, current_account()).id)}
+
+
 plain_bp = FlaskBlueprint("test_plain", __name__, url_prefix="/api/_test")
 
 
@@ -80,6 +136,18 @@ def forbidden() -> str:
     raise PermissionDenied()
 
 
+def _forget_per_request_state() -> None:
+    """Give every test request the empty ``g`` a real request starts with.
+
+    The test transaction keeps one app context open, so Flask-Login's cached user and Flask-WTF's
+    cached CSRF token would otherwise carry from one client's request to the next.
+    """
+    g.pop("_login_user", None)
+    g.pop("csrf_token", None)
+
+
 def register(app: Flask) -> None:
+    app.before_request(_forget_per_request_state)
     extensions.api.register_blueprint(smorest_bp)
+    extensions.api.register_blueprint(secured_bp)
     app.register_blueprint(plain_bp)

@@ -19,13 +19,6 @@ def _error(response) -> dict:  # type: ignore[no-untyped-def]
     return response.get_json()["error"]
 
 
-@pytest.fixture
-def csrf_on(app: Flask) -> Iterator[None]:
-    app.config["WTF_CSRF_ENABLED"] = True
-    yield
-    app.config["WTF_CSRF_ENABLED"] = False
-
-
 @pytest.fixture(autouse=True)
 def _reset_limits(app: Flask) -> Iterator[None]:
     limiter.reset()

@@ -136,6 +136,7 @@ class BaseConfig:
         self.S3_SECRET_ACCESS_KEY = _env("S3_SECRET_ACCESS_KEY")
         self.S3_REGION = _env("S3_REGION", "us-east-1")
 
+        self.MAIL_BACKEND = _env("MAIL_BACKEND", "smtp")
         self.SMTP_HOST = _env("SMTP_HOST", "localhost")
         self.SMTP_PORT = _env_int("SMTP_PORT", 1025)
         self.SMTP_USERNAME = _env("SMTP_USERNAME")
@@ -198,6 +199,7 @@ class TestConfig(BaseConfig):
         # Tests that exercise CSRF switch this on for the app under test.
         self.WTF_CSRF_ENABLED = False
         self.PAYPAL_MODE = "mock"
+        self.MAIL_BACKEND = "memory"
         self.LLM_API_KEY = ""
         self.DATA_ENCRYPTION_KEY = self.DATA_ENCRYPTION_KEY or DEV_DATA_ENCRYPTION_KEY
         self.LOG_LEVEL = _env("LOG_LEVEL", "WARNING").upper()

@@ -1,0 +1,5 @@
+Msimbo wako wa kuingia TibaDirect ni {{ code }}.
+
+Unatumika mara moja na unaisha baada ya dakika {{ minutes }}. Kama hukuomba kuingia, puuza barua pepe hii.
+
+TibaDirect haiombi msimbo huu kwa simu wala kwa ujumbe.

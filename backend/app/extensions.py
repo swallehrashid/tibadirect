@@ -3,6 +3,7 @@
 from flask import Flask, current_app
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
@@ -18,16 +19,21 @@ api = TibaApi()
 csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address)
 talisman = Talisman()
+login_manager = LoginManager()
 
 
 def init_extensions(app: Flask) -> None:
-    from app.security import web
+    from app.security import permissions, web
 
     web.apply_proxy_fix(app)
     db.init_app(app)
     migrate.init_app(app, db, compare_type=True)
     api.init_app(app)
     web.declare_security_schemes(api)
+    login_manager.init_app(app)
+    login_manager.session_protection = "basic"
+    login_manager.user_loader(permissions.user_loader)
+    login_manager.unauthorized_handler(permissions.unauthorized)
     csrf.init_app(app)
     limiter.init_app(app)
     web.init_security_headers(app, talisman)

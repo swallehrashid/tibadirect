@@ -1,0 +1,5 @@
+Your TibaDirect sign-in code is {{ code }}.
+
+It works once and expires in {{ minutes }} minutes. If you did not ask to sign in, you can ignore this email.
+
+TibaDirect never asks for this code by phone or message.

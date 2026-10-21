@@ -3,6 +3,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from flask_login import UserMixin
 from sqlalchemy import CHAR, CheckConstraint, DateTime, SmallInteger, String, true
 from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
     from app.models.hospital import HospitalStaff
 
 
-class User(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
+class User(UserMixin, db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     """A person who can sign in. Staff and admin accounts exist only through seed or admin tools."""
 
     __tablename__ = "users"

@@ -1,13 +1,16 @@
 """Admin console routes."""
 
+from datetime import UTC, datetime
+
 from flask.views import MethodView
 
 from app.api.base import TibaBlueprint
 from app.extensions import db
 from app.models.enums import UserRole
 from app.schemas.admin import JobsOverviewSchema, RetriedJobSchema
+from app.schemas.ledger import ChainVerificationSchema
 from app.security.permissions import current_account
-from app.services import audit_service, job_service
+from app.services import audit_service, job_service, ledger_service
 from app.services.audit_service import Target
 
 blp = TibaBlueprint("admin", __name__, url_prefix="/api/admin", description="Admin console")
@@ -39,3 +42,26 @@ class RetryJob(MethodView):
         )
         db.session.commit()
         return {"id": job.id, "queue": job.origin, "status": job.get_status().value}
+
+
+@blp.route("/ledger/verify")
+class VerifyLedger(MethodView):
+    @blp.secured(UserRole.ADMIN)
+    @blp.response(200, ChainVerificationSchema)
+    def get(self) -> dict:
+        """Recompute the whole hash chain. If it is broken, names the first entry that fails."""
+        status = ledger_service.verify_chain(db.session)
+        audit_service.record(
+            "ledger.verified",
+            Target("ledger", None),
+            actor=current_account(),
+            details={"valid": status.valid, "entries_checked": status.entries_checked},
+        )
+        db.session.commit()
+        return {
+            "valid": status.valid,
+            "entries_checked": status.entries_checked,
+            "last_hash": status.last_hash,
+            "first_bad_seq": status.first_bad_seq,
+            "checked_at": datetime.now(UTC),
+        }

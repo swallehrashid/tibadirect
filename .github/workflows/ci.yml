@@ -110,3 +110,8 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pinned so CI scans with exactly the version the config was verified against.
+          GITLEAKS_VERSION: "8.24.3"
+          # Findings fail the job and appear in the job summary and the SARIF artifact; commenting
+          # on the pull request would need write permission this workflow does not grant.
+          GITLEAKS_ENABLE_COMMENTS: "false"

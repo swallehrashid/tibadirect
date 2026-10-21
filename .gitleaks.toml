@@ -3,9 +3,10 @@ title = "TibaDirect secret scan"
 [extend]
 useDefault = true
 
-# Only exact, fictional values are allowed. Anything else that looks like a secret still fails.
-[[allowlists]]
-description = "Development-only encryption key from .env.example and a fake production key and token used in tests"
+# Only these exact fictional values are allowed; anything else that looks like a secret fails.
+# The singular [allowlist] table is used because it works in every gitleaks 8.x release.
+[allowlist]
+description = "Development-only encryption key (.env.example, CI), a fake production key and a fake token used in tests"
 regexes = [
   '''ZGV2LW9ubHkta2V5LWRvLW5vdC11c2UtaW4tcHJvZCE=''',
   '''q83vZ1Y2xW9pL0aB5cD7eF1gH3iJ5kL7mN9oP1qR3sT=''',

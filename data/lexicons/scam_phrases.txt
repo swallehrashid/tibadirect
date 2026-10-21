@@ -1,4 +1,4 @@
-# Phrases used by the appeal checker's rule features (docs: SYSTEM_DESIGN.md, appeal checker).
+# Phrases used by the appeal checker's rule features.
 # Format: category: phrase. Matched case-insensitively. Lines starting with '#' are comments.
 # Categories: urgency, personal_payee, send_to_number, advance_fee, secrecy, verification_refusal,
 # impersonation, pressure_to_share, vague_story.

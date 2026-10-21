@@ -105,7 +105,7 @@ def test_synthetic_generate_builds_the_expected_command(app: Flask, monkeypatch,
     assert result.exit_code == 0, result.output
     [(command, cwd)] = calls
     assert command[1:] == ["generate.py", "--out", str(out), "--seed", "7", "--scale", "2"]
-    assert cwd == Path(app.config["SYNTHETIC_DATA_DIR"])
+    assert cwd == Path(app.config["SYNTHETIC_DATA_DIR"]) / "generator"
 
 
 def test_synthetic_generate_reports_a_failing_generator(app: Flask, monkeypatch) -> None:

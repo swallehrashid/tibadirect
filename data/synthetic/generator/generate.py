@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """TibaDirect synthetic dataset generator (requirement AI-01).
 
-    python generate.py --out . --seed 42            # default: 92 invoices + 128 appeals
-    python generate.py --out . --seed 42 --scale 2  # twice as many
+    flask synthetic generate                       # from backend/: the usual way
+    python generate.py --seed 42                   # 92 invoices + 100 appeals into data/synthetic
+    python generate.py --seed 42 --scale 2         # twice as many
 
-Writes (relative to --out):
+Writes (relative to --out, default: the data/synthetic directory above this one):
     facility_register.csv           25 fictional facilities for the facility check (AI-06) and seeding
     invoices/INV-###.{pdf,jpg,png}  genuine, tampered and duplicated documents
     labels.csv                      one row per document: label, tamper type, split, signals
@@ -32,6 +33,7 @@ from catalog import PACKAGE, SCENARIOS, build_items, fake_name, fake_patient, ro
 from hospitals import (BILLING_SYSTEMS, HOSPITALS, LOOKALIKES, UNKNOWN_FACILITIES,
                        format_phone, register_rows, REGISTER_COLUMNS)
 
+DATASET_DIR = Path(__file__).resolve().parent.parent
 HOSP = {h["id"]: h for h in HOSPITALS}
 PRICE_FACTOR = {1: 1.25, 2: 1.15, 3: 0.85, 4: 1.0, 5: 0.9, 6: 0.95, 7: 0.8, 8: 1.05}
 EDITOR = "QuickPDF Editor 9.1"
@@ -453,7 +455,7 @@ def finish(out: Path, stage: Path, docs, rng):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--out", default=".", help="output directory (default: current)")
+    ap.add_argument("--out", default=str(DATASET_DIR), help="output directory (default: data/synthetic)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--scale", type=int, default=1, help="multiply document counts")
     ap.add_argument("--skip-appeals", action="store_true")

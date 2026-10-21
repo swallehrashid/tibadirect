@@ -1,4 +1,4 @@
-"""Read the synthetic dataset in ``data/synthetic`` (see its README).
+"""Read the synthetic dataset in ``data/synthetic`` (built by ``data/synthetic/generator``).
 
 Used by ``flask seed`` and, later, by the AI evaluation. Everything in the dataset is invented.
 """

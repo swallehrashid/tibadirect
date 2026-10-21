@@ -1,7 +1,7 @@
 """Enumerations stored as native PostgreSQL enums (lowercase values).
 
-The table in docs/database/DATABASE_DESIGN.md is the reference;
-a test keeps this module in step with it.
+The initial migration writes the same values out literally; a test compares the database's enum
+labels with this module, so the two cannot drift apart.
 """
 
 import re

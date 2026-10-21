@@ -1,14 +1,11 @@
-"""Whole-schema checks: the metadata matches the design and respects the data-minimisation rules."""
+"""Whole-schema checks: the designed tables exist and the data-minimisation rules hold."""
 
 import re
-from pathlib import Path
 
 from sqlalchemy.orm import configure_mappers
 
 from app.extensions import db
 from app.models.enums import ALL_ENUMS, db_enum_name
-
-DESIGN_DOC = Path(__file__).resolve().parents[3] / "docs" / "database" / "DATABASE_DESIGN.md"
 
 EXPECTED_TABLES = {
     # identity
@@ -52,13 +49,6 @@ NEVER_COLLECT_EXACT = {"national_id", "id_number", "passport", "passport_number"
 def test_the_schema_has_exactly_the_22_designed_tables() -> None:
     assert set(db.metadata.tables) == EXPECTED_TABLES
     assert len(EXPECTED_TABLES) == 22
-
-
-def test_every_table_in_the_design_document_is_modelled() -> None:
-    text = DESIGN_DOC.read_text(encoding="utf8")
-    documented = set(re.findall(r"^### (\w+)(?: \(append-only\))?$", text, flags=re.MULTILINE))
-    dictionary = documented & EXPECTED_TABLES
-    assert dictionary == EXPECTED_TABLES
 
 
 def test_every_table_has_a_primary_key_and_creation_time() -> None:

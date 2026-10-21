@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Sanity-check the synthetic dataset. Exit code 1 if any check fails (safe to run in CI).
 
-    python validate.py            # checks the dataset next to this script
+    python validate.py            # checks the dataset in data/synthetic (the folder above this one)
     python validate.py --ocr 20   # also OCR 20 raster invoices (needs tesseract)
 """
 import argparse
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parent.parent
 fails, passes = [], 0
 
 

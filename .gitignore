@@ -33,3 +33,11 @@ data/synthetic/generated/
 .vscode/
 *.swp
 .DS_Store
+
+# Working documents stay on the team's machines. The only published Markdown is the root README
+# and Markdown the application itself reads at runtime (consent wording).
+*.md
+!/README.md
+!/backend/app/consent_texts/*.md
+*.docx
+*.code-workspace

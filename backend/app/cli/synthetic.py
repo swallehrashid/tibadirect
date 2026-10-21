@@ -13,6 +13,10 @@ def _data_dir() -> Path:
     return Path(current_app.config["SYNTHETIC_DATA_DIR"])
 
 
+def _generator_dir() -> Path:
+    return _data_dir() / "generator"
+
+
 @click.group("synthetic")
 def synthetic_group() -> None:
     """Synthetic invoices, appeals and the facility register (all fictional)."""
@@ -43,7 +47,7 @@ def generate_command(out: Path | None, seed: int, scale: int) -> None:
         str(scale),
     ]
     click.echo(f"Generating into {target} (seed {seed}, scale {scale}) ...")
-    result = subprocess.run(command, cwd=data_dir, check=False)
+    result = subprocess.run(command, cwd=_generator_dir(), check=False)
     if result.returncode:
         raise click.ClickException("The generator failed.")
 
@@ -53,8 +57,7 @@ def generate_command(out: Path | None, seed: int, scale: int) -> None:
 @with_appcontext
 def validate_command(ocr: int) -> None:
     """Run the dataset's consistency checks."""
-    data_dir = _data_dir()
     command = [sys.executable, "validate.py", *(["--ocr", str(ocr)] if ocr else [])]
-    result = subprocess.run(command, cwd=data_dir, check=False)
+    result = subprocess.run(command, cwd=_generator_dir(), check=False)
     if result.returncode:
         raise click.ClickException("The dataset has failing checks.")

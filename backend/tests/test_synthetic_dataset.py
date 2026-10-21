@@ -21,6 +21,7 @@ from app.synthetic_data import (
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = DEFAULT_DATA_DIR
+GENERATOR = DATA / "generator"
 LEXICONS = ROOT / "data" / "lexicons"
 
 
@@ -30,20 +31,20 @@ def _lexicon(name: str) -> list[str]:
 
 
 def _catalog():
-    spec = importlib.util.spec_from_file_location("synthetic_catalog", DATA / "catalog.py")
+    spec = importlib.util.spec_from_file_location("synthetic_catalog", GENERATOR / "catalog.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
 def _hospitals():
-    sys.path.insert(0, str(DATA))
+    sys.path.insert(0, str(GENERATOR))
     try:
         import hospitals  # noqa: PLC0415
 
         return hospitals
     finally:
-        sys.path.remove(str(DATA))
+        sys.path.remove(str(GENERATOR))
         sys.modules.pop("hospitals", None)
 
 
@@ -126,7 +127,7 @@ def test_files_are_small_enough_to_upload() -> None:
 
 def test_the_datasets_own_validator_passes() -> None:
     result = subprocess.run(
-        [sys.executable, "validate.py"], cwd=DATA, capture_output=True, text=True, check=False
+        [sys.executable, "validate.py"], cwd=GENERATOR, capture_output=True, text=True, check=False
     )
     assert result.returncode == 0, result.stdout[-2000:]
     assert " 0 failed" in result.stdout
@@ -173,7 +174,7 @@ def test_the_medical_lexicon_covers_every_clinical_string_the_invoices_print() -
 
 def test_editor_software_lexicon_flags_the_datasets_editors_but_not_billing_systems() -> None:
     editors = [e.lower() for e in _lexicon("editor_software.txt")]
-    generate = (DATA / "generate.py").read_text(encoding="utf-8")
+    generate = (GENERATOR / "generate.py").read_text(encoding="utf-8")
     for constant in ("EDITOR", "GENERIC"):
         value = re.search(rf'^{constant} = "([^"]+)"', generate, flags=re.MULTILINE).group(1)
         assert any(e in value.lower() for e in editors), value
@@ -218,7 +219,7 @@ def test_scam_phrases_separate_the_labelled_appeals() -> None:
 def test_the_same_seed_rebuilds_the_committed_dataset_byte_for_byte(tmp_path: Path) -> None:
     result = subprocess.run(
         [sys.executable, "generate.py", "--out", str(tmp_path), "--seed", "42"],
-        cwd=DATA,
+        cwd=GENERATOR,
         capture_output=True,
         text=True,
         check=False,

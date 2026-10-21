@@ -1,7 +1,7 @@
 # Medical terms that must never leave the server unredacted (diagnoses, procedures, tests, drugs).
 # One term per line, matched case-insensitively as whole words or phrases. Lines starting with '#'
-# are comments. English plus common Swahili. Used by the redaction step (docs: SYSTEM_DESIGN.md) and by
-# the story validator that refuses medical words on public case pages.
+# are comments. English plus common Swahili. Used by the redaction step and by the story validator
+# that refuses medical words on public case pages.
 # Every medical string the synthetic invoices print must appear here; a test enforces it.
 # --- diagnoses and conditions (159)
 abscess

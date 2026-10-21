@@ -1,25 +1,7 @@
-import re
-from pathlib import Path
-
 import pytest
 
 from app.models import enums
 from app.models.enums import ALL_ENUMS, CaseStatus, db_enum_name, pg_enum
-
-DESIGN_DOC = Path(__file__).resolve().parents[3] / "docs" / "database" / "DATABASE_DESIGN.md"
-
-
-def _documented_enums() -> dict[str, list[str]]:
-    """Rows of the enumeration table in the database design document."""
-    section = DESIGN_DOC.read_text(encoding="utf8").split("## 3. Enumerations")[1].split("\n## ")[0]
-    rows = re.findall(r"^\| `(\w+)` \| (.+) \|$", section, flags=re.MULTILINE)
-    return {name: re.findall(r"`(\w+)`", values) for name, values in rows}
-
-
-def test_every_enum_matches_the_design_document() -> None:
-    documented = _documented_enums()
-    in_code = {db_enum_name(cls): [m.value for m in cls] for cls in ALL_ENUMS}
-    assert in_code == documented
 
 
 def test_all_enums_are_registered() -> None:

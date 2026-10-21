@@ -1,0 +1,49 @@
+# Software that edits or re-creates a document. If a PDF's Producer or Creator metadata contains one
+# of these (case-insensitive substring), the tamper check raises pdf_editor_software.
+# Hospital billing systems and plain printers are deliberately NOT listed.
+# PDF editors
+Acrobat Pro
+Adobe Acrobat
+Foxit PhantomPDF
+Foxit Editor
+Nitro PDF
+Nitro Pro
+PDF-XChange Editor
+PDF Studio
+PDFelement
+Wondershare PDFelement
+Soda PDF
+Sejda
+Smallpdf
+iLovePDF
+PDFescape
+PDF24
+Master PDF Editor
+QuickPDF Editor
+Kofax Power PDF
+Canva
+# image editors
+Adobe Photoshop
+Photoshop
+GIMP
+Paint.NET
+Pixlr
+Snapseed
+Adobe Lightroom
+Affinity Photo
+Corel PaintShop
+PhotoScape
+Fotor
+Microsoft Paint
+Inkscape
+CorelDRAW
+# document makers and invoice generators
+Online Invoice Maker
+Invoice Generator
+Invoice Simple
+Zoho Invoice
+Microsoft Word
+LibreOffice Writer
+Google Docs
+Apple Pages
+WPS Writer

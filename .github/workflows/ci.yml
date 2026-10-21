@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (lint, migrations, tests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: tiba
+          POSTGRES_PASSWORD: tiba
+          POSTGRES_DB: tibadirect
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tiba -d tibadirect"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      APP_ENV: development
+      DATA_ENCRYPTION_KEY: ZGV2LW9ubHkta2V5LWRvLW5vdC11c2UtaW4tcHJvZCE=
+      DATABASE_URL: postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect
+      TEST_DATABASE_URL: postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect_test
+      REDIS_URL: redis://localhost:6379/0
+      PAYPAL_MODE: mock
+      LLM_API_KEY: ""
+      PGPASSWORD: tiba
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr poppler-utils
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Create the test database
+        run: psql -h localhost -U tiba -d tibadirect -c "CREATE DATABASE tibadirect_test"
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Migrations run up, down and up again on an empty database
+        run: |
+          flask --app wsgi db upgrade
+          flask --app wsgi db downgrade base
+          flask --app wsgi db upgrade
+
+      - name: Seed data loads and resets
+        env:
+          DEMO_BANNER: "true"
+        run: |
+          flask --app wsgi seed
+          flask --app wsgi reset-demo --yes
+
+      - name: Tests with coverage
+        run: pytest --cov=app --cov-fail-under=75
+
+      - name: Slow tests (dataset reproducibility)
+        run: pytest -m slow
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pinned so CI scans with exactly the version the config was verified against.
+          GITLEAKS_VERSION: "8.24.3"
+          # Findings fail the job and appear in the job summary and the SARIF artifact; commenting
+          # on the pull request would need write permission this workflow does not grant.
+          GITLEAKS_ENABLE_COMMENTS: "false"

@@ -1,0 +1,50 @@
+.DEFAULT_GOAL := help
+
+COMPOSE ?= docker compose
+VENV    ?= $(CURDIR)/backend/.venv
+BIN     := $(VENV)/bin
+
+.PHONY: help up down up-app migrate seed reset-demo test lint fmt gen-api synthetic eval e2e
+
+help: ## Show this help
+	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
+
+up: ## Start Postgres, Redis, MinIO (with bucket) and Mailpit
+	$(COMPOSE) up -d --wait postgres redis minio mailpit
+	$(COMPOSE) run --rm minio-init
+
+down: ## Stop local infrastructure (data volumes are kept)
+	$(COMPOSE) down
+
+up-app: ## Start infrastructure plus the application services (profile "app")
+	$(COMPOSE) --profile app up -d --build
+
+migrate: ## Apply database migrations
+	cd backend && $(BIN)/flask --app wsgi db upgrade
+
+seed: ## Load seed data
+	cd backend && $(BIN)/flask --app wsgi seed
+
+reset-demo: ## Truncate all tables and re-seed
+	cd backend && $(BIN)/flask --app wsgi reset-demo
+
+test: ## Run the backend test suite
+	cd backend && $(BIN)/pytest
+
+lint: ## Lint the backend
+	cd backend && $(BIN)/ruff check . && $(BIN)/ruff format --check .
+
+fmt: ## Format the backend
+	cd backend && $(BIN)/ruff check --fix . && $(BIN)/ruff format .
+
+gen-api: ## Regenerate frontend API types from the running backend
+	cd frontend && npm run gen:api
+
+synthetic: ## Generate the synthetic dataset
+	cd backend && $(BIN)/flask --app wsgi synthetic generate
+
+eval: ## Run the AI evaluation harness
+	cd backend && $(BIN)/flask --app wsgi ai evaluate
+
+e2e: ## Run the end-to-end tests
+	cd frontend && npm run e2e

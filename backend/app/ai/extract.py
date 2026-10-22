@@ -36,6 +36,10 @@ MAX_LLM_CHARS = 12_000
 class LineItem(BaseModel):
     label: str  # already redacted, e.g. "Bed charges", "[REDACTED:PROCEDURE] fee"
     amount_kes: Decimal
+    # not in the specification's schema; read from the bill's quantity and unit price columns,
+    # so the tamper check can test that quantity times unit price is the amount
+    quantity: int | None = None
+    unit_kes: Decimal | None = None
 
     @field_validator("label")
     @classmethod
@@ -183,6 +187,11 @@ def _facility(text: str) -> str | None:
     return lines[0][:80] if lines else None
 
 
+def invoice_number_in(text: str | None) -> str | None:
+    """The invoice, estimate or receipt number printed in the top of a text, if any."""
+    return _invoice_number(text or "")
+
+
 def _invoice_number(text: str) -> str | None:
     for line in text.split("\n")[:25]:
         match = INVOICE_LABEL_RE.search(line)
@@ -218,7 +227,14 @@ def _line_items(text: str) -> list[LineItem]:
         amount = parse_amount(match.group("amount"))
         if amount is None:
             continue
-        items.append(LineItem(label=label, amount_kes=amount))
+        items.append(
+            LineItem(
+                label=label,
+                amount_kes=amount,
+                quantity=int(match.group("qty")),
+                unit_kes=parse_amount(match.group("unit")),
+            )
+        )
     return items
 
 

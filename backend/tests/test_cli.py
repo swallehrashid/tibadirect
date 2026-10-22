@@ -126,3 +126,13 @@ def test_synthetic_validate_reports_failing_checks(app: Flask, monkeypatch) -> N
     result = app.test_cli_runner().invoke(args=["synthetic", "validate"])
     assert result.exit_code != 0
     assert "failing checks" in result.output
+
+
+def test_fx_refresh_stores_and_reports_a_rate(migrated_scratch_app: Flask) -> None:
+    from app.cli.fx import fx_group
+
+    result = migrated_scratch_app.test_cli_runner().invoke(fx_group, ["refresh"])
+
+    assert result.exit_code == 0, result.output
+    assert "USD/KES 129.00000000 from static." in result.output
+    assert _count(migrated_scratch_app, "fx_rates") == 1

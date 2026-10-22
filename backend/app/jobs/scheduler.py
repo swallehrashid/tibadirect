@@ -35,13 +35,14 @@ class PeriodicJob:
     every_seconds: int
 
 
-# Later features add their jobs here (FX rates, retention sweep, follow-up holds, ...).
+# Later features add their jobs here (settlement checks, follow-up holds, ...).
 PERIODIC_JOBS: list[PeriodicJob] = [
     PeriodicJob("heartbeat", "app.jobs.tasks.heartbeat", jobs.QUEUE_DEFAULT, 300),
     PeriodicJob(
         "sweep_pending_triage", "app.jobs.tasks.sweep_pending_triage", jobs.QUEUE_TRIAGE, 300
     ),
     PeriodicJob("retention_sweep", "app.jobs.tasks.retention_sweep", jobs.QUEUE_DEFAULT, 3600),
+    PeriodicJob("refresh_fx_rates", "app.jobs.tasks.refresh_fx_rates", jobs.QUEUE_DEFAULT, 3600),
 ]
 
 

@@ -257,6 +257,29 @@
         ]
       }
     },
+    "/api/public/fx": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicFx"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The latest USD to KES rate. KES amounts on donation receipts use the rate at the time\nof the payment, so this is a guide for choosing an amount, not a quote.",
+        "tags": [
+          "public"
+        ]
+      }
+    },
     "/api/public/stats": {
       "get": {
         "responses": {
@@ -2882,6 +2905,41 @@
           },
           "features": {
             "$ref": "#/components/schemas/FeatureFlags"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicFx": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "string",
+            "example": "USD"
+          },
+          "quote": {
+            "type": "string",
+            "example": "KES"
+          },
+          "rate": {
+            "type": "string",
+            "description": "KES for 1 USD, as a decimal string",
+            "example": "129.00000000"
+          },
+          "source": {
+            "type": "string",
+            "description": "open_er_api, or static for the fallback"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "is_live": {
+            "type": "boolean",
+            "description": "False when the rate is the static one"
+          },
+          "is_stale": {
+            "type": "boolean",
+            "description": "A live rate that has not been refreshed for six hours"
           }
         },
         "additionalProperties": false

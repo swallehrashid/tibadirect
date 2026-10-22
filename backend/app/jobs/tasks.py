@@ -46,3 +46,12 @@ def retention_sweep() -> int:
     deleted = document_service.sweep_raw_documents(db.session)
     db.session.commit()
     return deleted
+
+
+def refresh_fx_rates() -> str:
+    """Store the latest USD to KES rate (hourly). Returns where the rate came from."""
+    from app.services import fx_service
+
+    rate = fx_service.refresh_rates(db.session)
+    db.session.commit()
+    return rate.source

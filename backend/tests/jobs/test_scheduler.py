@@ -35,6 +35,7 @@ def test_the_heartbeat_is_in_the_real_schedule() -> None:
         "heartbeat",
         "sweep_pending_triage",
         "retention_sweep",
+        "refresh_fx_rates",
     ]
 
 

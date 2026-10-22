@@ -7,6 +7,8 @@ GOOD_PRODUCTION_ENV = {
     "DATA_ENCRYPTION_KEY": "q83vZ1Y2xW9pL0aB5cD7eF1gH3iJ5kL7mN9oP1qR3sT=",
     "HASH_PEPPER": "another-long-random-pepper",
     "DATABASE_URL": "postgres://u:p@db.example.test:5432/tibadirect",
+    "S3_ACCESS_KEY_ID": "bucket-user-for-this-test",
+    "S3_SECRET_ACCESS_KEY": "bucket-password-for-this-test",
 }
 
 
@@ -41,6 +43,9 @@ def test_production_accepts_real_values(monkeypatch: pytest.MonkeyPatch) -> None
         ("DATA_ENCRYPTION_KEY", "ZGV2LW9ubHkta2V5LWRvLW5vdC11c2UtaW4tcHJvZCE="),
         ("HASH_PEPPER", "change-me-too"),
         ("HASH_PEPPER", ""),
+        ("S3_ACCESS_KEY_ID", "tibadirect-dev"),
+        ("S3_SECRET_ACCESS_KEY", "tibadirect-dev-secret"),
+        ("S3_SECRET_ACCESS_KEY", ""),
     ],
 )
 def test_production_refuses_default_secrets(

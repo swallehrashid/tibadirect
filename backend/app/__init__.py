@@ -11,6 +11,8 @@ from app.config import get_config
 from app.errors import register_error_handlers
 from app.logging import configure_logging
 from app.request_id import init_request_id
+from app.security import web
+from app.spa import init_spa
 
 __version__ = "0.1.0"
 
@@ -34,10 +36,31 @@ def create_app(config_name: str | None = None) -> Flask:
     register_error_handlers(app)
     register_cli(app)
     _register_blueprints()
+    web.exempt_health_from_https_redirect(app)
+    init_spa(app)
     return app
 
 
 def _register_blueprints() -> None:
+    from app.api.admin import blp as admin_blp
+    from app.api.auth import blp as auth_blp
+    from app.api.cases import blp as cases_blp
+    from app.api.consents import blp as consents_blp
+    from app.api.documents import blp as documents_blp
     from app.api.health import blp as health_blp
+    from app.api.hospital_portal import blp as hospital_portal_blp
+    from app.api.hospitals import blp as hospitals_blp
+    from app.api.public import blp as public_blp
 
-    extensions.api.register_blueprint(health_blp)
+    for blueprint in (
+        health_blp,
+        auth_blp,
+        public_blp,
+        admin_blp,
+        hospitals_blp,
+        consents_blp,
+        cases_blp,
+        documents_blp,
+        hospital_portal_blp,
+    ):
+        extensions.api.register_blueprint(blueprint)

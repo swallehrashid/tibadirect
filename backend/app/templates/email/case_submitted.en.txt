@@ -1,0 +1,5 @@
+We received your case "{{ alias }}".
+
+We are checking the bill now. Once that is done we ask the hospital's billing desk to confirm it. We will email you again when something changes.
+
+Nothing is published until the hospital confirms the bill.

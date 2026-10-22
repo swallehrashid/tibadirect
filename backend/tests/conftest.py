@@ -1,19 +1,23 @@
 """Shared fixtures: the app, a Postgres test database and per-test rolled-back transactions."""
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 import flask_migrate
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
+from moto import mock_aws
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import scoped_session
 
 from app import create_app
-from app.extensions import db
+from app.extensions import db, limiter
+from app.models.identity import User
+from app.services import mail_service
 from tests import support
+from tests.browser import Browser
 
 MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
 
@@ -110,3 +114,96 @@ def migrated_scratch_app(scratch_app: Flask) -> Flask:
     with scratch_app.app_context():
         flask_migrate.upgrade(directory=str(MIGRATIONS_DIR))
     return scratch_app
+
+
+@pytest.fixture
+def csrf_on(app: Flask) -> Iterator[None]:
+    """Switch CSRF protection on for the shared app, as it is in production."""
+    app.config["WTF_CSRF_ENABLED"] = True
+    yield
+    app.config["WTF_CSRF_ENABLED"] = False
+
+
+@pytest.fixture(autouse=True)
+def _fresh_limits_and_outbox() -> Iterator[None]:
+    limiter.reset()
+    mail_service.outbox.clear()
+    yield
+    limiter.reset()
+
+
+@pytest.fixture
+def browser(app: Flask, db_session: scoped_session, csrf_on: None) -> Browser:
+    return Browser(app.test_client())
+
+
+@pytest.fixture
+def browser_for(app: Flask, db_session: scoped_session, csrf_on: None) -> Callable[..., Browser]:
+    """Make a browser already signed in as ``user`` (session set directly, then a fresh token)."""
+
+    def make(user: User, remote_addr: str = "198.51.100.10") -> Browser:
+        client = app.test_client()
+        with client.session_transaction() as session:
+            session["_user_id"] = str(user.id)
+            session["_fresh"] = True
+        browser = Browser(client, remote_addr)
+        browser.refresh_csrf()
+        return browser
+
+    return make
+
+
+@pytest.fixture
+def redis_clean(app: Flask) -> Iterator[None]:
+    """Empty the test Redis database (number 15) before and after a test that uses queues.
+
+    No application context stays open during the test, so it never swaps the database session
+    that other fixtures and factories are using.
+    """
+
+    def flush() -> None:
+        with app.app_context():
+            from app.jobs.queue import get_connection
+
+            connection = get_connection()
+            assert connection.connection_pool.connection_kwargs["db"] == 15, "refusing to flush"
+            connection.flushdb()
+
+    flush()
+    yield
+    flush()
+
+
+@pytest.fixture
+def async_jobs(app: Flask, redis_clean: None) -> Iterator[None]:
+    """Jobs wait on the queue for a worker, as in production, instead of running inline."""
+    app.config["JOBS_ASYNC"] = True
+    yield
+    app.config["JOBS_ASYNC"] = False
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _no_real_object_storage() -> Iterator[None]:
+    """Every S3 call in the test run goes to moto's in-memory service, never to a real server."""
+    with mock_aws():
+        yield
+
+
+@pytest.fixture
+def s3(app: Flask) -> Iterator[None]:
+    """An empty private bucket for the test, emptied and removed afterwards.
+
+    No application context stays open during the test: Flask's CLI reuses an open context, which
+    would point commands run against a scratch app at this app's database.
+    """
+    from app.services import storage_service
+
+    with app.app_context():
+        storage_service.ensure_bucket()
+    yield
+    with app.app_context():
+        client = storage_service._client()
+        bucket = app.config["S3_BUCKET"]
+        for key in list(storage_service._keys_under("")):
+            client.delete_object(Bucket=bucket, Key=key)
+        client.delete_bucket(Bucket=bucket)

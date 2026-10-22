@@ -1,0 +1,5 @@
+Hospitali haikuweza kuthibitisha bili ya "{{ alias }}", kwa hiyo kesi imefungwa.
+
+Ingia kwenye TibaDirect kuona kilichotokea. Hakuna kilichochapishwa na hakuna michango iliyopokelewa.
+
+Ukidhani ni kosa, wasiliana na idara ya malipo ya hospitali kisha anzisha kesi mpya.

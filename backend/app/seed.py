@@ -71,8 +71,10 @@ from app.models.verification import Confirmation, ConfirmationRequest
 from app.money import apply_bps, kes_minor_to_usd_minor, usd_goal_minor, usd_minor_to_kes_minor
 from app.security import crypto
 from app.security.masking import mask_email
-from app.services import ledger_service
+from app.security.uploads import ALLOWED_TYPES
+from app.services import case_service, ledger_service
 from app.services.ledger_service import NewEntry
+from app.services.storage_service import DEMO_PREFIX, document_key
 from app.synthetic_data import DEFAULT_DATA_DIR, DatasetDocument, load_documents, load_register
 
 ADMIN_EMAIL = "admin@tibadirect.test"
@@ -238,6 +240,8 @@ def seed_all(
     _case_funded(world)
     _case_closed(world)
     _case_cancelled(world)
+    session.flush()
+    _add_status_history(world)
     session.flush()
 
     for case in session.execute(select(Case)).scalars():
@@ -411,7 +415,8 @@ def _add_document(
     world.session.add(document)
     world.session.flush()
     if raw_kept:
-        document.storage_key = f"demo/cases/{case.id}/{document.id}"
+        extension = ALLOWED_TYPES.get(doc.mime_type, ("bin", frozenset()))[0]
+        document.storage_key = DEMO_PREFIX + document_key(case.id, document.id, extension)
     else:
         document.raw_deleted_at = uploaded + timedelta(hours=24)
     if status is DocumentStatus.TRIAGED:
@@ -819,20 +824,68 @@ def _gross(world: _World, target_kes_minor: int, share: float) -> int:
     return max(500, round(usd * share / 100) * 100)
 
 
+def _status_path(case: Case) -> list[CaseStatus]:
+    """The statuses a seeded case passed through to reach its current one."""
+    S = CaseStatus
+    paths = {
+        S.DRAFT: [],
+        S.PENDING_TRIAGE: [S.PENDING_TRIAGE],
+        S.IN_REVIEW: [S.PENDING_TRIAGE, S.IN_REVIEW],
+        S.PENDING_CONFIRMATION: [S.PENDING_TRIAGE, S.PENDING_CONFIRMATION],
+        S.LIVE: [S.PENDING_TRIAGE, S.PENDING_CONFIRMATION, S.LIVE],
+        S.FUNDED: [S.PENDING_TRIAGE, S.PENDING_CONFIRMATION, S.LIVE, S.FUNDED],
+        S.CLOSED: [S.PENDING_TRIAGE, S.PENDING_CONFIRMATION, S.LIVE, S.CLOSED],
+        S.CANCELLED: [S.PENDING_TRIAGE, S.PENDING_CONFIRMATION, S.LIVE, S.FROZEN, S.CANCELLED],
+        S.FROZEN: [S.PENDING_TRIAGE, S.PENDING_CONFIRMATION, S.LIVE, S.FROZEN],
+    }
+    return paths[case.status]
+
+
+def _add_status_history(world: _World) -> None:
+    """Write the ``case.transitioned`` entries a real case would have, so the demo timelines work.
+
+    Known dates (submitted, live, funded, frozen, closed) are used where the case has them; the
+    steps between are a minute apart.
+    """
+    known = {
+        CaseStatus.PENDING_TRIAGE: "submitted_at",
+        CaseStatus.LIVE: "live_at",
+        CaseStatus.FUNDED: "funded_at",
+        CaseStatus.FROZEN: "frozen_at",
+        CaseStatus.CLOSED: "closed_at",
+        CaseStatus.CANCELLED: "closed_at",
+    }
+    for case in world.session.execute(select(Case)).scalars():
+        stamps = [getattr(case, name) for name in set(known.values()) | {"submitted_at"}]
+        earliest = min((stamp for stamp in stamps if stamp is not None), default=None)
+        # A seeded case is created "now" by the database; move its start back so history is past.
+        started = (earliest - timedelta(hours=2)) if earliest else world.now - timedelta(hours=6)
+        case.created_at = min(case.created_at, started)
+        previous, clock = CaseStatus.DRAFT, case.created_at
+        for status in _status_path(case):
+            attribute = known.get(status)
+            at = getattr(case, attribute) if attribute else None
+            clock = at if at is not None and at > clock else clock + timedelta(minutes=1)
+            actor = case.created_by if status == CaseStatus.PENDING_TRIAGE else None
+            if status == CaseStatus.FROZEN:
+                actor = world.admin
+            world.session.add(
+                AuditLog(
+                    actor_type=ActorType.USER if actor else ActorType.SYSTEM,
+                    actor_user_id=actor.id if actor else None,
+                    action="case.transitioned",
+                    target_type="case",
+                    target_id=case.id,
+                    details={"from": previous.value, "to": status.value},
+                    created_at=clock,
+                )
+            )
+            previous = status
+
+
 def recompute_cached_totals(session: Session, case: Case) -> None:
-    """Set the cached money columns from the donations and settlements that back them."""
-    counted = {DonationStatus.CAPTURED, DonationStatus.PARTIALLY_REFUNDED, DonationStatus.REFUNDED}
-    donations = [d for d in case.donations if d.status in counted]
-    case.captured_net_usd_minor = sum(d.net_usd_minor for d in donations)
-    case.refunded_usd_minor = sum(d.refunded_usd_minor for d in donations)
-    case.pledged_kes_minor = sum(
-        usd_minor_to_kes_minor(d.net_usd_minor - d.refunded_usd_minor, d.fx_rate.rate)
-        for d in donations
-    )
-    done = [s for s in case.settlements if s.status is SettlementStatus.SUCCEEDED]
-    case.settled_usd_minor = sum(s.amount_usd_minor for s in done)
-    case.settled_kes_minor = sum(s.amount_kes_minor for s in done)
-    case.donor_count = len(donations)
+    """Set the cached money columns from the rows that back them (see ``case_service``)."""
+    case_service.recompute_totals(case)
 
 
 # --------------------------------------------------------------------------- the eight cases

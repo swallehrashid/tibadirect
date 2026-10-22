@@ -1,0 +1,150 @@
+# Render Blueprint. Field names checked against https://render.com/docs/blueprint-spec.
+# Connect the repository in the Render dashboard; values marked `sync: false` are asked for once.
+services:
+  - type: web
+    name: tibadirect-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEMO_BANNER
+        value: "true"
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: PROXY_FIX_COUNT
+        value: "1"
+      - key: JOBS_ASYNC
+        value: "true"
+      - key: S3_SERVER_SIDE_ENCRYPTION
+        value: AES256
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tibadirect-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: tibadirect-redis
+          property: connectionString
+      - key: APP_BASE_URL
+        sync: false
+      - key: S3_ENDPOINT_URL
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      - fromGroup: tibadirect-secrets
+
+  # Runs the periodic scheduler beside an RQ worker for all three queues.
+  - type: worker
+    name: tibadirect-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: sh -c "python -m app.jobs.scheduler & exec python -m app.jobs.worker"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEMO_BANNER
+        value: "true"
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: PROXY_FIX_COUNT
+        value: "1"
+      - key: JOBS_ASYNC
+        value: "true"
+      - key: S3_SERVER_SIDE_ENCRYPTION
+        value: AES256
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tibadirect-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: tibadirect-redis
+          property: connectionString
+      - key: APP_BASE_URL
+        sync: false
+      - key: S3_ENDPOINT_URL
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      - fromGroup: tibadirect-secrets
+
+  # Holds the job queues and rate-limit counters. Private: only services in this Blueprint reach it.
+  - type: keyvalue
+    name: tibadirect-redis
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+    plan: free
+
+databases:
+  - name: tibadirect-db
+    databaseName: tibadirect
+    user: tiba
+    plan: free
+
+# The web service and the worker must hold the SAME secrets, or the worker could not read what the
+# web service encrypted. One group, generated once, is shared by both. generateValue makes a random
+# base64 256-bit value, which is what DATA_ENCRYPTION_KEY needs. Check docs/DEPLOY.md if Render
+# does not generate values inside a group.
+envVarGroups:
+  - name: tibadirect-secrets
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: HASH_PEPPER
+        generateValue: true
+      - key: DATA_ENCRYPTION_KEY
+        generateValue: true

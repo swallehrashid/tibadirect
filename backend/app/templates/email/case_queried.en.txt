@@ -1,0 +1,5 @@
+The hospital has a question about the bill for "{{ alias }}".
+
+Sign in to TibaDirect to read their message. Our team will look at the case and get in touch if we need anything from you.
+
+Your page stays hidden until the hospital confirms the bill.

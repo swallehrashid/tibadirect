@@ -136,3 +136,38 @@ def test_fx_refresh_stores_and_reports_a_rate(migrated_scratch_app: Flask) -> No
     assert result.exit_code == 0, result.output
     assert "USD/KES 129.00000000 from static." in result.output
     assert _count(migrated_scratch_app, "fx_rates") == 1
+
+
+def test_paypal_order_and_capture_commands_walk_a_donation_through(
+    migrated_scratch_app: Flask,
+) -> None:
+    from app.cli.paypal import paypal_group
+
+    runner = migrated_scratch_app.test_cli_runner()
+    runner.invoke(seed_command)
+
+    ordered = runner.invoke(paypal_group, ["order", "demolive2345", "25"])
+    assert ordered.exit_code == 0, ordered.output
+    order_id = re.search(r"Order (\S+) for \$25\.00", ordered.output).group(1)
+    assert "checkoutnow?token=" in ordered.output
+
+    captured = runner.invoke(paypal_group, ["capture", order_id])
+    assert captured.exit_code == 0, captured.output
+    assert "$25.00 gross, $1.03 fee, $23.97 net" in captured.output
+    assert "Receipt token:" in captured.output
+
+
+def test_paypal_commands_explain_why_they_refuse(migrated_scratch_app: Flask) -> None:
+    from app.cli.paypal import paypal_group
+
+    runner = migrated_scratch_app.test_cli_runner()
+    runner.invoke(seed_command)
+
+    unknown = runner.invoke(paypal_group, ["order", "nosuchcase01", "25"])
+    assert unknown.exit_code != 0
+    assert "Case not found" in unknown.output
+    bad_amount = runner.invoke(paypal_group, ["order", "demolive2345", "lots"])
+    assert bad_amount.exit_code != 0
+    missing = runner.invoke(paypal_group, ["capture", "NOSUCHORDER"])
+    assert missing.exit_code != 0
+    assert "donation_not_found" in missing.output

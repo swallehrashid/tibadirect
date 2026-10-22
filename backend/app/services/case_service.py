@@ -352,6 +352,12 @@ def goal_kes_minor(case: Case) -> int | None:
     return apply_bps(case.target_kes_minor, 10_000 + case.buffer_bps)
 
 
+def has_reached_goal(case: Case) -> bool:
+    """Pledged money covers the confirmed target plus its buffer."""
+    goal = goal_kes_minor(case)
+    return goal is not None and case.pledged_kes_minor >= goal
+
+
 def is_accepting_donations(case: Case) -> bool:
     """Live, with a confirmed target, and not yet pledged up to target plus buffer."""
     goal = goal_kes_minor(case)

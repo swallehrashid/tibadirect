@@ -31,6 +31,7 @@ MOCK_PAYER_EMAIL = "mock.donor@example.test"
 WEBHOOK_SIGNATURE_PREFIX = "MOCKSIG-"
 
 PAYOUT_OUTCOMES = frozenset({"SUCCESS", "FAILED", "BLOCKED", "RETURNED", "PENDING"})
+CAPTURE_STATUSES = frozenset({"COMPLETED", "PENDING", "DECLINED"})
 
 
 class Store(Protocol):
@@ -164,6 +165,14 @@ class MockPayPal:
         queue["items"].append({"http_status": http_status, "name": name, "issue": issue})
         self.store.put("faults", operation, queue)
 
+    def next_capture_status(self, status: str) -> None:
+        """Make the next capture end as PENDING or DECLINED instead of COMPLETED."""
+        if status not in CAPTURE_STATUSES:
+            raise ValueError(f"Unknown capture status {status!r}")
+        queue = self.store.get("outcomes", "capture") or {"items": []}
+        queue["items"].append(status)
+        self.store.put("outcomes", "capture", queue)
+
     def next_payout_outcome(self, outcome: str) -> None:
         """Decide how the next payout item ends: SUCCESS, FAILED, BLOCKED, RETURNED or PENDING."""
         if outcome not in PAYOUT_OUTCOMES:
@@ -266,31 +275,38 @@ class MockPayPal:
         gross = to_minor(unit["amount"]["value"])
         fee = apply_bps(gross, self.fee_bps, rounding=ROUND_HALF_UP) + self.fee_fixed_usd_minor
         fee = min(fee, gross)
+        queue = self.store.get("outcomes", "capture") or {"items": []}
+        status = queue["items"].pop(0) if queue["items"] else "COMPLETED"
+        self.store.put("outcomes", "capture", queue)
         capture_id = _derive("CAP", f"{order_id}|capture")
-        capture = {
+        capture: dict[str, Any] = {
             "id": capture_id,
-            "status": "COMPLETED",
+            "status": status,
             "amount": unit["amount"],
             "final_capture": True,
             "custom_id": unit["custom_id"],
-            "seller_receivable_breakdown": {
-                "gross_amount": _money(gross),
-                "paypal_fee": _money(fee),
-                "net_amount": _money(gross - fee),
-            },
             "create_time": _stamp(),
             "update_time": _stamp(),
         }
-        order["status"] = "COMPLETED"
+        if status == "COMPLETED":
+            capture["seller_receivable_breakdown"] = {
+                "gross_amount": _money(gross),
+                "paypal_fee": _money(fee),
+                "net_amount": _money(gross - fee),
+            }
+        else:
+            capture["status_details"] = {
+                "reason": "PENDING_REVIEW" if status == "PENDING" else "OTHER"
+            }
+        unit["payments"] = {"captures": [capture]}
+        if status == "COMPLETED":
+            order["status"] = "COMPLETED"
         completed = {
             "id": order_id,
-            "status": "COMPLETED",
+            "status": order["status"],
             "payer": order["payer"],
             "purchase_units": [
-                {
-                    "reference_id": unit["reference_id"],
-                    "payments": {"captures": [capture]},
-                }
+                {"reference_id": unit["reference_id"], "payments": {"captures": [capture]}}
             ],
         }
         self.store.put("order", order_id, order)

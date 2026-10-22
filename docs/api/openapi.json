@@ -2200,6 +2200,134 @@
         }
       ]
     },
+    "/api/donations/orders": {
+      "post": {
+        "responses": {
+          "422": {
+            "description": "Amount, name or choice not valid"
+          },
+          "502": {
+            "description": "PayPal could not be reached"
+          },
+          "409": {
+            "description": "The case is not taking donations (case_not_accepting)"
+          },
+          "404": {
+            "description": "No such public case"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderCreated"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrder"
+              }
+            }
+          }
+        },
+        "summary": "Start a donation: creates the PayPal order the donor then approves in PayPal.",
+        "tags": [
+          "donations"
+        ]
+      }
+    },
+    "/api/donations/orders/{order_id}/capture": {
+      "post": {
+        "responses": {
+          "502": {
+            "description": "PayPal could not be reached"
+          },
+          "422": {
+            "description": "PayPal declined the payment"
+          },
+          "409": {
+            "description": "Case fully funded (nothing was captured), or payment pending"
+          },
+          "404": {
+            "description": "No such order"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Take the money once the donor has approved the order. Repeating the call returns the\nsame donation. If the case stopped needing money since the order was made, nothing is\ncaptured and the donor is not charged.",
+        "tags": [
+          "donations"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "order_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "/api/donations/receipts/{receipt_token}": {
+      "get": {
+        "responses": {
+          "404": {
+            "description": "No such receipt"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "A donation receipt: amount, fee, KES estimate, excess choice, case and ledger entry.",
+        "tags": [
+          "donations"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "receipt_token",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
     "/api/hospital/queue": {
       "get": {
         "responses": {
@@ -2646,6 +2774,10 @@
     {
       "name": "documents",
       "description": "Bills and checks"
+    },
+    {
+      "name": "donations",
+      "description": "Donate to a case"
     },
     {
       "name": "hospital_portal",
@@ -4213,6 +4345,149 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateOrder": {
+        "type": "object",
+        "properties": {
+          "case_slug": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "amount_usd": {
+            "type": "number",
+            "description": "US dollars, $1 to $10,000, at most two decimals",
+            "example": "25.00"
+          },
+          "excess_choice": {
+            "default": "refund",
+            "description": "What happens to money the case does not need",
+            "enum": [
+              "refund",
+              "solidarity_pool",
+              "follow_up_care"
+            ]
+          },
+          "donor_display_name": {
+            "type": "string",
+            "default": null,
+            "description": "Shown beside the donation in the public ledger",
+            "nullable": true
+          },
+          "is_anonymous": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "amount_usd",
+          "case_slug"
+        ],
+        "additionalProperties": false
+      },
+      "OrderCreated": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "Give this to the PayPal button"
+          },
+          "amount_usd_minor": {
+            "type": "integer"
+          },
+          "amount_usd": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Receipt": {
+        "type": "object",
+        "properties": {
+          "receipt_token": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "amount_usd_minor": {
+            "type": "integer"
+          },
+          "amount_usd": {
+            "readOnly": true
+          },
+          "paypal_fee_usd_minor": {
+            "type": "integer"
+          },
+          "paypal_fee_usd": {
+            "readOnly": true
+          },
+          "net_usd_minor": {
+            "type": "integer",
+            "description": "What reaches the case"
+          },
+          "net_usd": {
+            "readOnly": true
+          },
+          "refunded_usd_minor": {
+            "type": "integer"
+          },
+          "kes_estimate_minor": {
+            "type": "integer",
+            "description": "KES value of the net amount at the rate when it was paid"
+          },
+          "kes_estimate": {
+            "readOnly": true
+          },
+          "fx_rate": {
+            "type": "string",
+            "nullable": true
+          },
+          "excess_choice": {
+            "type": "string"
+          },
+          "donor_display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "case_slug": {
+            "type": "string"
+          },
+          "case_alias": {
+            "type": "string"
+          },
+          "hospital_name": {
+            "type": "string"
+          },
+          "ledger_reference": {
+            "type": "string",
+            "description": "The PayPal capture, shortened",
+            "nullable": true
+          },
+          "ledger_hash_short": {
+            "type": "string",
+            "description": "First 12 characters of the ledger entry hash",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CaptureResult": {
+        "type": "object",
+        "properties": {
+          "receipt_token": {
+            "type": "string"
+          },
+          "donation": {
+            "$ref": "#/components/schemas/Receipt"
           }
         },
         "additionalProperties": false

@@ -1,0 +1,10 @@
+Thank you for helping with "{{ alias }}".
+
+You gave: {{ amount }}
+PayPal fee: {{ fee }}
+Goes to the case: {{ net }} (about {{ kes_estimate }} at today's rate)
+
+Your money is paid to the hospital in steps, never to the family. See every step on the case ledger:
+{{ ledger_url }}
+
+Your receipt: {{ receipt_url }}

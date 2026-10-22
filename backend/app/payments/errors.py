@@ -130,3 +130,13 @@ def unavailable(reason: str) -> PayPalError:
     """The network failed before PayPal answered (timeout, connection reset)."""
     status, code, message = UNAVAILABLE
     return PayPalError(status_code=status, code=code, message=message, issue=reason, retryable=True)
+
+
+def malformed(what: str) -> PayPalError:
+    """PayPal answered, but not in the shape its documentation promises."""
+    return PayPalError(
+        status_code=502,
+        code="paypal_bad_response",
+        message="PayPal sent an answer we could not read.",
+        issue=what,
+    )

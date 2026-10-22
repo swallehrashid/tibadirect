@@ -2,6 +2,7 @@
 
 from flask import Flask
 
+from app.cli.ai import ai_group
 from app.cli.fx import fx_group
 from app.cli.paypal import paypal_group
 from app.cli.seed import reset_demo_command, seed_command
@@ -16,3 +17,4 @@ def register_cli(app: Flask) -> None:
     app.cli.add_command(storage_group)
     app.cli.add_command(fx_group)
     app.cli.add_command(paypal_group)
+    app.cli.add_command(ai_group)

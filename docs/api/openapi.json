@@ -500,6 +500,60 @@
         }
       ]
     },
+    "/api/public/checker/appeal": {
+      "post": {
+        "responses": {
+          "429": {
+            "description": "More than 20 checks an hour from this address"
+          },
+          "422": {
+            "description": "No readable message"
+          },
+          "404": {
+            "description": "The checker is switched off"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppealResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Score a forwarded appeal. What you send is hashed and never stored.",
+        "tags": [
+          "checker"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppealText"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
     "/api/admin/jobs": {
       "get": {
         "responses": {
@@ -3017,6 +3071,10 @@
       "description": "Public pages and data"
     },
     {
+      "name": "checker",
+      "description": "Check a forwarded appeal"
+    },
+    {
       "name": "admin",
       "description": "Admin console"
     },
@@ -3540,6 +3598,98 @@
           "checked_at": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppealText": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000,
+            "description": "The message exactly as received. It is not stored."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "MatchedCase": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "hospital_name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "description": "This appeal matches a hospital-confirmed TibaDirect case"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppealResult": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer",
+            "description": "0 (no concern) to 100"
+          },
+          "band": {
+            "type": "string",
+            "description": "low, medium or high"
+          },
+          "flagged": {
+            "type": "boolean",
+            "description": "True if it reads as likely a scam"
+          },
+          "reasons_en": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reasons_sw": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "matched_case": {
+            "anyOf": [
+              {
+                "type": "object",
+                "nullable": true
+              },
+              {
+                "$ref": "#/components/schemas/MatchedCase"
+              }
+            ]
+          },
+          "safety_tip_en": {
+            "type": "string"
+          },
+          "safety_tip_sw": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Only when the optional language model is on",
+            "nullable": true
+          },
+          "used_llm": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

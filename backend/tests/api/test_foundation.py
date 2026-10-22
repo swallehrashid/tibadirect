@@ -187,7 +187,7 @@ def test_public_config_exposes_only_what_the_browser_needs(client: FlaskClient, 
         "paypal_mode": "mock",
         "currency": "USD",
         "demo_banner": app.config["DEMO_BANNER"],
-        "features": {"agent": False, "appeal_checker": False},
+        "features": {"agent": False, "appeal_checker": True},
     }
     assert "secret" not in str(body).lower()
 

@@ -45,6 +45,7 @@ def _register_blueprints() -> None:
     from app.api.admin import blp as admin_blp
     from app.api.auth import blp as auth_blp
     from app.api.cases import blp as cases_blp
+    from app.api.checker import blp as checker_blp
     from app.api.consents import blp as consents_blp
     from app.api.documents import blp as documents_blp
     from app.api.donations import blp as donations_blp
@@ -58,6 +59,7 @@ def _register_blueprints() -> None:
         health_blp,
         auth_blp,
         public_blp,
+        checker_blp,
         admin_blp,
         hospitals_blp,
         consents_blp,

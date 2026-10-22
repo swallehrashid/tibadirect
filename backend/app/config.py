@@ -203,8 +203,7 @@ class BaseConfig:
 
         self.RAW_DOC_RETENTION_HOURS = _env_int("RAW_DOC_RETENTION_HOURS", 24)
         self.AGENT_ENABLED = _env_bool("AGENT_ENABLED", False)
-        # The checker itself ships in Phase 3, which turns this on by default.
-        self.APPEAL_CHECKER_ENABLED = _env_bool("APPEAL_CHECKER_ENABLED", False)
+        self.APPEAL_CHECKER_ENABLED = _env_bool("APPEAL_CHECKER_ENABLED", True)
         self.APPEAL_CHECKER_USE_LLM = _env_bool("APPEAL_CHECKER_USE_LLM", False)
 
 

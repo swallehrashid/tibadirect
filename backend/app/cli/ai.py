@@ -8,7 +8,8 @@ import joblib
 from flask import current_app
 from flask.cli import with_appcontext
 
-from app.ai import appeals
+from app.ai import appeals, evaluate
+from app.ai.appeals import split_metrics
 from app.models.hospital import normalize_facility_name
 from app.synthetic_data import load_register
 
@@ -16,28 +17,6 @@ from app.synthetic_data import load_register
 @click.group("ai")
 def ai_group() -> None:
     """The AI engine's commands."""
-
-
-def split_metrics(model: object, rows: list[dict], names: list[str]) -> dict[str, float | int]:
-    """Precision and recall of "likely a scam" (score of 50 or more) over labelled messages."""
-    tp = fp = fn = tn = 0
-    for row in rows:
-        probability = float(model.predict_proba([row["text"]])[0][1])  # type: ignore[attr-defined]
-        score = appeals.score_from(appeals.rule_features(names, row["text"]), probability)
-        flagged, scam = score >= appeals.FLAG_FROM, row["label"] == "scam"
-        tp += flagged and scam
-        fp += flagged and not scam
-        fn += (not flagged) and scam
-        tn += (not flagged) and not scam
-    return {
-        "n": len(rows),
-        "precision": round(tp / max(1, tp + fp), 3),
-        "recall": round(tp / max(1, tp + fn), 3),
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-        "tn": tn,
-    }
 
 
 @ai_group.command("train-appeals")
@@ -68,3 +47,22 @@ def train_appeals_command(out: Path, train_on: str) -> None:
     appeals.forget_model()
     click.echo(f"Trained on {len(training)} messages ({train_on}) -> {out}")
     click.echo(f"Held-out test split: {artifact['test_metrics']}")
+
+
+@ai_group.command("evaluate")
+@click.option(
+    "--out",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Where to write the report (default: docs/evaluation/REPORT.md in the repository).",
+)
+@with_appcontext
+def evaluate_command(out: Path | None) -> None:
+    """Run every check against the synthetic set and write the evaluation report."""
+    data_dir = Path(current_app.config["SYNTHETIC_DATA_DIR"])
+    destination = out or Path(__file__).resolve().parents[3] / "docs" / "evaluation" / "REPORT.md"
+    result = evaluate.evaluate(data_dir)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(evaluate.render_report(result), encoding="utf-8")
+    scored = sum(run.scored for run in result.runs)
+    click.echo(f"Evaluated {scored} of {len(result.runs)} bills -> {destination}")

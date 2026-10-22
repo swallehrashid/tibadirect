@@ -95,6 +95,11 @@ jobs:
       - name: The appeal classifier trains and scores the held-out messages
         run: flask --app wsgi ai train-appeals --out "$RUNNER_TEMP/appeal_clf.joblib"
 
+      - name: The evaluation runs against the synthetic set
+        run: |
+          flask --app wsgi ai evaluate --out "$RUNNER_TEMP/REPORT.md"
+          head -20 "$RUNNER_TEMP/REPORT.md"
+
       - name: Tests with coverage
         run: pytest --cov=app --cov-fail-under=75
 

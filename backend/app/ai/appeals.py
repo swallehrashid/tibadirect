@@ -371,6 +371,28 @@ def assess(session: Session, value: str) -> Verdict:
     )
 
 
+def split_metrics(model: object, rows: list[dict], names: list[str]) -> dict[str, float | int]:
+    """Precision and recall of "likely a scam" (score of 50 or more) over labelled messages."""
+    tp = fp = fn = tn = 0
+    for row in rows:
+        probability = float(model.predict_proba([row["text"]])[0][1])  # type: ignore[attr-defined]
+        score = score_from(rule_features(names, row["text"]), probability)
+        flagged, scam = score >= FLAG_FROM, row["label"] == "scam"
+        tp += flagged and scam
+        fp += flagged and not scam
+        fn += (not flagged) and scam
+        tn += (not flagged) and not scam
+    return {
+        "n": len(rows),
+        "precision": round(tp / max(1, tp + fp), 3),
+        "recall": round(tp / max(1, tp + fn), 3),
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
+    }
+
+
 def read_image(data: bytes, mime_type: str) -> str:
     """The text of a screenshot of a message."""
     return text_reader.extract(data, mime_type).text

@@ -20,6 +20,8 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
+from sqlalchemy.orm import Session
+
 from app.ai import duplicates, extract, facility, llm, redact, risk, tamper, text
 from app.ai.reasons import reasons_for
 from app.ai.signals import Signal
@@ -74,13 +76,22 @@ def _unreadable(reason: str) -> TriageOutcome:
     )
 
 
-def analyse(document: CaseDocument) -> TriageOutcome:
+def analyse(
+    document: CaseDocument, raw: bytes | None = None, session: Session | None = None
+) -> TriageOutcome:
     """Run every check on one document and return the outcome. Updates the document's stored
-    redacted text, page hash and fingerprint; the caller commits."""
+    redacted text, page hash and fingerprint; the caller commits.
+
+    ``raw`` is the file itself when the caller already holds it (the evaluation does); otherwise
+    it is read from private storage. ``session`` is where the register and earlier bills are
+    looked up; the evaluation passes its own so it never sees real submissions.
+    """
+    session = session or db.session
     case = document.case
-    if document.storage_key is None or document.raw_deleted_at is not None:
-        return _unreadable("no_file")
-    raw = storage_service.get_object(document.storage_key)
+    if raw is None:
+        if document.storage_key is None or document.raw_deleted_at is not None:
+            return _unreadable("no_file")
+        raw = storage_service.get_object(document.storage_key)
     read = text.extract(raw, document.mime_type)
 
     cleaned = redact.redact(read.text)
@@ -102,7 +113,7 @@ def analyse(document: CaseDocument) -> TriageOutcome:
             Signal("low_extraction_confidence", {"reason": read.error or "ocr_unavailable"})
         )
 
-    matched = facility.check(db.session, bill, read.text, case.hospital)
+    matched = facility.check(session, bill, read.text, case.hospital)
     canonical = (
         matched.match.entry.name
         if matched.match.entry and matched.match.score >= 85
@@ -114,7 +125,7 @@ def analyse(document: CaseDocument) -> TriageOutcome:
 
     signals.extend(
         duplicates.check(
-            db.session,
+            session,
             case,
             document,
             sha256=document.sha256,

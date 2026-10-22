@@ -162,6 +162,7 @@ class Settlement(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     idempotency_key: Mapped[str] = mapped_column(String(64), unique=True)
     external_batch_id: Mapped[str | None] = mapped_column(String(40))
     external_item_id: Mapped[str | None] = mapped_column(String(40))
+    invoice_payment_id: Mapped[str | None] = mapped_column(String(40))
     failure_reason: Mapped[str | None] = mapped_column(String(300))
     requested_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

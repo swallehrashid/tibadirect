@@ -5026,6 +5026,16 @@
             "type": "string",
             "nullable": true
           },
+          "paypal_invoice_id": {
+            "type": "string",
+            "description": "The PayPal invoice issued for this bill, if any",
+            "nullable": true
+          },
+          "invoice_status": {
+            "type": "string",
+            "description": "PayPal's status for that invoice: DRAFT, SENT, PARTIALLY_PAID, PAID, CANCELLED, or FAILED if it could not be issued",
+            "nullable": true
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"

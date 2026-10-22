@@ -72,6 +72,16 @@ class ConfirmationSchema(ma.Schema):
         lambda c: c.second_approver.user.display_name if c.second_approver else None
     )
     query_note = ma.fields.String(allow_none=True)
+    paypal_invoice_id = ma.fields.String(
+        allow_none=True, metadata={"description": "The PayPal invoice issued for this bill, if any"}
+    )
+    invoice_status = ma.fields.String(
+        allow_none=True,
+        metadata={
+            "description": "PayPal's status for that invoice: DRAFT, SENT, PARTIALLY_PAID, PAID, "
+            "CANCELLED, or FAILED if it could not be issued"
+        },
+    )
     created_at = ma.fields.DateTime()
     finalized_at = ma.fields.DateTime(allow_none=True)
 

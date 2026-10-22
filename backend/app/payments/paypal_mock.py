@@ -472,6 +472,158 @@ class MockPayPal:
             items.append(entry)
         return {"batch_header": header, "items": items}
 
+    # ------------------------------------------------------------------ invoices
+
+    def _invoice(self, invoice_id: str) -> dict[str, Any]:
+        invoice = self.store.get("invoice", invoice_id)
+        if invoice is None:
+            raise errors.from_response(
+                404,
+                {"name": "RESOURCE_NOT_FOUND", "details": [{"issue": "INVALID_RESOURCE_ID"}]},
+                None,
+            )
+        return invoice
+
+    @staticmethod
+    def _wrong_status(invoice: dict[str, Any]) -> errors.PayPalError:
+        return errors.from_response(
+            422,
+            {"name": "UNPROCESSABLE_ENTITY", "details": [{"issue": "INVALID_INVOICE_STATUS"}]},
+            None,
+        )
+
+    def create_invoice(
+        self,
+        *,
+        invoice_number: str,
+        recipient_email: str,
+        item_name: str,
+        amount_usd_minor: int,
+        note: str,
+        invoice_date: str,
+        request_id: str,
+    ) -> dict[str, Any]:
+        self._maybe_fail("create_invoice")
+        replay = self.store.get("invoice_request", request_id)
+        if replay is not None:
+            return replay
+        if self.store.get("invoice_number", invoice_number) is not None:
+            raise errors.from_response(
+                422,
+                {
+                    "name": "UNPROCESSABLE_ENTITY",
+                    "details": [{"issue": "DUPLICATE_INVOICE_NUMBER"}],
+                },
+                None,
+            )
+        digest = hashlib.sha1(request_id.encode()).hexdigest()[:16].upper()
+        invoice_id = "INV2-" + "-".join(digest[i : i + 4] for i in range(0, 16, 4))
+        invoice = {
+            "id": invoice_id,
+            "status": "DRAFT",
+            "detail": {
+                "invoice_number": invoice_number,
+                "invoice_date": invoice_date,
+                "currency_code": CURRENCY,
+                "note": note,
+            },
+            "primary_recipients": [{"billing_info": {"email_address": recipient_email}}],
+            "items": [
+                {
+                    "name": item_name,
+                    "quantity": "1",
+                    "unit_amount": _money(amount_usd_minor),
+                }
+            ],
+            "total_minor": amount_usd_minor,
+            "amount": _money(amount_usd_minor),
+            "due_amount": _money(amount_usd_minor),
+            "payments": {"paid_amount": _money(0), "transactions": []},
+        }
+        self.store.put("invoice", invoice_id, invoice)
+        self.store.put("invoice_number", invoice_number, {"id": invoice_id})
+        link = {
+            "rel": "self",
+            "href": f"https://api.sandbox.paypal.com/v2/invoicing/invoices/{invoice_id}",
+            "method": "GET",
+        }
+        self.store.put("invoice_request", request_id, link)
+        return link
+
+    def send_invoice(self, invoice_id: str, *, request_id: str) -> dict[str, Any]:
+        self._maybe_fail("send_invoice")
+        invoice = self._invoice(invoice_id)
+        if invoice["status"] in ("CANCELLED", "PAID"):
+            raise self._wrong_status(invoice)
+        if invoice["status"] == "DRAFT":
+            invoice["status"] = "SENT"
+            self.store.put("invoice", invoice_id, invoice)
+        return {
+            "rel": "x-recipient-view",
+            "href": f"https://www.sandbox.paypal.com/invoice/p/#{invoice_id}",
+            "method": "GET",
+        }
+
+    def record_invoice_payment(
+        self,
+        invoice_id: str,
+        *,
+        amount_usd_minor: int,
+        payment_date: str,
+        note: str,
+        request_id: str,
+    ) -> dict[str, Any]:
+        self._maybe_fail("record_invoice_payment")
+        replay = self.store.get("invoice_payment_request", request_id)
+        if replay is not None:
+            return replay
+        invoice = self._invoice(invoice_id)
+        if invoice["status"] in ("DRAFT", "CANCELLED", "PAID"):
+            raise self._wrong_status(invoice)
+        paid = sum(to_minor(t["amount"]["value"]) for t in invoice["payments"]["transactions"])
+        if paid + amount_usd_minor > invoice["total_minor"]:
+            raise errors.from_response(
+                422,
+                {
+                    "name": "UNPROCESSABLE_ENTITY",
+                    "details": [{"issue": "PAYMENT_AMOUNT_EXCEEDS_DUE_AMOUNT"}],
+                },
+                None,
+            )
+        payment_id = _derive("INVPAY", request_id)
+        invoice["payments"]["transactions"].append(
+            {
+                "payment_id": payment_id,
+                "method": "BANK_TRANSFER",
+                "payment_date": payment_date,
+                "note": note,
+                "amount": _money(amount_usd_minor),
+            }
+        )
+        paid += amount_usd_minor
+        invoice["payments"]["paid_amount"] = _money(paid)
+        invoice["due_amount"] = _money(invoice["total_minor"] - paid)
+        invoice["status"] = "PAID" if paid >= invoice["total_minor"] else "PARTIALLY_PAID"
+        self.store.put("invoice", invoice_id, invoice)
+        result = {"payment_id": payment_id}
+        self.store.put("invoice_payment_request", request_id, result)
+        return result
+
+    def get_invoice(self, invoice_id: str) -> dict[str, Any]:
+        self._maybe_fail("get_invoice")
+        return self._invoice(invoice_id)
+
+    def cancel_invoice(self, invoice_id: str, *, note: str, request_id: str) -> dict[str, Any]:
+        self._maybe_fail("cancel_invoice")
+        invoice = self._invoice(invoice_id)
+        if invoice["status"] == "CANCELLED":
+            return {}
+        if invoice["status"] in ("PAID", "PARTIALLY_PAID"):
+            raise self._wrong_status(invoice)
+        invoice["status"] = "CANCELLED"
+        self.store.put("invoice", invoice_id, invoice)
+        return {}
+
     # ------------------------------------------------------------------ webhooks
 
     def verify_webhook_signature(

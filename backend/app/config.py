@@ -172,6 +172,8 @@ class BaseConfig:
         self.PAYPAL_CLIENT_SECRET = _env("PAYPAL_CLIENT_SECRET")
         self.PAYPAL_WEBHOOK_ID = _env("PAYPAL_WEBHOOK_ID")
         self.HOSPITAL_PAYPAL_CREDENTIALS = _env_json("HOSPITAL_PAYPAL_CREDENTIALS", {})
+        # The collector account's PayPal email: the person a hospital's invoice is addressed to.
+        self.PAYPAL_COLLECTOR_EMAIL = _env("PAYPAL_COLLECTOR_EMAIL")
         # Settings of the offline fake used when PAYPAL_MODE=mock. The store is "redis" so the API
         # and the worker see the same orders, or "memory" for one process.
         self.PAYPAL_MOCK_STORE = _env("PAYPAL_MOCK_STORE", "redis")
@@ -235,6 +237,7 @@ class TestConfig(BaseConfig):
         self.PAYPAL_MODE = "mock"
         self.PAYPAL_MOCK_STORE = "memory"
         self.PAYPAL_WEBHOOK_ID = "WH-TEST-WEBHOOK-ID"
+        self.PAYPAL_COLLECTOR_EMAIL = "collector@tibadirect.test"
         self.MOCK_PARTNER_DELAY_SECONDS = 0
         # No endpoint: boto3 uses the AWS address, which moto intercepts in every test, so a test
         # can never reach the MinIO that may be running on a developer's machine.

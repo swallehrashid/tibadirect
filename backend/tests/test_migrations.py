@@ -72,8 +72,36 @@ def test_the_revision_is_recorded(scratch_app: Flask) -> None:
     with scratch_app.app_context():
         flask_migrate.upgrade(directory=MIGRATIONS_DIR)
     assert (
-        _count(scratch_app, "SELECT count(*) FROM alembic_version WHERE version_num = '0002'") == 1
+        _count(scratch_app, "SELECT count(*) FROM alembic_version WHERE version_num = '0003'") == 1
     )
+
+
+def test_the_invoice_columns_arrive_with_0003_and_leave_with_a_downgrade(
+    scratch_app: Flask,
+) -> None:
+    """Revision 0003 adds the invoice status, amount and payment ID."""
+
+    def present(table: str, column: str) -> int:
+        return _count(
+            scratch_app,
+            "SELECT count(*) FROM information_schema.columns "
+            f"WHERE table_name = '{table}' AND column_name = '{column}'",
+        )
+
+    wanted = [
+        ("confirmations", "invoice_status"),
+        ("confirmations", "invoice_usd_minor"),
+        ("settlements", "invoice_payment_id"),
+    ]
+    with scratch_app.app_context():
+        flask_migrate.upgrade(directory=MIGRATIONS_DIR)
+        assert [present(*pair) for pair in wanted] == [1, 1, 1]
+
+        flask_migrate.downgrade(directory=MIGRATIONS_DIR, revision="0002")
+        assert [present(*pair) for pair in wanted] == [0, 0, 0]
+
+        flask_migrate.upgrade(directory=MIGRATIONS_DIR)
+        assert [present(*pair) for pair in wanted] == [1, 1, 1]
 
 
 def test_the_pooled_amount_arrives_with_its_rule_and_leaves_with_a_downgrade(

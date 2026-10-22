@@ -31,6 +31,7 @@ from app.services import (
     confirmation_service,
     document_service,
     excess_policy_service,
+    invoicing_service,
     notification_service,
     settlement_service,
 )
@@ -145,6 +146,7 @@ def _after_decision(confirmation: Confirmation, status_before: CaseStatus) -> No
     if confirmation.status != ConfirmationStatus.CONFIRMED:
         return
     case = confirmation.case
+    invoicing_service.enqueue_issue(confirmation)
     settlement_service.enqueue_check(case.id)
     if status_before != CaseStatus.CLOSED and case.status == CaseStatus.CLOSED:
         notification_service.notify_closed(case)

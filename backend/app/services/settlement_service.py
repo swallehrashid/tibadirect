@@ -54,6 +54,7 @@ from app.services import (
     case_service,
     excess_policy_service,
     fx_service,
+    invoicing_service,
     ledger_service,
     mail_service,
     notification_service,
@@ -522,6 +523,7 @@ def _notify_if_paid(
     if settlement is None:
         return
     notify_settled(settlement)
+    invoicing_service.enqueue_payment(settlement)
     if case_was_open and settlement.case.status == CaseStatus.CLOSED:
         notification_service.notify_closed(settlement.case)
         excess_policy_service.enqueue_run(settlement.case_id)

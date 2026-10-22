@@ -47,6 +47,7 @@ from app.services import (
     audit_service,
     case_service,
     donation_service,
+    invoicing_service,
     ledger_service,
     refund_service,
     review_service,
@@ -445,8 +446,16 @@ def _handle_payout(session: Session, resource: dict[str, Any], event: WebhookEve
     )
 
 
-def _handle_later(session: Session, resource: dict[str, Any], event: WebhookEvent) -> None:
-    raise Ignored("Invoices are handled from P3-F17 onwards")
+def _handle_invoice_paid(session: Session, resource: dict[str, Any], event: WebhookEvent) -> None:
+    """A hospital's invoice was paid in full: keep the status PayPal reports."""
+    invoice = resource.get("invoice") if isinstance(resource.get("invoice"), dict) else resource
+    invoice_id, status = invoice.get("id"), invoice.get("status")
+    if not isinstance(invoice_id, str) or not isinstance(status, str):
+        raise Ignored("The invoice event has no invoice ID or status")
+    if not invoicing_service.apply_reported_status(
+        session, invoice_id, status, request_id=_event_request(event)
+    ):
+        raise Ignored("No confirmation has that invoice")
 
 
 def _event_request(event: WebhookEvent) -> str:
@@ -465,7 +474,7 @@ HANDLERS: dict[str, Handler] = {
     "PAYMENT.PAYOUTS-ITEM.FAILED": _handle_payout,
     "PAYMENT.PAYOUTS-ITEM.BLOCKED": _handle_payout,
     "PAYMENT.PAYOUTS-ITEM.RETURNED": _handle_payout,
-    "INVOICING.INVOICE.PAID": _handle_later,
+    "INVOICING.INVOICE.PAID": _handle_invoice_paid,
 }
 
 

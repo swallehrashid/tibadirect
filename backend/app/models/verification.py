@@ -28,7 +28,7 @@ from app.models.enums import (
 
 if TYPE_CHECKING:
     from app.models.case import Case, CaseDocument
-    from app.models.hospital import HospitalStaff
+    from app.models.hospital import Hospital, HospitalStaff
     from app.models.money import Settlement
 
 
@@ -125,9 +125,13 @@ class Confirmation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     deposit_kes_minor: Mapped[int | None] = mapped_column(BigInteger)
     query_note: Mapped[str | None] = mapped_column(String(500))
     paypal_invoice_id: Mapped[str | None] = mapped_column(String(40), unique=True)
+    # PayPal's own word for where the invoice stands (DRAFT, SENT, PARTIALLY_PAID, PAID, CANCELLED)
+    invoice_status: Mapped[str | None] = mapped_column(String(24))
+    invoice_usd_minor: Mapped[int | None] = mapped_column(BigInteger)
     finalized_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     case: Mapped["Case"] = relationship(back_populates="confirmations")
+    hospital: Mapped["Hospital"] = relationship(back_populates="confirmations")
     document: Mapped["CaseDocument"] = relationship(back_populates="confirmations")
     confirmation_request: Mapped[ConfirmationRequest] = relationship(
         back_populates="confirmation", foreign_keys=[confirmation_request_id]

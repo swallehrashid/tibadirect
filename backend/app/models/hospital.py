@@ -85,6 +85,7 @@ class Hospital(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     register_entry: Mapped[FacilityRegisterEntry] = relationship(back_populates="hospital")
     staff: Mapped[list["HospitalStaff"]] = relationship(back_populates="hospital")
     cases: Mapped[list["Case"]] = relationship(back_populates="hospital")
+    confirmations: Mapped[list["Confirmation"]] = relationship(back_populates="hospital")
 
     @property
     def official_email(self) -> str:

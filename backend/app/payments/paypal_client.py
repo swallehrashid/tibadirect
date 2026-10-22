@@ -1,4 +1,4 @@
-"""PayPal REST client for the collector account (orders, refunds, payouts, webhook checks).
+"""PayPal REST client (orders, refunds, payouts, invoices, webhook checks).
 
 One class talks to PayPal; ``paypal_mock.MockPayPal`` has the same methods and returns the same
 JSON shapes, so services never know which one they hold. ``get_client()`` picks by ``PAYPAL_MODE``.
@@ -88,6 +88,46 @@ class PayPalGateway(Protocol):
     def verify_webhook_signature(
         self, *, headers: Mapping[str, str], raw_body: bytes, webhook_id: str
     ) -> bool: ...
+
+
+class InvoicingGateway(Protocol):
+    """What the app asks of PayPal Invoicing, as the hospital. Results are PayPal's JSON."""
+
+    def create_invoice(
+        self,
+        *,
+        invoice_number: str,
+        recipient_email: str,
+        item_name: str,
+        amount_usd_minor: int,
+        note: str,
+        invoice_date: str,
+        request_id: str,
+    ) -> dict[str, Any]: ...
+
+    def send_invoice(self, invoice_id: str, *, request_id: str) -> dict[str, Any]: ...
+
+    def record_invoice_payment(
+        self,
+        invoice_id: str,
+        *,
+        amount_usd_minor: int,
+        payment_date: str,
+        note: str,
+        request_id: str,
+    ) -> dict[str, Any]: ...
+
+    def get_invoice(self, invoice_id: str) -> dict[str, Any]: ...
+
+    def cancel_invoice(self, invoice_id: str, *, note: str, request_id: str) -> dict[str, Any]: ...
+
+
+def invoice_id_from(result: dict[str, Any]) -> str | None:
+    """The invoice ID in a create response: PayPal answers with a link whose last part is the ID."""
+    href = result.get("href") or result.get("id")
+    if not isinstance(href, str) or not href:
+        return None
+    return href.rstrip("/").rsplit("/", 1)[-1] or None
 
 
 def _amount(minor: int) -> dict[str, str]:
@@ -335,6 +375,89 @@ class PayPalClient:
     def get_payout(self, batch_id: str) -> dict[str, Any]:
         return self._request("GET", f"/v1/payments/payouts/{batch_id}")
 
+    # ------------------------------------------------------------------ invoices
+
+    def create_invoice(
+        self,
+        *,
+        invoice_number: str,
+        recipient_email: str,
+        item_name: str,
+        amount_usd_minor: int,
+        note: str,
+        invoice_date: str,
+        request_id: str,
+    ) -> dict[str, Any]:
+        """Draft an invoice from this account to ``recipient_email``, payable in parts."""
+        body = {
+            "detail": {
+                "invoice_number": invoice_number,
+                "invoice_date": invoice_date,
+                "currency_code": CURRENCY,
+                "note": note,
+                "payment_term": {"term_type": "NET_30"},
+            },
+            "primary_recipients": [{"billing_info": {"email_address": recipient_email}}],
+            "items": [
+                {
+                    "name": item_name,
+                    "quantity": "1",
+                    "unit_amount": _amount(amount_usd_minor),
+                }
+            ],
+            "configuration": {
+                "partial_payment": {"allow_partial_payment": True},
+                "allow_tip": False,
+            },
+        }
+        return self._request(
+            "POST", "/v2/invoicing/invoices", json_body=body, request_id=request_id
+        )
+
+    def send_invoice(self, invoice_id: str, *, request_id: str) -> dict[str, Any]:
+        body = {"send_to_recipient": True, "send_to_invoicer": False}
+        return self._request(
+            "POST",
+            f"/v2/invoicing/invoices/{invoice_id}/send",
+            json_body=body,
+            request_id=request_id,
+        )
+
+    def record_invoice_payment(
+        self,
+        invoice_id: str,
+        *,
+        amount_usd_minor: int,
+        payment_date: str,
+        note: str,
+        request_id: str,
+    ) -> dict[str, Any]:
+        """Record money received outside PayPal against the invoice (a bank transfer)."""
+        body = {
+            "method": "BANK_TRANSFER",
+            "payment_date": payment_date,
+            "amount": _amount(amount_usd_minor),
+            "note": note,
+        }
+        return self._request(
+            "POST",
+            f"/v2/invoicing/invoices/{invoice_id}/payments",
+            json_body=body,
+            request_id=request_id,
+        )
+
+    def get_invoice(self, invoice_id: str) -> dict[str, Any]:
+        return self._request("GET", f"/v2/invoicing/invoices/{invoice_id}")
+
+    def cancel_invoice(self, invoice_id: str, *, note: str, request_id: str) -> dict[str, Any]:
+        body = {"note": note, "send_to_invoicer": False, "send_to_recipient": False}
+        return self._request(
+            "POST",
+            f"/v2/invoicing/invoices/{invoice_id}/cancel",
+            json_body=body,
+            request_id=request_id,
+        )
+
     # ------------------------------------------------------------------ webhooks
 
     def verify_webhook_signature(
@@ -377,6 +500,33 @@ def _json_or_none(response: requests.Response) -> dict[str, Any] | None:
     except ValueError:
         return None
     return body if isinstance(body, dict) else None
+
+
+def get_invoicing_client(register_code: str) -> InvoicingGateway | None:
+    """The invoicing client for a hospital, or None if it has no PayPal credentials configured.
+
+    Credentials come from ``HOSPITAL_PAYPAL_CREDENTIALS`` (register code to client ID and secret).
+    In mock mode every configured hospital shares the one fake, which keeps all invoices in the
+    same store. A real client is built once per hospital and kept for the life of the process.
+    """
+    config = current_app.config
+    credentials = config["HOSPITAL_PAYPAL_CREDENTIALS"].get(register_code)
+    if not credentials:
+        return None
+    if config["PAYPAL_MODE"] == "mock":
+        return get_client()  # type: ignore[return-value]
+    clients: dict[str, PayPalClient] = current_app.extensions.setdefault("hospital_paypal", {})
+    if register_code not in clients:
+        client_id = credentials.get("client_id") if isinstance(credentials, dict) else None
+        client_secret = credentials.get("client_secret") if isinstance(credentials, dict) else None
+        if not client_id or not client_secret:
+            raise ConfigError(
+                f"HOSPITAL_PAYPAL_CREDENTIALS for {register_code} needs client_id and client_secret"
+            )
+        clients[register_code] = PayPalClient(
+            base_url=config["PAYPAL_API_BASE"], client_id=client_id, client_secret=client_secret
+        )
+    return clients[register_code]
 
 
 def get_client() -> PayPalGateway:

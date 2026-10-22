@@ -106,6 +106,31 @@ def sweep_settlements() -> int:
     return settlement_service.sweep(db.session)
 
 
+def issue_invoice(confirmation_id: str | uuid.UUID) -> str:
+    """Draft and send the hospital's PayPal invoice for a confirmed bill."""
+    from app.services import invoicing_service
+
+    return invoicing_service.issue(
+        db.session, uuid.UUID(str(confirmation_id)), request_id=job_request_id()
+    )
+
+
+def record_invoice_payment(settlement_id: str | uuid.UUID) -> str:
+    """Record a paid tranche as a payment on the hospital's invoice."""
+    from app.services import invoicing_service
+
+    return invoicing_service.record_payment(
+        db.session, uuid.UUID(str(settlement_id)), request_id=job_request_id()
+    )
+
+
+def sweep_invoices() -> int:
+    """Finish invoicing that was missed: unsent invoices, unrecorded tranches, stale statuses."""
+    from app.services import invoicing_service
+
+    return invoicing_service.sweep(db.session)
+
+
 def run_excess_policy(case_id: str | uuid.UUID) -> dict[str, int | str]:
     """Place the money a closed or cancelled case did not need, as each donor chose."""
     from app.services import excess_policy_service

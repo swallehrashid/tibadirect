@@ -39,6 +39,7 @@ def test_the_heartbeat_is_in_the_real_schedule() -> None:
         "sweep_webhook_events",
         "poll_payout_status",
         "sweep_settlements",
+        "sweep_invoices",
         "expire_follow_up_holds",
     ]
 

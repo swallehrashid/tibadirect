@@ -240,3 +240,13 @@ def manual_settlement(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
     seen: list[tuple[str, str]] = []
     monkeypatch.setattr(settlement_service, "_enqueue", lambda func, arg: seen.append((func, arg)))
     return seen
+
+
+@pytest.fixture
+def manual_refunds(monkeypatch: pytest.MonkeyPatch) -> list:
+    """Refund jobs are recorded instead of run, so a test decides when PayPal is asked."""
+    from app.services import refund_service
+
+    seen: list = []
+    monkeypatch.setattr(refund_service, "enqueue_execute", seen.append)
+    return seen

@@ -72,5 +72,49 @@ def test_the_revision_is_recorded(scratch_app: Flask) -> None:
     with scratch_app.app_context():
         flask_migrate.upgrade(directory=MIGRATIONS_DIR)
     assert (
-        _count(scratch_app, "SELECT count(*) FROM alembic_version WHERE version_num = '0001'") == 1
+        _count(scratch_app, "SELECT count(*) FROM alembic_version WHERE version_num = '0002'") == 1
     )
+
+
+def test_the_pooled_amount_arrives_with_its_rule_and_leaves_with_a_downgrade(
+    scratch_app: Flask,
+) -> None:
+    """Revision 0002 adds ``donations.pooled_usd_minor`` and widens the allocation rule."""
+    column = (
+        "SELECT count(*) FROM information_schema.columns "
+        "WHERE table_name = 'donations' AND column_name = 'pooled_usd_minor'"
+    )
+    rule = (
+        "SELECT pg_get_constraintdef(oid) FROM pg_constraint "
+        "WHERE conname = 'ck_donations_allocation_within_net'"
+    )
+    with scratch_app.app_context():
+        flask_migrate.upgrade(directory=MIGRATIONS_DIR)
+        assert _count(scratch_app, column) == 1
+        assert "pooled_usd_minor" in db.session.execute(text(rule)).scalar_one()
+
+        flask_migrate.downgrade(directory=MIGRATIONS_DIR, revision="0001")
+        assert _count(scratch_app, column) == 0
+        assert "pooled_usd_minor" not in db.session.execute(text(rule)).scalar_one()
+
+        flask_migrate.upgrade(directory=MIGRATIONS_DIR)
+        assert _count(scratch_app, column) == 1
+
+
+def test_a_donation_cannot_hold_more_than_its_net_across_paid_refunded_and_pooled(
+    migrated_scratch_app: Flask,
+) -> None:
+    import pytest
+    from sqlalchemy.exc import IntegrityError
+
+    with migrated_scratch_app.app_context():
+        from tests.factories import DonationFactory
+
+        DonationFactory(net_usd_minor=1000, allocated_usd_minor=300, refunded_usd_minor=300)
+        with pytest.raises(IntegrityError, match="ck_donations_allocation_within_net"):
+            DonationFactory(
+                net_usd_minor=1000,
+                allocated_usd_minor=400,
+                refunded_usd_minor=300,
+                pooled_usd_minor=400,
+            )

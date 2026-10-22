@@ -984,3 +984,22 @@ def test_a_payout_event_delivered_twice_pays_and_tells_once(
         len([m for m in mail_service.outbox if m.template == "tranche_settled"]) == 2
     )  # family, hospital
     assert case.settled_kes_minor == 2_501_310
+
+
+def test_a_reversal_takes_back_only_money_still_in_the_case_not_what_went_to_the_pool(
+    client, db_session, paypal: MockPayPal
+) -> None:
+    case = live_case()
+    donation = donate(db_session, case)
+    donation.pooled_usd_minor = donation.net_usd_minor  # already moved to the solidarity pool
+    db_session.commit()
+
+    deliver(client, make_event("PAYMENT.CAPTURE.REVERSED", {"id": donation.paypal_capture_id}))
+
+    db_session.refresh(donation)
+    assert donation.status == DonationStatus.REVERSED
+    assert [e for e in ledger(db_session, case) if e.entry_type == LedgerEntryType.REVERSAL] == []
+    assert (
+        db_session.execute(select(ReviewItem)).scalar_one().payload["removed_from_case_usd_minor"]
+        == 0
+    )

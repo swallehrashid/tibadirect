@@ -376,9 +376,7 @@ def _handle_capture_reversed(
         return
     if donation.status not in donation_service.TAKEN_STATUSES:
         raise Ignored("The payment was never recorded as taken")
-    held = max(
-        0, donation.net_usd_minor - donation.allocated_usd_minor - donation.refunded_usd_minor
-    )
+    held = max(0, refund_service.refundable_usd_minor(donation))
     donation.status = DonationStatus.REVERSED
     if held:
         ledger_service.append(

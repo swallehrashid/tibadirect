@@ -104,3 +104,35 @@ def sweep_settlements() -> int:
     from app.services import settlement_service
 
     return settlement_service.sweep(db.session)
+
+
+def run_excess_policy(case_id: str | uuid.UUID) -> dict[str, int | str]:
+    """Place the money a closed or cancelled case did not need, as each donor chose."""
+    from app.services import excess_policy_service
+
+    result = excess_policy_service.run_excess_policy(
+        db.session, uuid.UUID(str(case_id)), request_id=job_request_id()
+    )
+    return {
+        "reason": result.reason,
+        "refunds": len(result.refunds),
+        "pooled_usd_minor": result.pooled_usd_minor,
+        "held_usd_minor": result.held_usd_minor,
+    }
+
+
+def execute_refund(refund_id: str | uuid.UUID) -> str | None:
+    """Ask PayPal to make a refund that is written down but not yet made."""
+    from app.services import refund_service
+
+    status = refund_service.execute_refund(
+        db.session, uuid.UUID(str(refund_id)), request_id=job_request_id()
+    )
+    return status.value if status is not None else None
+
+
+def expire_follow_up_holds() -> int:
+    """Hourly: refund follow-up holds that have run out and queue anything an outage missed."""
+    from app.services import excess_policy_service
+
+    return excess_policy_service.sweep(db.session)

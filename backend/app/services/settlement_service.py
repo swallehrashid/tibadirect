@@ -52,10 +52,12 @@ from app.payments.errors import PayPalError
 from app.services import (
     audit_service,
     case_service,
+    excess_policy_service,
     fx_service,
     ledger_service,
     mail_service,
     notification_service,
+    refund_service,
     review_service,
 )
 
@@ -105,11 +107,10 @@ def committed_kes_minor(session: Session, case: Case) -> int:
     )
 
 
-def holdable(donation: Donation) -> int:
-    """What a donation still holds for the case: net minus paid out minus refunded."""
-    return max(
-        0, donation.net_usd_minor - donation.allocated_usd_minor - donation.refunded_usd_minor
-    )
+def holdable(donation: Donation, pending_refunds: int = 0) -> int:
+    """What a donation can still give a tranche: what the case holds of it (net minus paid out,
+    refunded and pooled) less any refund already promised to the donor."""
+    return max(0, refund_service.refundable_usd_minor(donation) - pending_refunds)
 
 
 def settlement_cap_kes_minor(case: Case) -> int:
@@ -160,7 +161,8 @@ def _create_tranche(session: Session, case: Case, *, request_id: str | None) -> 
             .execution_options(populate_existing=True)
         ).scalars()
     )
-    available_usd = sum(holdable(d) for d in donations)
+    promised = refund_service.pending_by_donation(session, case.id)
+    available_usd = sum(holdable(d, promised.get(d.id, 0)) for d in donations)
     remaining_kes = settlement_cap_kes_minor(case) - committed_kes_minor(session, case)
     if remaining_kes <= 0:
         return CheckResult(None, "cap_reached")
@@ -217,7 +219,7 @@ def _create_tranche(session: Session, case: Case, *, request_id: str | None) -> 
 
     left = amount_usd
     for donation in donations:
-        take = min(left, holdable(donation))
+        take = min(left, holdable(donation, promised.get(donation.id, 0)))
         if take <= 0:
             continue
         donation.allocated_usd_minor += take
@@ -503,6 +505,7 @@ def _notify_if_paid(
     notify_settled(settlement)
     if case_was_open and settlement.case.status == CaseStatus.CLOSED:
         notification_service.notify_closed(settlement.case)
+        excess_policy_service.enqueue_run(settlement.case_id)
 
 
 def notify_settled(settlement: Settlement) -> None:

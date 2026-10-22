@@ -1,0 +1,3 @@
+We have refunded {{ amount }} of your donation to "{{ alias }}" to your PayPal account, because {{ reason }}.
+
+PayPal shows it in your account straight away or within a few days, depending on how you paid. Nothing else is needed from you.

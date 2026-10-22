@@ -84,8 +84,9 @@ class Donation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
         CheckConstraint("net_usd_minor >= 0", name="net_non_negative"),
         CheckConstraint("allocated_usd_minor >= 0", name="allocated_non_negative"),
         CheckConstraint("refunded_usd_minor >= 0", name="refunded_non_negative"),
+        CheckConstraint("pooled_usd_minor >= 0", name="pooled_non_negative"),
         CheckConstraint(
-            "allocated_usd_minor + refunded_usd_minor <= net_usd_minor",
+            "allocated_usd_minor + refunded_usd_minor + pooled_usd_minor <= net_usd_minor",
             name="allocation_within_net",
         ),
         Index("ix_donations_case_status", "case_id", "status"),
@@ -110,6 +111,7 @@ class Donation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     kes_equivalent_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     allocated_usd_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     refunded_usd_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    pooled_usd_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     excess_choice: Mapped[ExcessChoice] = mapped_column(
         pg_enum(ExcessChoice),
         default=ExcessChoice.REFUND,

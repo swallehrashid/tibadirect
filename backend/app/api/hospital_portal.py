@@ -30,6 +30,7 @@ from app.services import (
     case_service,
     confirmation_service,
     document_service,
+    excess_policy_service,
     notification_service,
     settlement_service,
 )
@@ -147,6 +148,7 @@ def _after_decision(confirmation: Confirmation, status_before: CaseStatus) -> No
     settlement_service.enqueue_check(case.id)
     if status_before != CaseStatus.CLOSED and case.status == CaseStatus.CLOSED:
         notification_service.notify_closed(case)
+        excess_policy_service.enqueue_run(case.id)
 
 
 @blp.route("/cases/<uuid:case_id>/decision")

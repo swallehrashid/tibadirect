@@ -1,0 +1,3 @@
+Tumekurejeshea {{ amount }} ya mchango wako kwa "{{ alias }}" kwenye akaunti yako ya PayPal, kwa sababu {{ reason }}.
+
+PayPal huonyesha marejesho mara moja au ndani ya siku chache, kulingana na jinsi ulivyolipa. Hakuna kitu kingine kinachohitajika kutoka kwako.

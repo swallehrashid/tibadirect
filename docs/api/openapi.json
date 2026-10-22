@@ -1326,6 +1326,313 @@
         ]
       }
     },
+    "/api/admin/agent/ask": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "503": {
+            "description": "No language model is configured"
+          },
+          "502": {
+            "description": "The language model could not be reached"
+          },
+          "429": {
+            "description": "More than 30 questions an hour"
+          },
+          "404": {
+            "description": "The agent is switched off, or there is no such case"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ask"
+              }
+            }
+          }
+        },
+        "summary": "Ask about the money. It reads the books and may propose a refund, a payout or a freeze;\na proposal waits in the actions list until an administrator approves it.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/agent/actions": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "default": null,
+              "enum": [
+                "proposed",
+                "approved",
+                "rejected",
+                "executed",
+                "failed",
+                null
+              ],
+              "nullable": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentActionPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Proposals, the ones waiting first. Filter by ``status``.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/agent/actions/{action_id}/approve": {
+      "post": {
+        "responses": {
+          "409": {
+            "description": "Already decided"
+          },
+          "404": {
+            "description": "No such action"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Approve a proposal and carry it out through the normal service. If it can no longer be\ndone the answer is the action with status ``failed`` and the reason in ``error``.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "action_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/admin/agent/actions/{action_id}/reject": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "Already decided"
+          },
+          "404": {
+            "description": "No such action"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reject"
+              }
+            }
+          }
+        },
+        "summary": "Turn a proposal down. A reason is required.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "action_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
     "/api/hospitals": {
       "get": {
         "parameters": [
@@ -3079,6 +3386,10 @@
       "description": "Admin console"
     },
     {
+      "name": "agent",
+      "description": "Treasurer agent (admin)"
+    },
+    {
       "name": "hospitals",
       "description": "Hospitals"
     },
@@ -4285,6 +4596,167 @@
             "type": "integer"
           }
         },
+        "additionalProperties": false
+      },
+      "Ask": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000,
+            "description": "What the administrator wants to know or have looked at"
+          },
+          "case_id": {
+            "type": "string",
+            "format": "uuid",
+            "default": null,
+            "description": "The case the question is about, if there is one",
+            "nullable": true
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "additionalProperties": false
+      },
+      "ToolCall": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "input": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string",
+            "description": "How much came back, or why it failed"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AgentAction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_type": {
+            "readOnly": true
+          },
+          "case_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "case_alias": {
+            "readOnly": true
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "decided_by": {
+            "readOnly": true
+          },
+          "decided_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "executed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "result": {
+            "type": "object",
+            "additionalProperties": {},
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AskResult": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "tool_calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToolCall"
+            }
+          },
+          "proposed_actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgentAction"
+            }
+          },
+          "steps": {
+            "type": "integer"
+          },
+          "stopped_early": {
+            "type": "boolean",
+            "description": "True if it ran out of steps before finishing its answer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AgentActionPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgentAction"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Reject": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Why, in 10 to 500 characters. Required."
+          }
+        },
+        "required": [
+          "note"
+        ],
         "additionalProperties": false
       },
       "HospitalListItem": {

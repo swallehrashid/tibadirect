@@ -191,6 +191,49 @@ class MockPayPal:
     def reset(self) -> None:
         self.store.clear()
 
+    def _record(
+        self,
+        code: str,
+        transaction_id: str,
+        amount_minor: int,
+        *,
+        fee_minor: int = 0,
+        reference: str | None = None,
+    ) -> None:
+        """Add a line to the fake's transaction report. Money out is negative, like PayPal's."""
+        log = self.store.get("txn_log", "all") or {"items": []}
+        log["items"].append(
+            {
+                "transaction_id": transaction_id,
+                "transaction_event_code": code,
+                "transaction_initiation_date": _stamp(),
+                "transaction_status": "S",
+                "transaction_amount": _money(amount_minor),
+                "fee_amount": _money(-fee_minor),
+                "paypal_reference_id": reference,
+            }
+        )
+        self.store.put("txn_log", "all", log)
+
+    def search_transactions(self, *, start: datetime, end: datetime) -> dict[str, Any]:
+        self._maybe_fail("search_transactions")
+        log = self.store.get("txn_log", "all") or {"items": []}
+        low, high = (
+            start.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            end.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        )
+        rows = [
+            {"transaction_info": item}
+            for item in log["items"]
+            if low <= item["transaction_initiation_date"] <= high
+        ]
+        return {
+            "transaction_details": rows,
+            "total_items": len(rows),
+            "total_pages": 1,
+            "page": 1,
+        }
+
     def _maybe_fail(self, operation: str) -> None:
         queue = self.store.get("faults", operation)
         if not queue or not queue["items"]:
@@ -323,6 +366,8 @@ class MockPayPal:
             {"order_id": order_id, "gross": gross, "refunded": 0, "payer": order["payer"]},
         )
         self.store.put("capture_request", request_id, completed)
+        if status == "COMPLETED":
+            self._record("T0006", capture_id, gross, fee_minor=fee, reference=order_id)
         return completed
 
     # ------------------------------------------------------------------ refunds
@@ -368,6 +413,7 @@ class MockPayPal:
             "update_time": _stamp(),
         }
         self.store.put("refund_request", request_id, refund)
+        self._record("T1107", refund["id"], -amount_usd_minor, reference=capture_id)
         return refund
 
     # ------------------------------------------------------------------ payouts
@@ -434,6 +480,9 @@ class MockPayPal:
         self.store.put("payout_sender", sender_batch_id, {"batch_id": batch_id})
         response = {"batch_header": header}
         self.store.put("payout_request", request_id, response)
+        for entry in batch["items"]:
+            amount = to_minor(entry["payout_item"]["amount"]["value"])
+            self._record("T0400", entry["transaction_id"], -amount, reference=batch_id)
         return response
 
     def get_payout(self, batch_id: str) -> dict[str, Any]:

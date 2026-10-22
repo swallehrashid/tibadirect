@@ -20,6 +20,7 @@ import logging
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any, Protocol
 
 import requests
@@ -84,6 +85,8 @@ class PayPalGateway(Protocol):
     ) -> dict[str, Any]: ...
 
     def get_payout(self, batch_id: str) -> dict[str, Any]: ...
+
+    def search_transactions(self, *, start: datetime, end: datetime) -> dict[str, Any]: ...
 
     def verify_webhook_signature(
         self, *, headers: Mapping[str, str], raw_body: bytes, webhook_id: str
@@ -374,6 +377,23 @@ class PayPalClient:
 
     def get_payout(self, batch_id: str) -> dict[str, Any]:
         return self._request("GET", f"/v1/payments/payouts/{batch_id}")
+
+    # ------------------------------------------------------------------ reporting
+
+    def search_transactions(self, *, start: datetime, end: datetime) -> dict[str, Any]:
+        """PayPal's transaction report for a window of at most 31 days (first page, 100 rows).
+
+        Only the transaction itself is asked for, never the payer's details. In the sandbox the
+        report can trail a payment by several hours.
+        """
+        params = {
+            "start_date": start.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "end_date": end.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "fields": "transaction_info",
+            "page_size": 100,
+            "page": 1,
+        }
+        return self._request("GET", "/v1/reporting/transactions", params=params)
 
     # ------------------------------------------------------------------ invoices
 

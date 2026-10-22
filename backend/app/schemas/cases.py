@@ -195,3 +195,11 @@ class PublicCaseSchema(ma.Schema):
     donor_count = ma.fields.Integer()
     created_at = ma.fields.DateTime()
     live_at = ma.fields.DateTime(allow_none=True)
+
+
+class CancelCaseSchema(ma.Schema):
+    reason = ma.fields.String(
+        required=True,
+        validate=ma.validate.OneOf(["treatment_cancelled", "patient_deceased", "other"]),
+        metadata={"description": "Why the case is ending"},
+    )

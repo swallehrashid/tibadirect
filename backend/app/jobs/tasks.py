@@ -132,7 +132,18 @@ def execute_refund(refund_id: str | uuid.UUID) -> str | None:
 
 
 def expire_follow_up_holds() -> int:
-    """Hourly: refund follow-up holds that have run out and queue anything an outage missed."""
-    from app.services import excess_policy_service
+    """Hourly: refund follow-up holds that have run out, finish freezes, and queue anything a
+    queue outage missed."""
+    from app.services import case_ending_service, excess_policy_service
 
-    return excess_policy_service.sweep(db.session)
+    queued = excess_policy_service.sweep(db.session)
+    return queued + case_ending_service.sweep_frozen(db.session)
+
+
+def finish_frozen_case(case_id: str | uuid.UUID) -> str:
+    """Cancel a frozen case (reason fraud) once every donor has been paid back."""
+    from app.services import case_ending_service
+
+    return case_ending_service.finish_frozen(
+        db.session, uuid.UUID(str(case_id)), request_id=job_request_id()
+    )

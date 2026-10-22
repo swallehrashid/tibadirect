@@ -485,6 +485,23 @@ def _fail(
         )
 
 
+def cancel_unsent(
+    session: Session, case: Case, reason: str, *, request_id: str | None = None
+) -> int:
+    """Cancel every tranche not yet sent and free its money. Tranches already at the provider
+    are left to finish. The caller holds the case lock and commits. Returns how many."""
+    unsent = list(
+        session.execute(
+            select(Settlement).where(
+                Settlement.case_id == case.id, Settlement.status == SettlementStatus.PENDING
+            )
+        ).scalars()
+    )
+    for settlement in unsent:
+        _fail(session, case, settlement, f"Cancelled: {reason}", request_id, review=False)
+    return len(unsent)
+
+
 # --------------------------------------------------------------------------- after commit
 
 
@@ -497,9 +514,11 @@ def _notify_if_paid(
 ) -> None:
     """Email about a tranche that has just been paid, once, and about the case closing if that
     payment was the last. Never undoes the payment."""
+    settlement = session.get(Settlement, settlement_id)
+    if settlement is not None and settlement.case.status == CaseStatus.FROZEN:
+        _enqueue("app.jobs.tasks.finish_frozen_case", str(settlement.case_id))
     if before == SettlementStatus.SUCCEEDED or after != SettlementStatus.SUCCEEDED:
         return
-    settlement = session.get(Settlement, settlement_id)
     if settlement is None:
         return
     notify_settled(settlement)

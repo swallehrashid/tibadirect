@@ -1091,7 +1091,7 @@
             }
           }
         },
-        "summary": "Pause a case: it stops being public and stops taking money at once.",
+        "summary": "Pause a case: it stops being public and stops taking money at once, tranches not yet\nsent are cancelled, and every donor is refunded in full. When the refunds are made the\ncase is cancelled with the reason fraud.",
         "tags": [
           "admin"
         ],
@@ -1840,6 +1840,81 @@
           }
         },
         "summary": "Delete a draft (it becomes cancelled).",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/cases/{case_id}/cancel": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "The case cannot be cancelled from where it is"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelCase"
+              }
+            }
+          }
+        },
+        "summary": "End the case: donations stop at once and money the case no longer needs goes back,\nor on, as each donor chose. Not for drafts (delete those) or closed cases.",
         "tags": [
           "cases"
         ],
@@ -4440,6 +4515,24 @@
             "type": "boolean"
           }
         },
+        "additionalProperties": false
+      },
+      "CancelCase": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": [
+              "treatment_cancelled",
+              "patient_deceased",
+              "other"
+            ],
+            "description": "Why the case is ending"
+          }
+        },
+        "required": [
+          "reason"
+        ],
         "additionalProperties": false
       },
       "ReviewRequest": {

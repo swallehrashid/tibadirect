@@ -54,6 +54,10 @@ SUBJECTS: dict[str, dict[str, str]] = {
         "en": "Your TibaDirect refund is on its way",
         "sw": "Marejesho yako ya TibaDirect yamefanywa",
     },
+    "case_frozen": {
+        "en": "Your TibaDirect case has been paused",
+        "sw": "Kesi yako ya TibaDirect imesitishwa",
+    },
     "case_closed": {
         "en": "Your TibaDirect case is closed",
         "sw": "Kesi yako ya TibaDirect imefungwa",

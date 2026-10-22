@@ -29,6 +29,7 @@ from app.security.permissions import current_account, get_case_for_admin_or_404
 from app.services import (
     admin_service,
     audit_service,
+    case_ending_service,
     job_service,
     ledger_service,
     review_service,
@@ -161,10 +162,13 @@ class FreezeCase(MethodView):
     @blp.response(200, AdminCaseSchema)
     @blp.alt_response(409, description="The case cannot be frozen from its current status")
     def post(self, payload: dict, case_id: uuid.UUID) -> object:
-        """Pause a case: it stops being public and stops taking money at once."""
+        """Pause a case: it stops being public and stops taking money at once, tranches not yet
+        sent are cancelled, and every donor is refunded in full. When the refunds are made the
+        case is cancelled with the reason fraud."""
         case = get_case_for_admin_or_404(case_id)
-        admin_service.freeze(case, current_account(), payload["reason"])
+        ended = admin_service.freeze(db.session, case, current_account(), payload["reason"])
         db.session.commit()
+        case_ending_service.after_commit(ended, frozen=True, case=case)
         return case
 
 

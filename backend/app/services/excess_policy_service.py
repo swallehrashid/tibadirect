@@ -28,6 +28,7 @@ from app.models.case import Case
 from app.models.enums import (
     ActorType,
     CaseStatus,
+    CloseReason,
     DonationStatus,
     ExcessChoice,
     LedgerAccount,
@@ -91,6 +92,29 @@ def _pool(
     )
 
 
+def refund_all(
+    session: Session,
+    case: Case,
+    donations: list[Donation],
+    reason: RefundReason,
+    *,
+    request_id: str | None = None,
+) -> list[uuid.UUID]:
+    """Write down a refund for everything still held for each donation, whatever the donor chose
+    and however small (a case paused for review gives every donor their money back). The case and
+    donations are locked by the caller, who commits and then queues the refunds."""
+    refund_ids = []
+    for donation in donations:
+        left = leftover_usd_minor(session, donation)
+        if left <= 0:
+            continue
+        refund = refund_service.create_refund(
+            session, donation, case, left, reason, request_id=request_id
+        )
+        refund_ids.append(refund.id)
+    return refund_ids
+
+
 def run_excess_policy(
     session: Session,
     case_id: uuid.UUID,
@@ -119,6 +143,12 @@ def run_excess_policy(
         ).scalars()
     )
     result = PolicyResult()
+    if case.close_reason == CloseReason.FRAUD:
+        # A case ended for suspected fraud returns every donor's money, whatever they chose.
+        result.refunds = refund_all(
+            session, case, donations, RefundReason.FREEZE, request_id=request_id
+        )
+        donations = []
     for donation in donations:
         left = leftover_usd_minor(session, donation)
         if left <= 0:

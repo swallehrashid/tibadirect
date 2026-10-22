@@ -134,6 +134,8 @@ def transition(
     if to == S.CLOSED:
         case.closed_at = stamp
         case.close_reason = close_reason
+    elif to == S.CANCELLED and close_reason is not None:
+        case.close_reason = close_reason
     if to == S.FROZEN:
         case.frozen_at = stamp
         case.freeze_reason = (reason or "").strip()[:300]

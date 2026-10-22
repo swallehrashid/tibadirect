@@ -24,6 +24,7 @@ from app.logging import scrub
 from app.models.case import Case
 from app.models.enums import (
     ActorType,
+    CaseStatus,
     DonationStatus,
     LedgerAccount,
     LedgerEntryType,
@@ -393,6 +394,7 @@ def execute_refund(
         )
         session.commit()
         send_refund_email(refund)
+        _finish_freeze_if_frozen(case)
         return RefundStatus.SUCCEEDED
     if state == "PENDING":
         refund.paypal_refund_id = paypal_id  # the refund webhook finishes it
@@ -400,7 +402,18 @@ def execute_refund(
         return RefundStatus.PENDING
     _fail(session, case, refund, state.lower() or "failed", request_id)
     session.commit()
+    _finish_freeze_if_frozen(case)
     return RefundStatus.FAILED
+
+
+def _finish_freeze_if_frozen(case: Case) -> None:
+    """A refund just ended on a paused case: have the freeze finished if that was the last one."""
+    if case.status != CaseStatus.FROZEN:
+        return
+    try:
+        jobs.enqueue(jobs.QUEUE_PAYMENTS, "app.jobs.tasks.finish_frozen_case", str(case.id))
+    except RedisError:
+        logger.exception("could not queue the end of a freeze; the sweep will retry")
 
 
 def _fail(

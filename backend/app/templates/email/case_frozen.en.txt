@@ -1,0 +1,5 @@
+We have paused your case "{{ alias }}" while our team looks at it more closely.
+
+New donations are stopped and the page is hidden. Money already given is being returned to the people who gave it, and nothing more will be paid to the hospital while the case is paused.
+
+If you think this is a mistake, reply to this message or ask for a review from your case page.

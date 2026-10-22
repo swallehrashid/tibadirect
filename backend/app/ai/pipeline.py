@@ -1,9 +1,17 @@
-"""Triage orchestration for one uploaded bill.
+"""Triage of one uploaded bill, step by step (specification 7.1).
 
-Phase 2 ships a stub that returns a neutral result, so the whole flow (upload, submit, triage,
-hospital confirmation) works end to end. Phase 3 replaces ``analyse`` with the real checks and
-keeps everything around it: the result is stored, the document is marked triaged, and once every
-bill on the case is triaged the case moves on.
+1. Read the original file from private storage.
+2. Read its text (text layer, or OCR).
+3. Redact it, and store only the redacted text and the page hash.
+4. Read the fields, with the language model as a second opinion only if the family agreed and a
+   key is set.
+5. Raise signals: reading problems, duplicates, the facility, tampering.
+6. Score them, choose the route and write the reasons.
+7. Save a ``TriageResult``, mark the document triaged, open a review item if a person must look,
+   and move the case on once every bill on it has a result.
+
+The engine triages and explains; it never approves or rejects. A bill whose original is gone, or
+that cannot be read, still goes to the hospital with a note that it could not be read.
 """
 
 import logging
@@ -12,22 +20,27 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
+from app.ai import duplicates, extract, facility, llm, redact, risk, tamper, text
+from app.ai.reasons import reasons_for
+from app.ai.signals import Signal
 from app.extensions import db
 from app.models.case import Case, CaseDocument, TriageResult
 from app.models.enums import (
     ActorType,
     CaseStatus,
+    ConsentScope,
     DocumentKind,
     DocumentStatus,
+    ReviewSource,
     RiskBand,
     TriageRoute,
 )
-from app.services import case_service
+from app.services import case_service, review_service, storage_service
 
 logger = logging.getLogger(__name__)
 
 BILL_KINDS = frozenset({DocumentKind.INVOICE, DocumentKind.ESTIMATE, DocumentKind.FINAL_BILL})
-STUB_VERSION = "stub-v0"
+PIPELINE_VERSION = "v1"
 
 
 @dataclass(frozen=True)
@@ -45,14 +58,98 @@ class TriageOutcome:
     model_versions: dict[str, str] = field(default_factory=dict)
 
 
-def analyse(document: CaseDocument) -> TriageOutcome:
-    """The stub: nothing was checked yet, so the bill goes to the hospital with a neutral note."""
+def _unreadable(reason: str) -> TriageOutcome:
+    """A bill with no file to read: it goes to the hospital, with the reason in plain words."""
+    signals = [Signal("low_extraction_confidence", {"reason": reason})]
+    assessed = risk.assess(signals)
+    en, sw = reasons_for(signals)
     return TriageOutcome(
-        reasons_en=["Automatic checks pending"],
-        # Swahili wording is unreviewed; a native speaker checks it in P4-F10.
-        reasons_sw=["Ukaguzi wa kiotomatiki unasubiri"],
-        model_versions={"pipeline": STUB_VERSION},
+        signals=[s.as_json() for s in signals],
+        risk_score=assessed.score,
+        risk_band=assessed.band,
+        route=assessed.route,
+        reasons_en=en,
+        reasons_sw=sw,
+        model_versions={"pipeline": PIPELINE_VERSION},
     )
+
+
+def analyse(document: CaseDocument) -> TriageOutcome:
+    """Run every check on one document and return the outcome. Updates the document's stored
+    redacted text, page hash and fingerprint; the caller commits."""
+    case = document.case
+    if document.storage_key is None or document.raw_deleted_at is not None:
+        return _unreadable("no_file")
+    raw = storage_service.get_object(document.storage_key)
+    read = text.extract(raw, document.mime_type)
+
+    cleaned = redact.redact(read.text)
+    use_model = (
+        case.active_consent(ConsentScope.AI_PROCESSING_ABROAD) is not None and llm.available()
+    )
+    extraction = extract.extract(read.text, use_llm=use_model, ocr_confidence=read.confidence)
+    bill = extraction.bill
+
+    document.redacted_text = cleaned.text or None
+    document.phash = duplicates.image_hash(read.first_page) if read.first_page else None
+    if read.page_count:
+        document.page_count = min(read.page_count, 32767)
+
+    signals: list[Signal] = list(extraction.signals)
+    if read.error or (not read.readable and not read.ocr_available):
+        signals = [s for s in signals if s.code != "low_extraction_confidence"]
+        signals.append(
+            Signal("low_extraction_confidence", {"reason": read.error or "ocr_unavailable"})
+        )
+
+    matched = facility.check(db.session, bill, read.text, case.hospital)
+    canonical = (
+        matched.match.entry.name
+        if matched.match.entry and matched.match.score >= 85
+        else bill.facility_name
+    )
+    document.fingerprint = duplicates.invoice_fingerprint(
+        canonical, bill.invoice_number, bill.total_kes
+    )
+
+    signals.extend(
+        duplicates.check(
+            db.session,
+            case,
+            document,
+            sha256=document.sha256,
+            phash=document.phash,
+            fingerprint=document.fingerprint,
+            redacted_text=document.redacted_text,
+            invoice_number=bill.invoice_number,
+        )
+    )
+    signals.extend(matched.signals)
+    signals.extend(tamper.check(raw, document.mime_type, read, bill))
+
+    assessed = risk.assess(signals)
+    reasons_en, reasons_sw = reasons_for(signals)
+    return TriageOutcome(
+        extracted=bill.model_dump(mode="json", exclude={"patient_reference"}),
+        signals=[s.as_json() for s in signals],
+        risk_score=assessed.score,
+        risk_band=assessed.band,
+        route=assessed.route,
+        reasons_en=reasons_en,
+        reasons_sw=reasons_sw,
+        used_llm=extraction.used_llm,
+        model_versions={
+            "pipeline": PIPELINE_VERSION,
+            "text": read.method,
+            "llm": str(llm_model()) if extraction.used_llm else "none",
+        },
+    )
+
+
+def llm_model() -> str:
+    from flask import current_app
+
+    return current_app.config.get("LLM_MODEL", "")
 
 
 def _latest_result(document: CaseDocument) -> TriageResult | None:
@@ -135,6 +232,18 @@ def process_document(
         db.session.add(result)
         document.status = DocumentStatus.TRIAGED
         db.session.flush()
+        if outcome.route == TriageRoute.MANUAL_REVIEW:
+            review_service.create_item(
+                db.session,
+                case,
+                ReviewSource.AI_FLAG,
+                "The automatic checks found something a person should look at",
+                {
+                    "triage_result_id": str(result.id),
+                    "risk_score": outcome.risk_score,
+                    "signals": [s["code"] for s in outcome.signals],
+                },
+            )
         route_case_when_triaged(case, request_id=request_id)
         db.session.commit()
     except Exception:

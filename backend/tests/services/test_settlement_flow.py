@@ -9,6 +9,8 @@ from sqlalchemy import func, select
 from app.extensions import db
 from app.models.case import Case
 from app.models.enums import (
+    CaseStatus,
+    CloseReason,
     LedgerAccount,
     LedgerEntryType,
     SettlementStatus,
@@ -124,7 +126,12 @@ def test_a_run_of_donations_pays_in_tranches_until_the_bill_is_covered(db_sessio
     assert [t.tranche_no for t in tranches] == list(range(1, len(tranches) + 1))
     assert all(t.status == SettlementStatus.SUCCEEDED for t in tranches)
     assert len({t.idempotency_key for t in tranches}) == len(tranches)
-    assert settlement_service.run_settlement_check(db_session, case.id).reason == "cap_reached"
+    # the bill is paid in full, so the case closes and nothing more can settle
+    assert case.status == CaseStatus.CLOSED
+    assert case.close_reason == CloseReason.FULLY_SETTLED
+    assert settlement_service.run_settlement_check(db_session, case.id).reason == (
+        "case_not_settleable"
+    )
 
 
 @pytest.mark.parametrize("seed", [1, 2, 3, 4])

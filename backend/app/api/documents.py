@@ -96,6 +96,36 @@ class Submit(MethodView):
         return case
 
 
+@blp.route("/<uuid:case_id>/final-bill")
+class FinalBill(MethodView):
+    @blp.secured(UserRole.FAMILY)
+    @limiter.limit("20 per hour", key_func=_per_user, scope="upload")
+    @blp.arguments(UploadFileSchema, location="files")
+    @blp.response(201, DocumentSchema)
+    @blp.alt_response(
+        409, description="Not live, the bill is already final, or a final bill is being checked"
+    )
+    @blp.alt_response(413, description="The file is larger than 10 MB")
+    @blp.alt_response(415, description="Not a PDF, PNG or JPEG")
+    def post(self, files: dict, case_id: uuid.UUID) -> object:
+        """Upload the hospital's final bill for a live case. It is checked, then sent to the
+        hospital to confirm; once confirmed, the case is paid up to the final amount and closes
+        when that has been settled."""
+        user, case = _owned(case_id)
+        upload = files["file"]
+        document = document_service.add_final_bill(
+            db.session,
+            case,
+            user,
+            data=upload.stream.read(),
+            filename=upload.filename,
+            declared_type=upload.mimetype,
+        )
+        db.session.commit()
+        document_service.enqueue_triage([document])
+        return document
+
+
 @blp.route("/<uuid:case_id>/triage")
 class Triage(MethodView):
     @blp.secured(UserRole.FAMILY)

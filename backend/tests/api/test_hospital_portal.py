@@ -111,7 +111,8 @@ def test_the_queue_shows_this_hospitals_waiting_bills_only(
     assert not ids & {str(draft.id), str(live.id)}
     assert body["awaiting_second_approval"] == []
     [item] = body["pending"]
-    assert set(item) == {"id", "alias", "region", "submitted_at", "risk_band", "bills"}
+    assert set(item) == {"id", "alias", "region", "submitted_at", "risk_band", "bills", "kind"}
+    assert item["kind"] == "first_bill"
     assert item["bills"] == 1
 
 

@@ -29,7 +29,6 @@ from app.logging import scrub
 from app.models.case import Case
 from app.models.enums import (
     ActorType,
-    CaseStatus,
     DonationStatus,
     ExcessChoice,
     LedgerAccount,
@@ -353,8 +352,7 @@ def record_capture(
             "amount_matched_order": amount_matches,
         },
     )
-    if case.status == CaseStatus.LIVE and case_service.has_reached_goal(case):
-        case_service.transition(case, CaseStatus.FUNDED, ActorType.SYSTEM, "goal_reached")
+    case_service.sync_funding(case)
     session.commit()
     settlement_service.enqueue_check(case.id)
     send_receipt(donation, details.payer_email)

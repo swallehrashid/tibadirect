@@ -313,9 +313,10 @@ def execute_settlement(
         session.commit()
         return SettlementStatus.FAILED
 
+    open_before = case.status != CaseStatus.CLOSED
     status = _apply(session, case, settlement, result, request_id)
     session.commit()
-    _notify_if_paid(session, settlement.id, SettlementStatus.PENDING, status)
+    _notify_if_paid(session, settlement.id, SettlementStatus.PENDING, status, open_before)
     return status
 
 
@@ -342,10 +343,11 @@ def poll_settlement(
         session.rollback()
         return settlement.status
     before = settlement.status
+    open_before = case.status != CaseStatus.CLOSED
     result = adapter_for(settlement.adapter).poll(settlement)
     status = _apply(session, case, settlement, result, request_id)
     session.commit()
-    _notify_if_paid(session, settlement.id, before, status)
+    _notify_if_paid(session, settlement.id, before, status, open_before)
     return status
 
 
@@ -429,6 +431,7 @@ def _succeed(session: Session, case: Case, settlement: Settlement, request_id: s
         request_id=request_id,
         details={"case_id": case.id, "tranche_no": settlement.tranche_no},
     )
+    case_service.close_if_fully_settled(case)
 
 
 def _fail(
@@ -488,13 +491,18 @@ def _notify_if_paid(
     settlement_id: uuid.UUID,
     before: SettlementStatus,
     after: SettlementStatus,
+    case_was_open: bool,
 ) -> None:
-    """Email about a tranche that has just been paid, once. Never undoes the payment."""
+    """Email about a tranche that has just been paid, once, and about the case closing if that
+    payment was the last. Never undoes the payment."""
     if before == SettlementStatus.SUCCEEDED or after != SettlementStatus.SUCCEEDED:
         return
     settlement = session.get(Settlement, settlement_id)
-    if settlement is not None:
-        notify_settled(settlement)
+    if settlement is None:
+        return
+    notify_settled(settlement)
+    if case_was_open and settlement.case.status == CaseStatus.CLOSED:
+        notification_service.notify_closed(settlement.case)
 
 
 def notify_settled(settlement: Settlement) -> None:

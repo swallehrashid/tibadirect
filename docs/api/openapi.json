@@ -2204,6 +2204,87 @@
         }
       ]
     },
+    "/api/cases/{case_id}/final-bill": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "415": {
+            "description": "Not a PDF, PNG or JPEG"
+          },
+          "413": {
+            "description": "The file is larger than 10 MB"
+          },
+          "409": {
+            "description": "Not live, the bill is already final, or a final bill is being checked"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFile"
+              }
+            }
+          }
+        },
+        "summary": "Upload the hospital's final bill for a live case. It is checked, then sent to the\nhospital to confirm; once confirmed, the case is paid up to the final amount and closes\nwhen that has been settled.",
+        "tags": [
+          "documents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
     "/api/cases/{case_id}/triage": {
       "get": {
         "responses": {
@@ -2429,6 +2510,7 @@
           }
         },
         "summary": "Bills waiting for the hospital's decision, and bills waiting for a second approval.",
+        "description": "A bill is either a case's first bill or a final bill added to a case that is live.",
         "tags": [
           "hospital_portal"
         ],
@@ -4655,6 +4737,10 @@
           },
           "bills": {
             "type": "integer"
+          },
+          "kind": {
+            "type": "string",
+            "description": "first_bill, or final_bill for a live case's final bill"
           }
         },
         "additionalProperties": false

@@ -21,6 +21,8 @@ def _held(case, content: bytes = b"%PDF-bytes"):  # type: ignore[no-untyped-def]
     key = storage_service.document_key(case.id, __import__("uuid").uuid4(), "pdf")
     storage_service.put_object(key, content, "application/pdf")
     document = CaseDocumentFactory(case=case, storage_key=key)
+    # Uploaded long before the hospital confirmed it, as a real bill is.
+    document.created_at = datetime.now(UTC) - timedelta(days=60)
     return document, key
 
 

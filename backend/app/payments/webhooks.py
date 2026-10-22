@@ -397,6 +397,7 @@ def _handle_capture_reversed(
         )
     session.expire(case, ["donations"])
     case_service.recompute_totals(case)
+    case_service.sync_funding(case)
     audit_service.record(
         "donation.reversed",
         donation,

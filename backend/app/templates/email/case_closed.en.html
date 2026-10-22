@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en">
+  <body style="font-family: sans-serif; color: #1a1a1a;">
+    <p>The hospital's bill for &ldquo;{{ alias }}&rdquo; has been paid in full, so your case is now closed.</p>
+    {% if lower_bill %}<p>The final bill was lower than the first estimate, so some of the money given was not needed.</p>{% endif %}
+    <p>Money that was not needed follows each donor's own choice: a refund to their PayPal, the solidarity pool, or a short hold for follow-up care. Nothing goes to anyone else.</p>
+    <p>Every payment stays on the <a href="{{ url }}">case page</a>.</p>
+    <p>Thank you to everyone who helped.</p>
+  </body>
+</html>

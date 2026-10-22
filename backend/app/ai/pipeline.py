@@ -81,6 +81,16 @@ def route_case_when_triaged(case: Case, *, request_id: str | None = None) -> boo
     return True
 
 
+def _may_be_triaged(document: CaseDocument, case: Case) -> bool:
+    """A first bill is checked while the case waits for triage; a final bill, while it is live."""
+    if case.status == CaseStatus.PENDING_TRIAGE:
+        return True
+    return document.kind == DocumentKind.FINAL_BILL and case.status in (
+        CaseStatus.LIVE,
+        CaseStatus.FUNDED,
+    )
+
+
 def process_document(
     document_id: uuid.UUID, *, request_id: str | None = None
 ) -> TriageResult | None:
@@ -99,7 +109,7 @@ def process_document(
         route_case_when_triaged(case, request_id=request_id)
         db.session.commit()
         return existing
-    if case.status != CaseStatus.PENDING_TRIAGE:
+    if not _may_be_triaged(document, case):
         logger.info("triage skipped: case is not waiting for triage")
         return None
 

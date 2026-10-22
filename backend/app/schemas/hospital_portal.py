@@ -88,6 +88,9 @@ class QueueCaseSchema(ma.Schema):
     submitted_at = ma.fields.DateTime(allow_none=True)
     risk_band = ma.fields.String(allow_none=True)
     bills = ma.fields.Integer()
+    kind = ma.fields.String(
+        metadata={"description": "first_bill, or final_bill for a live case's final bill"}
+    )
 
 
 class QueueSchema(ma.Schema):

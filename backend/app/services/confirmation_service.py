@@ -25,6 +25,7 @@ from app.models.enums import (
     ConfirmationStatus,
     ConsentScope,
     DocumentKind,
+    DocumentStatus,
     ReviewSource,
     StaffRole,
 )
@@ -111,6 +112,34 @@ def current_bill(case: Case) -> CaseDocument | None:
     return max(bills, key=lambda document: document.created_at, default=None)
 
 
+# A final bill is decided while the case is already taking money.
+FINAL_BILL_STATUSES = (CaseStatus.LIVE, CaseStatus.FUNDED)
+
+
+def awaiting_final_bill(case: Case) -> CaseDocument | None:
+    """The newest checked final bill the hospital has not decided on yet, on a live case."""
+    if case.status not in FINAL_BILL_STATUSES:
+        return None
+    decided = {c.document_id for c in case.confirmations}
+    waiting = [
+        d
+        for d in case.documents
+        if d.kind == DocumentKind.FINAL_BILL
+        and d.status == DocumentStatus.TRIAGED
+        and d.id not in decided
+    ]
+    return max(waiting, key=lambda d: d.created_at, default=None)
+
+
+def awaiting_decision(case: Case) -> bool:
+    """True if the hospital has a bill to decide on: the first bill, or a later final bill."""
+    return case.status == CaseStatus.PENDING_CONFIRMATION or awaiting_final_bill(case) is not None
+
+
+def second_approval_possible(case: Case) -> bool:
+    return case.status == CaseStatus.PENDING_CONFIRMATION or case.status in FINAL_BILL_STATUSES
+
+
 def awaiting_second_approval(case: Case) -> Confirmation | None:
     return next(
         (c for c in case.confirmations if c.status == ConfirmationStatus.AWAITING_SECOND_APPROVAL),
@@ -149,7 +178,7 @@ def send_otp(session: Session, case: Case, staff: HospitalStaff, purpose: str) -
         )
     pending = awaiting_second_approval(case)
     if purpose == "decision":
-        if case.status != CaseStatus.PENDING_CONFIRMATION:
+        if not awaiting_decision(case):
             raise Conflict(
                 "This case is not waiting for the hospital's decision.",
                 code="case_not_awaiting_confirmation",
@@ -159,7 +188,7 @@ def send_otp(session: Session, case: Case, staff: HospitalStaff, purpose: str) -
                 "This bill is waiting for a second approval.", code="awaiting_second_approval"
             )
     else:
-        if pending is None or case.status != CaseStatus.PENDING_CONFIRMATION:
+        if pending is None or not second_approval_possible(case):
             raise Conflict("No second approval is pending.", code="no_second_approval_pending")
         _require_supervisor_who_did_not_confirm(staff, pending)
 
@@ -304,7 +333,7 @@ def decide(
     ``REJECTED``. Checks that can fail on the form run after the code is verified, but they run
     in the same transaction, so a refused decision leaves the code unused.
     """
-    if case.status != CaseStatus.PENDING_CONFIRMATION:
+    if not awaiting_decision(case):
         raise Conflict(
             "This case is not waiting for the hospital's decision.",
             code="case_not_awaiting_confirmation",
@@ -313,9 +342,15 @@ def decide(
         raise Conflict(
             "This bill is waiting for a second approval.", code="awaiting_second_approval"
         )
-    document = current_bill(case)
+    final_path = case.status in FINAL_BILL_STATUSES
+    if final_path:
+        # The case is taking money; changing its target must not interleave with a donation.
+        case = case_service.lock_case(session, case.id)
+    document = awaiting_final_bill(case) if final_path else current_bill(case)
     if document is None:
         raise Conflict("This case has no bill to decide on.", code="bill_required")
+    if final_path:
+        is_final_bill = True  # the document is a final bill, whatever the form says
     request = _verify_otp(session, request_id, otp, case=case, staff=staff, purpose="decision")
     note = (note or "").strip()[:NOTE_MAX] or None
 
@@ -336,7 +371,9 @@ def decide(
         )
         session.add(confirmation)
         session.flush()
-        if decision == ConfirmationStatus.QUERIED:
+        if final_path:
+            _handle_final_bill_not_confirmed(session, case, staff, confirmation)
+        elif decision == ConfirmationStatus.QUERIED:
             _handle_query(session, case, staff, confirmation)
         else:
             _handle_rejection(case, staff, confirmation)
@@ -429,11 +466,13 @@ def approve_second(
             "This bill is not waiting for a second approval.", code="no_second_approval_pending"
         )
     case = confirmation.case
-    if case.status != CaseStatus.PENDING_CONFIRMATION:
+    if not second_approval_possible(case):
         raise Conflict(
             "This case is no longer waiting for confirmation.",
             code="case_not_awaiting_confirmation",
         )
+    if case.status in FINAL_BILL_STATUSES:
+        case = case_service.lock_case(session, case.id)
     _require_supervisor_who_did_not_confirm(staff, confirmation)
     request = _verify_otp(
         session, request_id, otp, case=case, staff=staff, purpose="second_approval"
@@ -470,6 +509,38 @@ def apply_confirmed(session: Session, case: Case, confirmation: Confirmation) ->
         },
     )
     go_live_if_ready(session, case)
+    if case.status in FINAL_BILL_STATUSES:
+        _after_bill_on_live_case(session, case, confirmation)
+
+
+def _after_bill_on_live_case(session: Session, case: Case, confirmation: Confirmation) -> None:
+    """A bill was confirmed on a case already taking money: re-check funding and closure.
+
+    A larger bill can reopen a funded case; a smaller one can fund it. If the hospital has
+    already been paid more than a final bill asks for, that extra sits with the hospital as
+    patient credit, which only a person can arrange, so an admin is asked to look.
+    """
+    case_service.sync_funding(case)
+    if (
+        confirmation.is_final_bill
+        and case.target_kes_minor is not None
+        and case.settled_kes_minor > case.target_kes_minor
+    ):
+        session.add(
+            ReviewItem(
+                case=case,
+                source=ReviewSource.ADMIN,
+                reason="The final bill is lower than what has already been paid to the hospital",
+                payload={
+                    "origin": "final_bill_below_settled",
+                    "confirmation_id": str(confirmation.id),
+                    "settled_kes_minor": case.settled_kes_minor,
+                    "target_kes_minor": case.target_kes_minor,
+                },
+            )
+        )
+        session.flush()
+    case_service.close_if_fully_settled(case)
 
 
 def go_live_if_ready(session: Session, case: Case) -> bool:
@@ -514,6 +585,40 @@ def _handle_query(
         details={"confirmation_id": confirmation.id},
     )
     notification_service.notify_family(case, "case_queried")
+
+
+def _handle_final_bill_not_confirmed(
+    session: Session, case: Case, staff: HospitalStaff, confirmation: Confirmation
+) -> None:
+    """The hospital queried or rejected a final bill. The case stays live on its estimate; an
+    admin is asked to look and the family can upload another final bill."""
+    queried = confirmation.status == ConfirmationStatus.QUERIED
+    reason = (
+        "The hospital has a question about the final bill"
+        if queried
+        else "The hospital did not confirm the final bill"
+    )
+    if confirmation.query_note:
+        reason = f"{reason}: {confirmation.query_note}"
+    session.add(
+        ReviewItem(
+            case=case,
+            source=ReviewSource.ADMIN,
+            reason=reason[:300],
+            payload={
+                "origin": "final_bill_query" if queried else "final_bill_rejected",
+                "confirmation_id": str(confirmation.id),
+            },
+        )
+    )
+    session.flush()
+    audit_service.record(
+        "confirmation.queried" if queried else "confirmation.rejected",
+        case,
+        actor=staff.user,
+        details={"confirmation_id": confirmation.id, "is_final_bill": True},
+    )
+    notification_service.notify_family(case, "case_queried" if queried else "case_rejected")
 
 
 def _handle_rejection(case: Case, staff: HospitalStaff, confirmation: Confirmation) -> None:

@@ -1,0 +1,9 @@
+Bili ya hospitali ya "{{ alias }}" imelipwa yote, kwa hiyo kesi yako sasa imefungwa.
+{% if lower_bill %}
+Bili ya mwisho ilikuwa ndogo kuliko makadirio ya kwanza, kwa hiyo sehemu ya pesa iliyotolewa haikuhitajika.
+{% endif %}
+Pesa zisizohitajika hufuata uamuzi wa kila mchangiaji: kurejeshewa kupitia PayPal yake, hazina ya mshikamano, au kusubiri kwa muda mfupi kwa huduma za ufuatiliaji. Hakuna kinachoenda kwa mtu mwingine.
+
+Kila malipo yanabaki kwenye ukurasa wa kesi: {{ url }}
+
+Asante kwa wote waliosaidia.

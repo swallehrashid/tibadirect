@@ -100,6 +100,7 @@ def complete_refund(
     )
     session.expire(case, ["donations"])
     case_service.recompute_totals(case)
+    case_service.sync_funding(case)
     audit_service.record(
         "refund.succeeded",
         refund,

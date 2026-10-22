@@ -11,7 +11,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from flask import current_app
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 
 from app.errors import Conflict, NotFound
@@ -20,6 +20,7 @@ from app.models.case import Case, CaseDocument
 from app.models.enums import (
     ActorType,
     CaseStatus,
+    ConfirmationStatus,
     ConsentScope,
     DocumentKind,
     DocumentStatus,
@@ -70,6 +71,64 @@ def add_document(
             code="document_kind_not_allowed",
             details={"allowed": [k.value for k in DRAFT_UPLOAD_KINDS]},
         )
+    return _store_bill(
+        session, case, user, data=data, filename=filename, declared_type=declared_type, kind=kind
+    )
+
+
+def add_final_bill(
+    session: Session,
+    case: Case,
+    user: User,
+    *,
+    data: bytes,
+    filename: str | None,
+    declared_type: str | None,
+) -> CaseDocument:
+    """Add the hospital's final bill to a case that is live or funded on an estimate.
+
+    The caller commits and then queues triage for the result (``enqueue_triage``). One final
+    bill is checked at a time; a new one is welcome once the hospital has answered the last, or if
+    checking the last one failed.
+    """
+    if case.status not in confirmation_service.FINAL_BILL_STATUSES:
+        raise Conflict("A final bill can be added once the page is live.", code="case_not_live")
+    if not case.is_estimate:
+        raise Conflict("The bill on this case is already final.", code="final_bill_not_needed")
+    decided = {c.document_id for c in case.confirmations}
+    in_progress = [
+        d
+        for d in case.documents
+        if d.kind == DocumentKind.FINAL_BILL
+        and d.status != DocumentStatus.FAILED
+        and d.id not in decided
+    ]
+    if in_progress or confirmation_service.awaiting_second_approval(case) is not None:
+        raise Conflict(
+            "A final bill is already being checked. Wait for the hospital to answer.",
+            code="final_bill_pending",
+        )
+    return _store_bill(
+        session,
+        case,
+        user,
+        data=data,
+        filename=filename,
+        declared_type=declared_type,
+        kind=DocumentKind.FINAL_BILL,
+    )
+
+
+def _store_bill(
+    session: Session,
+    case: Case,
+    user: User,
+    *,
+    data: bytes,
+    filename: str | None,
+    declared_type: str | None,
+    kind: DocumentKind,
+) -> CaseDocument:
     checked = uploads.validate_upload(data, filename=filename, declared_type=declared_type)
     if len(_bills(case)) >= MAX_BILL_DOCUMENTS:
         raise Conflict(
@@ -209,14 +268,22 @@ def documents_waiting_for_triage(
 ) -> list[CaseDocument]:
     """Bills of cases in ``pending_triage`` that no worker has started on, for the sweep."""
     cutoff = datetime.now(UTC) - timedelta(seconds=older_than_seconds)
+    first_bills = (
+        Case.status == CaseStatus.PENDING_TRIAGE,
+        Case.submitted_at < cutoff,
+        CaseDocument.kind.in_(BILL_KINDS),
+    )
+    final_bills = (
+        Case.status.in_(confirmation_service.FINAL_BILL_STATUSES),
+        CaseDocument.kind == DocumentKind.FINAL_BILL,
+        CaseDocument.created_at < cutoff,
+    )
     statement = (
         select(CaseDocument)
         .join(Case, CaseDocument.case_id == Case.id)
         .where(
-            Case.status == CaseStatus.PENDING_TRIAGE,
-            Case.submitted_at < cutoff,
-            CaseDocument.kind.in_(BILL_KINDS),
             CaseDocument.status == DocumentStatus.UPLOADED,
+            or_(and_(*first_bills), and_(*final_bills)),
         )
         .order_by(CaseDocument.created_at)
     )
@@ -240,8 +307,16 @@ def sweep_raw_documents(session: Session, now: datetime | None = None) -> int:
     deleted = 0
     for document in held:
         case = document.case
-        confirmation = confirmation_service.confirmed(case)
-        confirmed_at = confirmation.finalized_at if confirmation else None
+        # The clock starts at the first confirmation made after the file was uploaded, so a final
+        # bill added to a live case is kept until the hospital has decided on it.
+        decisions = [
+            c.finalized_at
+            for c in case.confirmations
+            if c.status == ConfirmationStatus.CONFIRMED
+            and c.finalized_at is not None
+            and c.finalized_at >= document.created_at
+        ]
+        confirmed_at = min(decisions) if decisions else None
         cancelled_at = case.updated_at if case.status == CaseStatus.CANCELLED else None
         started = confirmed_at or cancelled_at
         if started is None or started > cutoff or document.storage_key is None:

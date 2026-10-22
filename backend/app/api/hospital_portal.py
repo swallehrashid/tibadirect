@@ -26,7 +26,7 @@ from app.schemas.hospital_portal import (
     SettlementItemSchema,
 )
 from app.security.permissions import current_staff, get_hospital_case_or_404
-from app.services import case_service, confirmation_service, document_service
+from app.services import case_service, confirmation_service, document_service, settlement_service
 
 blp = TibaBlueprint(
     "hospital_portal", __name__, url_prefix="/api/hospital", description="Hospital portal"
@@ -115,6 +115,12 @@ class SendOtp(MethodView):
         }
 
 
+def _check_settlement_if_confirmed(confirmation: Confirmation) -> None:
+    """A confirmed bill may release money that was waiting (a larger or final bill)."""
+    if confirmation.status == ConfirmationStatus.CONFIRMED:
+        settlement_service.enqueue_check(confirmation.case_id)
+
+
 @blp.route("/cases/<uuid:case_id>/decision")
 class Decision(MethodView):
     @blp.secured(UserRole.HOSPITAL_STAFF)
@@ -142,6 +148,7 @@ class Decision(MethodView):
             note=payload["note"],
         )
         db.session.commit()
+        _check_settlement_if_confirmed(confirmation)
         return {"confirmation": confirmation, "case_status": case.status.value}
 
 
@@ -166,6 +173,7 @@ class Approve(MethodView):
             otp=payload["otp"],
         )
         db.session.commit()
+        _check_settlement_if_confirmed(confirmation)
         return {"confirmation": confirmation, "case_status": confirmation.case.status.value}
 
 

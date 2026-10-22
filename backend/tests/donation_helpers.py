@@ -3,26 +3,60 @@
 from decimal import Decimal
 
 from app.models.case import Case
-from app.models.enums import CaseStatus, ConsentScope, ExcessChoice
+from app.models.enums import (
+    CaseStatus,
+    ConsentScope,
+    ExcessChoice,
+    SettlementMethod,
+    TrustLevel,
+)
 from app.models.money import Donation
 from app.payments.paypal_mock import MockPayPal
 from app.services import donation_service
-from tests.factories import CaseFactory, ConsentFactory, FxRateFactory
+from tests.factories import CaseFactory, ConfirmationFactory, ConsentFactory, FxRateFactory
 
 RATE = Decimal("129.00000000")
 
 
-def live_case(target_kes_minor: int = 10_000_000, buffer_bps: int = 500, **fields: object) -> Case:
+def live_case(
+    target_kes_minor: int = 10_000_000,
+    buffer_bps: int = 500,
+    is_estimate: bool = False,
+    **fields: object,
+) -> Case:
     """A public, live case with a confirmed target of KES 100,000 at 129 KES per dollar."""
     FxRateFactory(rate=RATE)
     case = CaseFactory(
         status=CaseStatus.LIVE,
         target_kes_minor=target_kes_minor,
         buffer_bps=buffer_bps,
-        is_estimate=False,
+        is_estimate=is_estimate,
         **fields,
     )
     ConsentFactory(case=case, scope=ConsentScope.PUBLIC_PAGE)
+    return case
+
+
+def settleable_case(
+    target_kes_minor: int = 10_000_000,
+    *,
+    is_estimate: bool = False,
+    deposit_kes_minor: int | None = None,
+    method: SettlementMethod = SettlementMethod.PAYPAL_PAYOUTS,
+    payout_email: str | None = "payouts@hospital.test",
+    buffer_bps: int = 500,
+) -> Case:
+    """A live, hospital-confirmed case whose hospital can be paid: money can now settle."""
+    case = live_case(target_kes_minor, buffer_bps, is_estimate)
+    case.trust_level = TrustLevel.HOSPITAL_CONFIRMED
+    case.hospital.settlement_method = method
+    case.hospital.paypal_payout_email = payout_email
+    ConfirmationFactory(
+        case=case,
+        amount_kes_minor=target_kes_minor,
+        deposit_kes_minor=deposit_kes_minor,
+        is_final_bill=not is_estimate,
+    )
     return case
 
 

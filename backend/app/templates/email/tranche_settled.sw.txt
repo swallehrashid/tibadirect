@@ -1,0 +1,8 @@
+{% if audience == "hospital" %}Malipo ya bili ya "{{ alias }}"{% if invoice %} (ankara {{ invoice }}){% endif %} yametumwa kwa hospitali yenu.{% else %}Malipo ya "{{ alias }}" yamefika hospitalini.{% endif %}
+
+Malipo ya {{ tranche }}: {{ amount_kes }} (yamelipwa kama {{ amount_usd }})
+Kumbukumbu: {{ reference }}
+{% if simulated %}
+Malipo haya yamefanywa kwa kuigiza kupitia PayPal Payouts kwenda akaunti ya majaribio ya hospitali. Kwa matumizi halisi, mshirika wa Kenya mwenye leseni hulipa paybill au akaunti ya benki ya hospitali.
+{% endif %}
+Kila malipo yanaonekana kwenye ukurasa wa kesi: {{ case_url }}

@@ -318,3 +318,18 @@ class AdminCaseSchema(ma.Schema):
     live_at = ma.fields.DateTime(allow_none=True)
     closed_at = ma.fields.DateTime(allow_none=True)
     frozen_at = ma.fields.DateTime(allow_none=True)
+
+
+class SettlementRunSchema(ma.Schema):
+    reason = ma.fields.String(
+        metadata={
+            "description": "created, or why no tranche was due: case_not_settleable, "
+            "no_confirmation, hospital_inactive, hospital_not_ready, cap_reached, "
+            "nothing_available, below_threshold"
+        }
+    )
+    settlement_id = ma.fields.UUID(allow_none=True)
+    tranche_no = ma.fields.Integer(allow_none=True)
+    amount_usd_minor = ma.fields.Integer(allow_none=True)
+    amount_kes_minor = ma.fields.Integer(allow_none=True)
+    status = ma.fields.String(allow_none=True)

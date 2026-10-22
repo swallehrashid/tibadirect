@@ -352,6 +352,20 @@ def goal_kes_minor(case: Case) -> int | None:
     return apply_bps(case.target_kes_minor, 10_000 + case.buffer_bps)
 
 
+def lock_case(session: Session, case_id: uuid.UUID) -> Case:
+    """The case row, locked and freshly read.
+
+    Every money path (capture, webhook, settlement, refund) takes this lock first and only then
+    locks donations, settlements or refunds, so no two of them can wait on each other.
+    """
+    return session.execute(
+        select(Case)
+        .where(Case.id == case_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).scalar_one()
+
+
 def has_reached_goal(case: Case) -> bool:
     """Pledged money covers the confirmed target plus its buffer."""
     goal = goal_kes_minor(case)

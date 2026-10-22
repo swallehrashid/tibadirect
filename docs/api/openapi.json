@@ -1113,6 +1113,69 @@
         }
       ]
     },
+    "/api/admin/cases/{case_id}/settlements/run": {
+      "post": {
+        "responses": {
+          "404": {
+            "description": "No such case"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementRun"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Check now whether a tranche is due for this case and, if so, create and send it.",
+        "description": "The same check runs after every donation and every 15 minutes; this is for an admin who\nwants it now. A case with nothing due answers 200 with the reason.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
     "/api/admin/audit-log": {
       "get": {
         "parameters": [
@@ -3822,6 +3885,37 @@
         "required": [
           "reason"
         ],
+        "additionalProperties": false
+      },
+      "SettlementRun": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "created, or why no tranche was due: case_not_settleable, no_confirmation, hospital_inactive, hospital_not_ready, cap_reached, nothing_available, below_threshold"
+          },
+          "settlement_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "tranche_no": {
+            "type": "integer",
+            "nullable": true
+          },
+          "amount_usd_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "amount_kes_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "AuditEntry": {

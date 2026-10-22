@@ -70,3 +70,37 @@ def sweep_webhook_events() -> int:
     from app.payments import webhooks
 
     return webhooks.enqueue_stale_events(db.session)
+
+
+def run_settlement_check(case_id: str | uuid.UUID) -> str:
+    """Pay the hospital a tranche if one is due. Returns why not, or ``created``."""
+    from app.services import settlement_service
+
+    result = settlement_service.run_settlement_check(
+        db.session, uuid.UUID(str(case_id)), request_id=job_request_id()
+    )
+    return result.reason
+
+
+def execute_settlement(settlement_id: str | uuid.UUID) -> str | None:
+    """Send a tranche that is written down but not yet sent."""
+    from app.services import settlement_service
+
+    status = settlement_service.execute_settlement(
+        db.session, uuid.UUID(str(settlement_id)), request_id=job_request_id()
+    )
+    return status.value if status is not None else None
+
+
+def poll_payout_status() -> int:
+    """Ask the payment provider about every tranche that is on its way and due a check."""
+    from app.services import settlement_service
+
+    return settlement_service.poll_open_settlements(db.session)
+
+
+def sweep_settlements() -> int:
+    """Re-send unsent tranches and check every open case (the safety net, every 15 minutes)."""
+    from app.services import settlement_service
+
+    return settlement_service.sweep(db.session)

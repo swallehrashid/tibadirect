@@ -62,6 +62,7 @@ ADMIN_ROUTES = [
     ("get", "/api/admin/audit-log"),
     ("get", f"/api/admin/cases/{uuid.uuid4()}"),
     ("post", f"/api/admin/cases/{uuid.uuid4()}/freeze"),
+    ("post", f"/api/admin/cases/{uuid.uuid4()}/settlements/run"),
     ("post", f"/api/admin/review-items/{uuid.uuid4()}/resolve"),
 ]
 

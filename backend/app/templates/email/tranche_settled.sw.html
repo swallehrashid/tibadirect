@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="sw">
+  <body style="font-family: sans-serif; color: #1a1a1a;">
+    <p>{% if audience == "hospital" %}Malipo ya bili ya &ldquo;{{ alias }}&rdquo;{% if invoice %} (ankara {{ invoice }}){% endif %} yametumwa kwa hospitali yenu.{% else %}Malipo ya &ldquo;{{ alias }}&rdquo; yamefika hospitalini.{% endif %}</p>
+    <p>Malipo ya {{ tranche }}: {{ amount_kes }} (yamelipwa kama {{ amount_usd }})<br>Kumbukumbu: {{ reference }}</p>
+    {% if simulated %}<p><em>Malipo haya yamefanywa kwa kuigiza kupitia PayPal Payouts kwenda akaunti ya majaribio ya hospitali. Kwa matumizi halisi, mshirika wa Kenya mwenye leseni hulipa paybill au akaunti ya benki ya hospitali.</em></p>{% endif %}
+    <p>Kila malipo yanaonekana kwenye <a href="{{ case_url }}">ukurasa wa kesi</a>.</p>
+  </body>
+</html>

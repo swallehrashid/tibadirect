@@ -46,6 +46,10 @@ PERIODIC_JOBS: list[PeriodicJob] = [
     PeriodicJob(
         "sweep_webhook_events", "app.jobs.tasks.sweep_webhook_events", jobs.QUEUE_PAYMENTS, 120
     ),
+    PeriodicJob(
+        "poll_payout_status", "app.jobs.tasks.poll_payout_status", jobs.QUEUE_PAYMENTS, 120
+    ),
+    PeriodicJob("sweep_settlements", "app.jobs.tasks.sweep_settlements", jobs.QUEUE_PAYMENTS, 900),
 ]
 
 

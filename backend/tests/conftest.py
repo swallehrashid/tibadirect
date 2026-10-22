@@ -226,3 +226,17 @@ def paypal(app: Flask) -> MockPayPal:
         gateway = get_client()
     assert isinstance(gateway, MockPayPal)
     return gateway
+
+
+@pytest.fixture
+def manual_settlement(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
+    """Settlement jobs are recorded instead of run, so a test drives each step itself.
+
+    Tests run the job queue inline, so without this a donation would create, send and follow a
+    tranche on its own, which is right end to end but hides the steps from a test about one.
+    """
+    from app.services import settlement_service
+
+    seen: list[tuple[str, str]] = []
+    monkeypatch.setattr(settlement_service, "_enqueue", lambda func, arg: seen.append((func, arg)))
+    return seen

@@ -38,7 +38,7 @@ from app.models.enums import (
     WebhookStatus,
 )
 from app.models.integration import WebhookEvent
-from app.models.money import Donation
+from app.models.money import Donation, Settlement
 from app.money import MoneyError
 from app.payments import parsing
 from app.payments.errors import PayPalError
@@ -50,6 +50,7 @@ from app.services import (
     ledger_service,
     refund_service,
     review_service,
+    settlement_service,
 )
 
 logger = logging.getLogger(__name__)
@@ -70,6 +71,7 @@ PERSONAL_KEYS = frozenset(
         "full_name",
         "address",
         "phone_number",
+        "receiver",
     }
 )
 
@@ -231,8 +233,11 @@ def enqueue_stale_events(session: Session) -> int:
 Handler = Callable[[Session, dict[str, Any], WebhookEvent], None]
 
 
-def _lock_donation(session: Session, resource: dict[str, Any]) -> Donation:
-    """The donation a capture belongs to, locked: by capture ID, then order ID, then custom ID."""
+def _lock_donation(session: Session, resource: dict[str, Any]) -> tuple[Case, Donation]:
+    """The donation a capture belongs to and its case, both locked (case first).
+
+    Found by capture ID, then order ID, then the ``custom_id`` we set (the donation ID).
+    """
     related = (resource.get("supplementary_data") or {}).get("related_ids") or {}
     lookups: list[Any] = []
     if isinstance(resource.get("id"), str):
@@ -244,24 +249,18 @@ def _lock_donation(session: Session, resource: dict[str, Any]) -> Donation:
         with contextlib.suppress(ValueError):
             lookups.append(Donation.id == uuid.UUID(custom))
     for condition in lookups:
+        found = session.execute(select(Donation.id, Donation.case_id).where(condition)).first()
+        if found is None:
+            continue
+        case = case_service.lock_case(session, found.case_id)
         donation = session.execute(
             select(Donation)
-            .where(condition)
+            .where(Donation.id == found.id)
             .with_for_update()
             .execution_options(populate_existing=True)
-        ).scalar_one_or_none()
-        if donation is not None:
-            return donation
+        ).scalar_one()
+        return case, donation
     raise Ignored("No donation matches this payment")
-
-
-def _lock_case(session: Session, donation: Donation) -> Case:
-    return session.execute(
-        select(Case)
-        .where(Case.id == donation.case_id)
-        .with_for_update()
-        .execution_options(populate_existing=True)
-    ).scalar_one()
 
 
 def _handle_order_approved(session: Session, resource: dict[str, Any], event: WebhookEvent) -> None:
@@ -273,8 +272,7 @@ def _handle_order_approved(session: Session, resource: dict[str, Any], event: We
 def _handle_capture_completed(
     session: Session, resource: dict[str, Any], event: WebhookEvent
 ) -> None:
-    donation = _lock_donation(session, resource)
-    case = _lock_case(session, donation)
+    case, donation = _lock_donation(session, resource)
     details = parsing.from_capture_resource(resource)
     if not details.completed:
         raise Ignored(f"The capture is {details.status.lower()}, not completed")
@@ -298,7 +296,7 @@ def _handle_capture_completed(
 
 
 def _handle_capture_denied(session: Session, resource: dict[str, Any], event: WebhookEvent) -> None:
-    donation = _lock_donation(session, resource)
+    _, donation = _lock_donation(session, resource)
     if donation.status != DonationStatus.CREATED:
         raise Ignored("The donation is not waiting for a payment")
     donation.status = DonationStatus.DENIED
@@ -331,8 +329,7 @@ def _handle_capture_refunded(
     capture_id = _capture_id_from_links(resource)
     if capture_id is None:
         raise Ignored("The refund does not name its payment")
-    donation = _lock_donation(session, {"id": capture_id})
-    case = _lock_case(session, donation)
+    case, donation = _lock_donation(session, {"id": capture_id})
     amount = parsing.amount_minor(resource.get("amount"), "refund amount")
 
     known = refund_service.find_by_paypal_id(session, refund_id)
@@ -374,8 +371,7 @@ def _handle_capture_refunded(
 def _handle_capture_reversed(
     session: Session, resource: dict[str, Any], event: WebhookEvent
 ) -> None:
-    donation = _lock_donation(session, resource)
-    case = _lock_case(session, donation)
+    case, donation = _lock_donation(session, resource)
     if donation.status == DonationStatus.REVERSED:
         return
     if donation.status not in donation_service.TAKEN_STATUSES:
@@ -425,8 +421,33 @@ def _handle_capture_reversed(
     )
 
 
+def _handle_payout(session: Session, resource: dict[str, Any], event: WebhookEvent) -> None:
+    """A payout changed. The event only says which one; the provider is asked for its state, so
+    a forged or out-of-order event can never set a status by itself."""
+    header = resource.get("batch_header") or {}
+    batch_id = resource.get("payout_batch_id") or header.get("payout_batch_id")
+    sender_batch = resource.get("sender_batch_id") or (header.get("sender_batch_header") or {}).get(
+        "sender_batch_id"
+    )
+    conditions = []
+    if isinstance(batch_id, str):
+        conditions.append(Settlement.external_batch_id == batch_id)
+    if isinstance(sender_batch, str):
+        conditions.append(Settlement.idempotency_key == sender_batch)
+    settlement_id = None
+    for condition in conditions:
+        settlement_id = session.execute(select(Settlement.id).where(condition)).scalar_one_or_none()
+        if settlement_id is not None:
+            break
+    if settlement_id is None:
+        raise Ignored("No settlement matches this payout")
+    settlement_service.poll_settlement(
+        session, settlement_id, include_finished=True, request_id=_event_request(event)
+    )
+
+
 def _handle_later(session: Session, resource: dict[str, Any], event: WebhookEvent) -> None:
-    raise Ignored("Handled from the settlement engine onwards (P3-F05)")
+    raise Ignored("Invoices are handled from P3-F17 onwards")
 
 
 def _event_request(event: WebhookEvent) -> str:
@@ -439,12 +460,12 @@ HANDLERS: dict[str, Handler] = {
     "PAYMENT.CAPTURE.DENIED": _handle_capture_denied,
     "PAYMENT.CAPTURE.REFUNDED": _handle_capture_refunded,
     "PAYMENT.CAPTURE.REVERSED": _handle_capture_reversed,
-    "PAYMENT.PAYOUTSBATCH.SUCCESS": _handle_later,
-    "PAYMENT.PAYOUTSBATCH.DENIED": _handle_later,
-    "PAYMENT.PAYOUTS-ITEM.SUCCEEDED": _handle_later,
-    "PAYMENT.PAYOUTS-ITEM.FAILED": _handle_later,
-    "PAYMENT.PAYOUTS-ITEM.BLOCKED": _handle_later,
-    "PAYMENT.PAYOUTS-ITEM.RETURNED": _handle_later,
+    "PAYMENT.PAYOUTSBATCH.SUCCESS": _handle_payout,
+    "PAYMENT.PAYOUTSBATCH.DENIED": _handle_payout,
+    "PAYMENT.PAYOUTS-ITEM.SUCCEEDED": _handle_payout,
+    "PAYMENT.PAYOUTS-ITEM.FAILED": _handle_payout,
+    "PAYMENT.PAYOUTS-ITEM.BLOCKED": _handle_payout,
+    "PAYMENT.PAYOUTS-ITEM.RETURNED": _handle_payout,
     "INVOICING.INVOICE.PAID": _handle_later,
 }
 

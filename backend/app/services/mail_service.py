@@ -46,6 +46,10 @@ SUBJECTS: dict[str, dict[str, str]] = {
         "en": "Your TibaDirect donation receipt",
         "sw": "Risiti ya mchango wako wa TibaDirect",
     },
+    "tranche_settled": {
+        "en": "A TibaDirect payment reached the hospital",
+        "sw": "Malipo ya TibaDirect yamefika hospitalini",
+    },
     "case_rejected": {
         "en": "The hospital could not confirm your bill",
         "sw": "Hospitali haikuweza kuthibitisha bili yako",

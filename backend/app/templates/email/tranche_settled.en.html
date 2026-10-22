@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en">
+  <body style="font-family: sans-serif; color: #1a1a1a;">
+    <p>{% if audience == "hospital" %}A payment for the bill &ldquo;{{ alias }}&rdquo;{% if invoice %} (invoice {{ invoice }}){% endif %} has been sent to your hospital.{% else %}A payment for &ldquo;{{ alias }}&rdquo; has reached the hospital.{% endif %}</p>
+    <p>Payment {{ tranche }}: {{ amount_kes }} (paid as {{ amount_usd }})<br>Reference: {{ reference }}</p>
+    {% if simulated %}<p><em>Settlement simulated via PayPal Payouts to the hospital's sandbox account. In production a licensed Kenyan partner pays the hospital's paybill or bank account.</em></p>{% endif %}
+    <p>Every payment is shown on the <a href="{{ case_url }}">case page</a>.</p>
+  </body>
+</html>

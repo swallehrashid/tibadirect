@@ -721,7 +721,7 @@ def test_a_reversal_for_a_payment_never_recorded_is_ignored(
         "BILLING.SOMETHING.NEW",
     ],
 )
-def test_events_with_nothing_to_do_yet_are_acknowledged_and_marked_ignored(
+def test_events_with_nothing_to_act_on_are_acknowledged_and_marked_ignored(
     client, db_session, paypal: MockPayPal, event_type: str
 ) -> None:
     response = deliver(client, make_event(event_type, {"id": "X-1"}))
@@ -840,3 +840,147 @@ def test_the_donation_service_is_what_records_a_webhook_capture(
     )
 
     assert [actor.value for actor in seen] == ["paypal"]
+
+
+# --------------------------------------------------------------------------- payout events
+
+
+def sent_tranche(db_session, paypal, outcome: str = "SUCCESS"):  # type: ignore[no-untyped-def]
+    """A tranche sent to PayPal and still marked processing: PayPal has yet to report back."""
+    from app.models.enums import SettlementStatus
+    from app.services import settlement_service
+    from tests.donation_helpers import settleable_case
+
+    case = settleable_case()
+    donate(db_session, case, "200.00")
+    paypal.next_payout_outcome("PENDING")
+    settlement = settlement_service.run_settlement_check(db_session, case.id).settlement
+    settlement_service.execute_settlement(db_session, settlement.id)
+    assert settlement.status == SettlementStatus.PROCESSING
+    batch = paypal.store.get("payout", settlement.external_batch_id)
+    batch["outcome"] = outcome  # PayPal has now made up its mind
+    paypal.store.put("payout", settlement.external_batch_id, batch)
+    return case, settlement
+
+
+def item_resource(settlement) -> dict:  # type: ignore[no-untyped-def]
+    return {
+        "payout_batch_id": settlement.external_batch_id,
+        "payout_item_id": "ITEM-X",
+        "transaction_status": "SUCCESS",
+    }
+
+
+@pytest.mark.usefixtures("manual_settlement")
+def test_an_item_succeeded_event_finishes_the_tranche_it_names(
+    client, db_session, paypal: MockPayPal
+) -> None:
+    from app.models.enums import SettlementStatus
+
+    case, settlement = sent_tranche(db_session, paypal)
+    mail_service.outbox.clear()
+
+    response = deliver(
+        client, make_event("PAYMENT.PAYOUTS-ITEM.SUCCEEDED", item_resource(settlement))
+    )
+
+    assert response.status_code == 200
+    db_session.refresh(settlement)
+    assert settlement.status == SettlementStatus.SUCCEEDED
+    assert case.settled_kes_minor == 2_501_310
+    assert events(db_session)[0].status == WebhookStatus.PROCESSED
+    assert {m.template for m in mail_service.outbox} == {"tranche_settled"}
+
+
+@pytest.mark.usefixtures("manual_settlement")
+def test_the_event_only_names_the_tranche_paypal_is_asked_for_the_truth(
+    client, db_session, paypal: MockPayPal
+) -> None:
+    """A forged-looking 'succeeded' cannot pay a tranche PayPal says has failed."""
+    from app.models.enums import SettlementStatus
+
+    case, settlement = sent_tranche(db_session, paypal, outcome="FAILED")
+
+    deliver(client, make_event("PAYMENT.PAYOUTS-ITEM.SUCCEEDED", item_resource(settlement)))
+
+    db_session.refresh(settlement)
+    assert settlement.status == SettlementStatus.FAILED
+    assert case.settled_kes_minor == 0
+
+
+@pytest.mark.usefixtures("manual_settlement")
+def test_a_batch_event_is_matched_by_batch_id_or_by_our_key(
+    client, db_session, paypal: MockPayPal
+) -> None:
+    from app.models.enums import SettlementStatus
+
+    case, settlement = sent_tranche(db_session, paypal)
+    resource = {
+        "batch_header": {
+            "payout_batch_id": "UNKNOWN",
+            "sender_batch_header": {"sender_batch_id": settlement.idempotency_key},
+        }
+    }
+
+    deliver(client, make_event("PAYMENT.PAYOUTSBATCH.SUCCESS", resource))
+
+    db_session.refresh(settlement)
+    assert settlement.status == SettlementStatus.SUCCEEDED
+
+
+@pytest.mark.usefixtures("manual_settlement")
+def test_a_payout_event_for_a_payout_we_never_made_is_ignored(
+    client, db_session, paypal: MockPayPal
+) -> None:
+    deliver(
+        client,
+        make_event("PAYMENT.PAYOUTS-ITEM.SUCCEEDED", {"payout_batch_id": "NOT-OURS"}),
+    )
+    deliver(client, make_event("PAYMENT.PAYOUTS-ITEM.SUCCEEDED", {}))
+
+    assert [e.status for e in events(db_session)] == [WebhookStatus.IGNORED] * 2
+    assert "No settlement matches" in events(db_session)[0].error
+
+
+@pytest.mark.usefixtures("manual_settlement")
+def test_a_payout_returned_after_it_was_paid_is_a_review_item_not_a_reversal(
+    client, db_session, paypal: MockPayPal
+) -> None:
+    from app.models.enums import SettlementStatus
+    from app.services import settlement_service
+
+    case, settlement = sent_tranche(db_session, paypal)
+    settlement_service.poll_settlement(db_session, settlement.id)
+    assert settlement.status == SettlementStatus.SUCCEEDED
+    batch = paypal.store.get("payout", settlement.external_batch_id)
+    batch["outcome"] = "RETURNED"
+    paypal.store.put("payout", settlement.external_batch_id, batch)
+    mail_service.outbox.clear()
+
+    deliver(client, make_event("PAYMENT.PAYOUTS-ITEM.RETURNED", item_resource(settlement)))
+
+    db_session.refresh(settlement)
+    assert settlement.status == SettlementStatus.SUCCEEDED
+    assert case.settled_kes_minor == 2_501_310
+    assert (
+        db_session.execute(select(ReviewItem)).scalar_one().payload["provider_status"] == "failed"
+    )
+    assert mail_service.outbox == []
+
+
+@pytest.mark.usefixtures("manual_settlement")
+def test_a_payout_event_delivered_twice_pays_and_tells_once(
+    client, db_session, paypal: MockPayPal
+) -> None:
+    case, settlement = sent_tranche(db_session, paypal)
+    event = make_event("PAYMENT.PAYOUTS-ITEM.SUCCEEDED", item_resource(settlement))
+    mail_service.outbox.clear()
+
+    deliver(client, event)
+    deliver(client, event)
+    deliver(client, make_event("PAYMENT.PAYOUTS-ITEM.SUCCEEDED", item_resource(settlement)))
+
+    assert (
+        len([m for m in mail_service.outbox if m.template == "tranche_settled"]) == 2
+    )  # family, hospital
+    assert case.settled_kes_minor == 2_501_310

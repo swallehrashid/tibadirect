@@ -2,9 +2,10 @@
 
 The flow is two calls from the browser. ``create_order`` checks the case can take money and asks
 PayPal for an order; after the donor approves it in PayPal's window, ``capture_order`` takes the
-money. Capture holds a lock on the donation and then on the case (always in that order, so two
-requests cannot deadlock), re-checks that the case still accepts money *before* asking PayPal to
-capture, and then writes the donation, the ledger entries and the case totals together.
+money. Capture holds a lock on the case and then on the donation (every money path locks in that
+order, so two requests cannot deadlock), re-checks that the case still accepts money *before*
+asking PayPal to capture, and then writes the donation, the ledger entries and the case totals
+together.
 
 ``record_capture`` does that last part for any capture it is handed, so the webhook handler can
 complete a donation whose browser closed before the capture call returned. Every step is safe to
@@ -42,7 +43,14 @@ from app.payments import parsing
 from app.payments.errors import PayPalError
 from app.payments.paypal_client import get_client
 from app.security import crypto
-from app.services import audit_service, case_service, fx_service, ledger_service, mail_service
+from app.services import (
+    audit_service,
+    case_service,
+    fx_service,
+    ledger_service,
+    mail_service,
+    settlement_service,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -194,25 +202,21 @@ def create_order(
 # --------------------------------------------------------------------------- capturing
 
 
-def _lock_donation(session: Session, order_id: str) -> Donation:
+def _lock_donation_of_order(session: Session, order_id: str) -> tuple[Case, Donation]:
+    """Find the donation for an order, then lock its case and the donation, in that order."""
+    case_id = session.execute(
+        select(Donation.case_id).where(Donation.paypal_order_id == order_id)
+    ).scalar_one_or_none()
+    if case_id is None:
+        raise NotFound("Donation not found.", code="donation_not_found")
+    case = case_service.lock_case(session, case_id)
     donation = session.execute(
         select(Donation)
         .where(Donation.paypal_order_id == order_id)
         .with_for_update()
         .execution_options(populate_existing=True)
-    ).scalar_one_or_none()
-    if donation is None:
-        raise NotFound("Donation not found.", code="donation_not_found")
-    return donation
-
-
-def _lock_case(session: Session, case_id: uuid.UUID) -> Case:
-    return session.execute(
-        select(Case)
-        .where(Case.id == case_id)
-        .with_for_update()
-        .execution_options(populate_existing=True)
     ).scalar_one()
+    return case, donation
 
 
 def capture_order(session: Session, order_id: str) -> CaptureResult:
@@ -223,7 +227,7 @@ def capture_order(session: Session, order_id: str) -> CaptureResult:
       becomes ``not_captured_case_closed`` and the donor is told they were not charged (409).
     * Otherwise PayPal is asked to capture, once, under the donation's own idempotency key.
     """
-    donation = _lock_donation(session, order_id)
+    case, donation = _lock_donation_of_order(session, order_id)
     if donation.status in TAKEN_STATUSES:
         return CaptureResult(donation, fresh=False)
     if donation.status == DonationStatus.NOT_CAPTURED_CASE_CLOSED:
@@ -231,7 +235,6 @@ def capture_order(session: Session, order_id: str) -> CaptureResult:
     if donation.status == DonationStatus.DENIED:
         raise PaymentDeclined()
 
-    case = _lock_case(session, donation.case_id)
     if not case_service.is_accepting_donations(case):
         donation.status = DonationStatus.NOT_CAPTURED_CASE_CLOSED
         audit_service.record(
@@ -283,9 +286,10 @@ def record_capture(
 ) -> bool:
     """Write a completed capture: the donation, ledger entries, case totals and the funded move.
 
-    ``donation`` and ``case`` must be locked by the caller. Returns False, changing nothing, if
-    the donation was already captured. Money PayPal has already taken is always recorded, even if
-    the case has stopped accepting more; the excess policy sorts that out when the case ends.
+    ``case`` and ``donation`` must be locked by the caller, the case first. Returns False, changing
+    nothing, if the donation was already captured. Money PayPal has already taken is always
+    recorded, even if the case has stopped accepting more; the excess policy sorts that out when
+    the case ends.
     """
     if donation.status in TAKEN_STATUSES:
         return False
@@ -352,6 +356,7 @@ def record_capture(
     if case.status == CaseStatus.LIVE and case_service.has_reached_goal(case):
         case_service.transition(case, CaseStatus.FUNDED, ActorType.SYSTEM, "goal_reached")
     session.commit()
+    settlement_service.enqueue_check(case.id)
     send_receipt(donation, details.payer_email)
     return True
 

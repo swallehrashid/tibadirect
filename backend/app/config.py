@@ -178,6 +178,8 @@ class BaseConfig:
         self.PAYPAL_MOCK_FEE_BPS = _env_int("PAYPAL_MOCK_FEE_BPS", 290)
         self.PAYPAL_MOCK_FEE_FIXED_USD_MINOR = _env_int("PAYPAL_MOCK_FEE_FIXED_USD_MINOR", 30)
         self.PAYPAL_MOCK_AUTO_APPROVE = _env_bool("PAYPAL_MOCK_AUTO_APPROVE", True)
+        # Seconds before the simulated Kenyan partner reports a payment as paid.
+        self.MOCK_PARTNER_DELAY_SECONDS = _env_int("MOCK_PARTNER_DELAY_SECONDS", 5)
 
         self.LLM_PROVIDER = _env("LLM_PROVIDER", "anthropic")
         self.LLM_API_KEY = _env("LLM_API_KEY")
@@ -234,6 +236,7 @@ class TestConfig(BaseConfig):
         self.PAYPAL_MODE = "mock"
         self.PAYPAL_MOCK_STORE = "memory"
         self.PAYPAL_WEBHOOK_ID = "WH-TEST-WEBHOOK-ID"
+        self.MOCK_PARTNER_DELAY_SECONDS = 0
         # No endpoint: boto3 uses the AWS address, which moto intercepts in every test, so a test
         # can never reach the MinIO that may be running on a developer's machine.
         self.S3_ENDPOINT_URL = ""

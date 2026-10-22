@@ -32,7 +32,7 @@ class CaptureDetails:
         return self.status == "COMPLETED"
 
 
-def _minor(amount: Any, what: str) -> int:
+def amount_minor(amount: Any, what: str) -> int:
     """``{"currency_code": "USD", "value": "25.00"}`` to 2500."""
     if not isinstance(amount, dict):
         raise errors.malformed(f"{what} missing")
@@ -48,11 +48,11 @@ def _minor(amount: Any, what: str) -> int:
 def _capture(resource: Any, *, order_id: str | None, payer_email: str | None) -> CaptureDetails:
     if not isinstance(resource, dict) or not isinstance(resource.get("id"), str):
         raise errors.malformed("capture missing")
-    gross = _minor(resource.get("amount"), "capture amount")
+    gross = amount_minor(resource.get("amount"), "capture amount")
     breakdown = resource.get("seller_receivable_breakdown")
     if isinstance(breakdown, dict) and breakdown.get("paypal_fee") and breakdown.get("net_amount"):
-        fee = _minor(breakdown["paypal_fee"], "PayPal fee")
-        net = _minor(breakdown["net_amount"], "net amount")
+        fee = amount_minor(breakdown["paypal_fee"], "PayPal fee")
+        net = amount_minor(breakdown["net_amount"], "net amount")
     else:
         # PayPal leaves the breakdown out in some cases (for example while a payment is pending);
         # the donation then counts in full until the completed event brings the real figures.

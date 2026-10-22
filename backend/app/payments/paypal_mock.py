@@ -30,6 +30,13 @@ KEY_PREFIX = "tibadirect:paypal_mock:"
 MOCK_PAYER_EMAIL = "mock.donor@example.test"
 WEBHOOK_SIGNATURE_PREFIX = "MOCKSIG-"
 
+WEBHOOK_HEADERS = (
+    "PAYPAL-AUTH-ALGO",
+    "PAYPAL-CERT-URL",
+    "PAYPAL-TRANSMISSION-ID",
+    "PAYPAL-TRANSMISSION-SIG",
+    "PAYPAL-TRANSMISSION-TIME",
+)
 PAYOUT_OUTCOMES = frozenset({"SUCCESS", "FAILED", "BLOCKED", "RETURNED", "PENDING"})
 CAPTURE_STATUSES = frozenset({"COMPLETED", "PENDING", "DECLINED"})
 
@@ -470,10 +477,11 @@ class MockPayPal:
     def verify_webhook_signature(
         self, *, headers: Mapping[str, str], raw_body: bytes, webhook_id: str
     ) -> bool:
-        transmission_id = headers.get("PAYPAL-TRANSMISSION-ID", "")
-        given = headers.get("PAYPAL-TRANSMISSION-SIG", "")
-        if not transmission_id or not given or not webhook_id:
+        # Like the real client, a delivery missing any of the five headers is not checked at all.
+        if not webhook_id or not all(headers.get(name) for name in WEBHOOK_HEADERS):
             return False
+        transmission_id = headers["PAYPAL-TRANSMISSION-ID"]
+        given = headers["PAYPAL-TRANSMISSION-SIG"]
         return hmac.compare_digest(given, webhook_signature(webhook_id, transmission_id, raw_body))
 
 

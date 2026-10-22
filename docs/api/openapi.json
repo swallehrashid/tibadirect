@@ -2736,6 +2736,47 @@
           }
         ]
       }
+    },
+    "/api/webhooks/paypal": {
+      "post": {
+        "responses": {
+          "502": {
+            "description": "PayPal could not be asked to verify; it will resend"
+          },
+          "400": {
+            "description": "Not an event, or the signature did not verify"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookAck"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Verify the signature through PayPal, store the event once and process it in the\nbackground. Replaying an event does nothing. Always answers fast.",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "A PayPal webhook event, exactly as PayPal sent it",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "security": []
+      }
     }
   },
   "info": {
@@ -2782,6 +2823,10 @@
     {
       "name": "hospital_portal",
       "description": "Hospital portal"
+    },
+    {
+      "name": "webhooks",
+      "description": "Events sent by PayPal"
     }
   ],
   "openapi": "3.0.3",
@@ -4802,6 +4847,16 @@
           },
           "total": {
             "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebhookAck": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "received for a new event, duplicate for one seen before"
           }
         },
         "additionalProperties": false

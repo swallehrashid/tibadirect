@@ -43,6 +43,9 @@ PERIODIC_JOBS: list[PeriodicJob] = [
     ),
     PeriodicJob("retention_sweep", "app.jobs.tasks.retention_sweep", jobs.QUEUE_DEFAULT, 3600),
     PeriodicJob("refresh_fx_rates", "app.jobs.tasks.refresh_fx_rates", jobs.QUEUE_DEFAULT, 3600),
+    PeriodicJob(
+        "sweep_webhook_events", "app.jobs.tasks.sweep_webhook_events", jobs.QUEUE_PAYMENTS, 120
+    ),
 ]
 
 

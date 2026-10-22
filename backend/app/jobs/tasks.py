@@ -55,3 +55,18 @@ def refresh_fx_rates() -> str:
     rate = fx_service.refresh_rates(db.session)
     db.session.commit()
     return rate.source
+
+
+def process_webhook_event(event_id: str | uuid.UUID) -> str | None:
+    """Handle one stored PayPal event. Takes an ID only; the event holds no payer details."""
+    from app.payments import webhooks
+
+    status = webhooks.process_event(db.session, uuid.UUID(str(event_id)))
+    return status.value if status is not None else None
+
+
+def sweep_webhook_events() -> int:
+    """Queue processing again for verified events a crash or a Redis outage left waiting."""
+    from app.payments import webhooks
+
+    return webhooks.enqueue_stale_events(db.session)

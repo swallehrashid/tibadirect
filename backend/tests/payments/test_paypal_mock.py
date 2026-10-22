@@ -300,6 +300,27 @@ def test_missing_signature_headers_do_not_verify(mock: MockPayPal) -> None:
     assert not mock.verify_webhook_signature(headers={}, raw_body=b"{}", webhook_id="W")
 
 
+@pytest.mark.parametrize(
+    "header",
+    [
+        "PAYPAL-AUTH-ALGO",
+        "PAYPAL-CERT-URL",
+        "PAYPAL-TRANSMISSION-ID",
+        "PAYPAL-TRANSMISSION-SIG",
+        "PAYPAL-TRANSMISSION-TIME",
+    ],
+)
+def test_a_delivery_missing_any_one_of_the_five_headers_does_not_verify(
+    mock: MockPayPal, header: str
+) -> None:
+    body = b'{"id": "WH-1"}'
+    headers = signed_webhook_headers("W", body)
+    assert mock.verify_webhook_signature(headers=headers, raw_body=body, webhook_id="W")
+    del headers[header]
+
+    assert not mock.verify_webhook_signature(headers=headers, raw_body=body, webhook_id="W")
+
+
 def test_the_signature_depends_on_all_three_inputs() -> None:
     base = webhook_signature("W", "T", b"{}")
     assert base != webhook_signature("W2", "T", b"{}")

@@ -233,6 +233,7 @@ class TestConfig(BaseConfig):
         self.WTF_CSRF_ENABLED = False
         self.PAYPAL_MODE = "mock"
         self.PAYPAL_MOCK_STORE = "memory"
+        self.PAYPAL_WEBHOOK_ID = "WH-TEST-WEBHOOK-ID"
         # No endpoint: boto3 uses the AWS address, which moto intercepts in every test, so a test
         # can never reach the MinIO that may be running on a developer's machine.
         self.S3_ENDPOINT_URL = ""

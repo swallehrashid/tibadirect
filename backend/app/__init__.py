@@ -52,6 +52,7 @@ def _register_blueprints() -> None:
     from app.api.hospital_portal import blp as hospital_portal_blp
     from app.api.hospitals import blp as hospitals_blp
     from app.api.public import blp as public_blp
+    from app.api.webhooks import blp as webhooks_blp
 
     for blueprint in (
         health_blp,
@@ -64,5 +65,6 @@ def _register_blueprints() -> None:
         documents_blp,
         donations_blp,
         hospital_portal_blp,
+        webhooks_blp,
     ):
         extensions.api.register_blueprint(blueprint)

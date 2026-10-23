@@ -24,7 +24,7 @@ export default tseslint.config(
     rules: { "react-refresh/only-export-components": "off" },
   },
   {
-    files: ["vite.config.ts", "tailwind.config.ts", "postcss.config.js", "eslint.config.js"],
+    files: ["vite.config.ts", "tailwind.config.ts", "playwright.config.ts", "postcss.config.js", "eslint.config.js", "e2e/**"],
     languageOptions: { globals: globals.node },
   },
 );

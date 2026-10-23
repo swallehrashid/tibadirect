@@ -301,7 +301,7 @@ describe("treasurer agent", () => {
   it("shows why a proposal could not be carried out", async () => {
     mockApi({ ...base, ...agentOn, "GET /api/admin/cases": page([]), "GET /api/admin/agent/actions": page([agentAction({ status: "failed", error: "The donation was already refunded." })]) });
     renderApp("/admin/agent");
-    await userEvent.click(await screen.findByRole("tab", { name: "All" }));
+    await userEvent.click(await screen.findByRole("button", { name: "All" }));
     expect(await screen.findByText("The donation was already refunded.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^Approve/ })).not.toBeInTheDocument();
   });

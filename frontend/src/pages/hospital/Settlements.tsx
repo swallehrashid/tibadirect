@@ -52,7 +52,7 @@ export function HospitalSettlementsPage() {
       ) : settlements.data.items.length === 0 ? (
         <EmptyState title={t("hospital.settlements.emptyTitle")} description={t("hospital.settlements.emptyBody")} />
       ) : (
-        <div role="region" aria-label={t("hospital.settlements.title")} data-testid="settlements-grid">
+        <div role="region" aria-label={t("common.tableOf", { name: t("hospital.settlements.title") })} data-testid="settlements-grid">
           <AgGridReact<SettlementItem> theme={tibaGridTheme} rowData={settlements.data.items} columnDefs={columns} getRowId={(params) => params.data.id} domLayout="autoHeight" defaultColDef={{ sortable: true, resizable: true }} />
         </div>
       )}

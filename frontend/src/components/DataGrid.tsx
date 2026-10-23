@@ -1,5 +1,6 @@
 import type { ColDef, GridOptions, RowClickedEvent } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
+import { useTranslation } from "react-i18next";
 import { tibaGridTheme } from "@/lib/aggrid";
 
 interface Props<T> {
@@ -15,8 +16,9 @@ interface Props<T> {
 
 /** AG Grid in the TibaDirect theme: sorted by clicking a header, as tall as its rows, scrolling sideways inside its own box on a phone. */
 export function DataGrid<T>({ rows, columns, getRowId, label, onRowClicked, noRows, options }: Props<T>) {
+  const { t } = useTranslation();
   return (
-    <div role="region" aria-label={label} data-testid="data-grid">
+    <div role="region" aria-label={t("common.tableOf", { name: label })} data-testid="data-grid">
       <AgGridReact<T>
         theme={tibaGridTheme}
         rowData={rows}

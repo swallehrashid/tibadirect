@@ -140,7 +140,7 @@ export function Check() {
   if (config?.features.appeal_checker === false) {
     return (
       <div className="container py-10">
-        <EmptyState title={t("checker.offTitle")} description={t("checker.offBody")} />
+        <EmptyState headingLevel={1} title={t("checker.offTitle")} description={t("checker.offBody")} />
       </div>
     );
   }

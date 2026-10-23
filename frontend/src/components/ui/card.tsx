@@ -11,10 +11,11 @@ export const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
 ));
 CardHeader.displayName = "CardHeader";
 
-export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(({ className, children, ...props }, ref) => (
-  <h3 ref={ref} className={cn("text-lg font-semibold leading-snug", className)} {...props}>
+/** A card's heading. It is an h2 unless the card sits under another h2 (then pass as="h3"), so heading levels never skip. */
+export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement> & { as?: "h1" | "h2" | "h3" }>(({ className, children, as: Tag = "h2", ...props }, ref) => (
+  <Tag ref={ref} className={cn("text-lg font-semibold leading-snug", className)} {...props}>
     {children}
-  </h3>
+  </Tag>
 ));
 CardTitle.displayName = "CardTitle";
 

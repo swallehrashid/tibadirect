@@ -5,7 +5,6 @@ import { ApiError } from "@/api/errors";
 import { usePublicConfig } from "@/api/queries";
 import { BillMeter } from "@/components/BillMeter";
 import { ConsentCard } from "@/components/ConsentCard";
-import { DemoBanner } from "@/components/DemoBanner";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { FileDropzone } from "@/components/FileDropzone";
@@ -74,7 +73,6 @@ export function Design() {
 
   return (
     <div className="pb-16">
-      <DemoBanner />
       <div className="container space-y-12 py-8">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
@@ -280,7 +278,7 @@ export function Design() {
               </AlertDialogContent>
             </AlertDialog>
           </div>
-          <div className="space-y-2" aria-label="Loading example">
+          <div className="space-y-2">
             <Skeleton className="h-6 w-1/2" />
             <Skeleton className="h-24 w-full" />
           </div>

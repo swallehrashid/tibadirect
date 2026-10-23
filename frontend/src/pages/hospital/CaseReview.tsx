@@ -37,6 +37,7 @@ export function CaseReview() {
     const missing = isApiError(query.error) && query.error.status === 404;
     return missing ? (
       <EmptyState
+        headingLevel={1}
         title={t("hospital.review.notFound.title")}
         description={t("hospital.review.notFound.body")}
         action={
@@ -46,7 +47,7 @@ export function CaseReview() {
         }
       />
     ) : (
-      <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+      <ErrorState headingLevel={1} error={query.error} onRetry={() => void query.refetch()} />
     );
   }
 

@@ -9,11 +9,14 @@ interface Props {
   onRetry?: () => void;
   title?: string;
   className?: string;
+  /** h1 when this replaces the whole page, otherwise h2. */
+  headingLevel?: 1 | 2;
 }
 
 /** A friendly error with a retry button and, when the API gave one, the reference to quote. */
-export function ErrorState({ error, onRetry, title, className }: Props) {
+export function ErrorState({ error, onRetry, title, className, headingLevel = 2 }: Props) {
   const { t } = useTranslation();
+  const Heading = headingLevel === 1 ? "h1" : "h2";
   let body = t("error.body");
   let reference: string | null = null;
   let retryable = true;
@@ -30,7 +33,7 @@ export function ErrorState({ error, onRetry, title, className }: Props) {
   return (
     <div role="alert" className={cn("flex flex-col items-center gap-3 rounded-lg border border-danger-600/30 bg-danger-50 px-6 py-10 text-center", className)}>
       <TriangleAlert className="size-10 text-danger-700" aria-hidden="true" />
-      <h3 className="font-heading text-lg font-semibold text-danger-700">{title ?? t("error.title")}</h3>
+      <Heading className="font-heading text-lg font-semibold text-danger-700">{title ?? t("error.title")}</Heading>
       <p className="max-w-md text-sm">{body}</p>
       {reference ? <p className="text-xs text-muted-foreground">{t("error.reference", { id: reference })}</p> : null}
       {onRetry && retryable ? (

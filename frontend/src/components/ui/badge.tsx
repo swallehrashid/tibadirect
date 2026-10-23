@@ -10,7 +10,7 @@ export const badgeVariants = cva(
       tone: {
         brand: "bg-tiba-100 text-tiba-900",
         confirmed: "bg-uzima-100 text-uzima-700",
-        pending: "bg-jua-100 text-jua-700",
+        pending: "bg-jua-50 text-jua-700 ring-1 ring-inset ring-jua-400/60",
         info: "bg-sky-100 text-sky-800",
         danger: "bg-danger-50 text-danger-700",
         neutral: "bg-muted text-muted-foreground",

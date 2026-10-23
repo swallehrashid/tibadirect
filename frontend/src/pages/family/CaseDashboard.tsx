@@ -41,6 +41,7 @@ export function CaseDashboard() {
     const missing = isApiError(query.error) && query.error.status === 404;
     return missing ? (
       <EmptyState
+        headingLevel={1}
         title={t("family.dashboard.notFound.title")}
         description={t("family.dashboard.notFound.body")}
         action={
@@ -50,7 +51,7 @@ export function CaseDashboard() {
         }
       />
     ) : (
-      <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+      <ErrorState headingLevel={1} error={query.error} onRetry={() => void query.refetch()} />
     );
   }
 

@@ -39,9 +39,9 @@ export function ReceiptPage() {
     return (
       <div className="container max-w-2xl py-10">
         {missing ? (
-          <EmptyState title={t("receipt.notFound.title")} description={t("receipt.notFound.body")} action={<Button asChild><Link to="/cases">{t("landing.hero.browse")}</Link></Button>} />
+          <EmptyState headingLevel={1} title={t("receipt.notFound.title")} description={t("receipt.notFound.body")} action={<Button asChild><Link to="/cases">{t("landing.hero.browse")}</Link></Button>} />
         ) : (
-          <ErrorState error={receipt.error} onRetry={() => void receipt.refetch()} />
+          <ErrorState headingLevel={1} error={receipt.error} onRetry={() => void receipt.refetch()} />
         )}
       </div>
     );

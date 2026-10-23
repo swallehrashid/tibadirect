@@ -40,7 +40,6 @@ export function setLanguage(language: Language): void {
     // Not saving the choice is harmless.
   }
   void i18n.changeLanguage(language);
-  document.documentElement.lang = language;
 }
 
 void i18n.use(initReactI18next).init({
@@ -49,6 +48,11 @@ void i18n.use(initReactI18next).init({
   fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
-document.documentElement.lang = i18n.language;
+// The page language follows the interface language, however it was changed (screen readers pick the voice from it).
+const syncPageLanguage = (language: string) => {
+  document.documentElement.lang = language.startsWith("sw") ? "sw" : "en";
+};
+i18n.on("languageChanged", syncPageLanguage);
+syncPageLanguage(i18n.language);
 
 export default i18n;

@@ -55,7 +55,7 @@ describe("email code sign-in", () => {
     const before = api.called("GET", "/api/auth/csrf").length;
     // Focus moves to the page content just after a navigation, which closes a menu opened in that instant; retry the click.
     await waitFor(async () => {
-      const trigger = screen.getByRole("button", { name: "Account menu" });
+      const trigger = screen.getByRole("button", { name: /Account menu/ });
       if (trigger.getAttribute("aria-expanded") !== "true") await userEvent.click(trigger);
       expect(screen.getByRole("menuitem", { name: /Sign out/ })).toBeInTheDocument();
     });

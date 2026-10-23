@@ -11,7 +11,7 @@ import { OtpInput } from "@/components/OtpInput";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toaster";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import i18n, { hasStoredLanguage, setLanguage } from "@/i18n";
 import { usePageTitle } from "@/lib/usePageTitle";
 
@@ -90,7 +90,7 @@ export function LoginVerify() {
     <div className="container flex justify-center py-10 md:py-16">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="font-heading text-2xl">{t("auth.verifyTitle")}</CardTitle>
+          <h1 className="font-heading text-2xl font-semibold leading-snug">{t("auth.verifyTitle")}</h1>
           <CardDescription>{t("auth.verifyIntro", { email })}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

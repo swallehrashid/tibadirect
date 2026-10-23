@@ -22,7 +22,8 @@
     "remove": "Ondoa",
     "sandbox": "Majaribio",
     "yes": "Ndiyo",
-    "no": "Hapana"
+    "no": "Hapana",
+    "tableOf": "{{name}} (jedwali)"
   },
   "trust": {
     "hospital_confirmed": {
@@ -127,7 +128,8 @@
   },
   "demo": {
     "banner": "Onyesho: hii inatumia pesa za majaribio za PayPal. Hakuna pesa halisi zinazohamishwa wala wagonjwa halisi wanaoonyeshwa.",
-    "tag": "Majaribio / kuigiza"
+    "tag": "Majaribio / kuigiza",
+    "label": "Tangazo la onyesho"
   },
   "nav": {
     "cases": "Angalia kesi",
@@ -1256,7 +1258,8 @@
         "doneToast": "Imefanyika.",
         "rejectedToast": "Pendekezo limekataliwa."
       }
-    }
+    },
+    "actions": "Hatua"
   },
   "checker": {
     "title": "Kagua ombi la msaada",

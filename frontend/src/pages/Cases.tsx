@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useHospitals, usePublicCases } from "@/api";
 import { CaseCard, CaseCardSkeleton } from "@/components/CaseCard";
 import { EmptyState } from "@/components/EmptyState";
+import { Pager } from "@/components/Pager";
 import { ErrorState } from "@/components/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -90,21 +91,11 @@ export function Cases() {
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {cases.data.items.map((item) => (
               <li key={item.slug}>
-                <CaseCard item={item} />
+                <CaseCard item={item} headingLevel={2} />
               </li>
             ))}
           </ul>
-          {totalPages > 1 ? (
-            <nav aria-label={t("cases.pages")} className="flex items-center justify-between gap-3">
-              <Button variant="outline" disabled={page <= 1} onClick={() => update({ page: page - 1 })}>
-                {t("cases.previous")}
-              </Button>
-              <span className="text-sm text-muted-foreground">{t("cases.pageOf", { page, total: totalPages })}</span>
-              <Button variant="outline" disabled={page >= totalPages} onClick={() => update({ page: page + 1 })}>
-                {t("cases.next")}
-              </Button>
-            </nav>
-          ) : null}
+          <Pager page={page} totalPages={totalPages} onPage={(next) => update({ page: next })} />
         </>
       )}
     </div>

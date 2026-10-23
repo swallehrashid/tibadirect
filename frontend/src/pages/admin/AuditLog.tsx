@@ -6,6 +6,7 @@ import { ADMIN_PAGE_SIZE, useAuditLog } from "@/api/admin";
 import { DataGrid } from "@/components/DataGrid";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
+import { Pager } from "@/components/Pager";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -40,7 +41,7 @@ export function AuditLogPage() {
       { field: "details", headerName: t("admin.audit.columns.details"), minWidth: 260, flex: 2, valueFormatter: (p) => JSON.stringify(p.value), cellClass: "font-mono text-xs" },
       {
         colId: "open",
-        headerName: "",
+        headerName: t("admin.actions"),
         sortable: false,
         pinned: "right",
         resizable: false,
@@ -118,21 +119,11 @@ export function AuditLogPage() {
         <>
           <DataGrid rows={log.data.items} columns={columns} getRowId={(row) => row.id} label={t("admin.audit.title")} onRowClicked={setSelected} />
           <p className="text-sm text-muted-foreground">{t("admin.audit.hint")}</p>
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground" aria-live="polite">
               {t("admin.audit.count", { count: log.data.total })}
             </p>
-            {totalPages > 1 ? (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                  {t("cases.previous")}
-                </Button>
-                <span className="text-sm text-muted-foreground">{t("cases.pageOf", { page, total: totalPages })}</span>
-                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                  {t("cases.next")}
-                </Button>
-              </div>
-            ) : null}
+            <Pager page={page} totalPages={totalPages} onPage={setPage} />
           </div>
         </>
       )}

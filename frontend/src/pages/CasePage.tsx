@@ -46,6 +46,7 @@ export function CasePage() {
       <div className="container py-10">
         {notFound ? (
           <EmptyState
+            headingLevel={1}
             title={t("casePage.notFound.title")}
             description={t("casePage.notFound.body")}
             action={
@@ -55,7 +56,7 @@ export function CasePage() {
             }
           />
         ) : (
-          <ErrorState error={caseQuery.error} onRetry={() => void caseQuery.refetch()} />
+          <ErrorState headingLevel={1} error={caseQuery.error} onRetry={() => void caseQuery.refetch()} />
         )}
       </div>
     );

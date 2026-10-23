@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { HospitalTriage } from "@/api";
 import { RiskBand } from "@/components/RiskBand";
+import { ScrollRegion } from "@/components/ScrollRegion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatKes, parseMinor } from "@/lib/money";
 
@@ -53,7 +54,7 @@ export function ExtractedPanel({ triage }: { triage: HospitalTriage | null }) {
         </dl>
 
         {lines.length > 0 ? (
-          <div className="overflow-x-auto">
+          <ScrollRegion label={t("hospital.extracted.lines")}>
             <table className="w-full text-sm">
               <caption className="pb-2 text-left font-semibold">{t("hospital.extracted.lines")}</caption>
               <thead>
@@ -79,7 +80,7 @@ export function ExtractedPanel({ triage }: { triage: HospitalTriage | null }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         ) : null}
 
         <div className="space-y-2">

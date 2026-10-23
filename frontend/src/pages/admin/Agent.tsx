@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { Textarea } from "@/components/ui/input";
 import { toast } from "@/components/ui/toaster";
 import { usePageTitle } from "@/lib/usePageTitle";
@@ -191,7 +191,7 @@ export function AgentPage() {
   const ask = useMutation({ mutationFn: () => adminApi.ask(question.trim(), caseId === NONE ? null : caseId) });
 
   if (configPending) return <Skeleton className="h-48" />;
-  if (!config?.features.agent) return <EmptyState title={t("admin.agent.offTitle")} description={t("admin.agent.offBody")} />;
+  if (!config?.features.agent) return <EmptyState headingLevel={1} title={t("admin.agent.offTitle")} description={t("admin.agent.offBody")} />;
 
   return (
     <div className="space-y-8">
@@ -244,12 +244,15 @@ export function AgentPage() {
         <h2 id="actions" className="font-heading text-xl font-bold">
           {t("admin.agent.actions")}
         </h2>
-        <Tabs value={filter} onValueChange={(value) => setFilter(value as "proposed" | "all")}>
-          <TabsList aria-label={t("admin.review.filter")}>
-            <TabsTrigger value="proposed">{t("admin.agent.waiting")}</TabsTrigger>
-            <TabsTrigger value="all">{t("admin.review.tabs.all")}</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <SegmentedControl
+          label={t("admin.review.filter")}
+          value={filter}
+          onChange={setFilter}
+          options={[
+            { value: "proposed", label: t("admin.agent.waiting") },
+            { value: "all", label: t("admin.review.tabs.all") },
+          ]}
+        />
         {actions.isPending ? (
           <Skeleton className="h-24" />
         ) : actions.isError ? (

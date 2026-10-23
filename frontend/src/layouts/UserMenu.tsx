@@ -16,8 +16,10 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" aria-label={t("shell.accountMenu")}>
-          <UserRound />
+        <Button variant="outline" size="sm">
+          <UserRound aria-hidden="true" />
+          {/* The visible name is part of the accessible name (WCAG 2.5.3); on a phone only the hidden words remain. */}
+          <span className="sr-only">{t("shell.accountMenu")}:</span>
           <span className="hidden max-w-32 truncate sm:inline">{user.display_name}</span>
           <ChevronDown />
         </Button>

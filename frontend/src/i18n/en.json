@@ -22,7 +22,8 @@
     "remove": "Remove",
     "sandbox": "Sandbox",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "tableOf": "{{name}} (table)"
   },
   "trust": {
     "hospital_confirmed": {
@@ -127,7 +128,8 @@
   },
   "demo": {
     "banner": "Demo: this uses PayPal sandbox money. No real money moves and no real patients are shown.",
-    "tag": "Sandbox / simulated"
+    "tag": "Sandbox / simulated",
+    "label": "Demo notice"
   },
   "nav": {
     "cases": "Browse cases",
@@ -1256,7 +1258,8 @@
         "doneToast": "Done.",
         "rejectedToast": "Suggestion rejected."
       }
-    }
+    },
+    "actions": "Actions"
   },
   "checker": {
     "title": "Check an appeal",

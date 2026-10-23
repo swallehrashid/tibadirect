@@ -9,6 +9,7 @@ import { ADMIN_PAGE_SIZE, adminApi, useAdminCases, useAdminJobs, useAdminStats }
 import { CASE_STATUSES, isOneOf, type CaseStatus } from "@/api/enums";
 import { DataGrid } from "@/components/DataGrid";
 import { ErrorState } from "@/components/ErrorState";
+import { Pager } from "@/components/Pager";
 import { StatTile } from "@/components/StatTile";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -85,7 +86,7 @@ function CasesTable() {
       { field: "settled_kes_minor", headerName: t("admin.cases.settled"), valueFormatter: (p) => formatKes(p.value as number, language), minWidth: 150, type: "rightAligned" },
       {
         colId: "open",
-        headerName: "",
+        headerName: t("admin.actions"),
         sortable: false,
         pinned: "right",
         resizable: false,
@@ -157,21 +158,11 @@ function CasesTable() {
       ) : (
         <>
           <DataGrid rows={cases.data.items} columns={columns} getRowId={(row) => row.id} label={t("admin.cases.title")} noRows={t("admin.cases.none")} onRowClicked={(row) => navigate(`/admin/cases/${row.id}`)} />
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground" aria-live="polite">
               {t("admin.cases.count", { count: cases.data.total })}
             </p>
-            {totalPages > 1 ? (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                  {t("cases.previous")}
-                </Button>
-                <span className="text-sm text-muted-foreground">{t("cases.pageOf", { page, total: totalPages })}</span>
-                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                  {t("cases.next")}
-                </Button>
-              </div>
-            ) : null}
+            <Pager page={page} totalPages={totalPages} onPage={setPage} />
           </div>
           <p className="text-sm text-muted-foreground">{t("admin.cases.hint")}</p>
         </>

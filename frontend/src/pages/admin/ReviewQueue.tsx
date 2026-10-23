@@ -7,6 +7,7 @@ import { isApiError, type ReviewItem, type ReviewResolution } from "@/api";
 import { adminApi, useReviewItems } from "@/api/admin";
 import { DataGrid } from "@/components/DataGrid";
 import { EmptyState } from "@/components/EmptyState";
+import { Pager } from "@/components/Pager";
 import { ErrorState } from "@/components/ErrorState";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import { Textarea } from "@/components/ui/input";
 import { toast } from "@/components/ui/toaster";
 import { usePageTitle } from "@/lib/usePageTitle";
@@ -149,7 +150,7 @@ export function ReviewQueuePage() {
       { field: "status", headerName: t("admin.review.columns.status"), valueFormatter: (p) => t(`admin.review.status.${p.value as string}`), minWidth: 120, flex: 0.8 },
       {
         colId: "open",
-        headerName: "",
+        headerName: t("admin.actions"),
         sortable: false,
         pinned: "right",
         resizable: false,
@@ -174,21 +175,15 @@ export function ReviewQueuePage() {
         <h1 className="font-heading text-2xl font-bold">{t("admin.review.title")}</h1>
         <p className="text-muted-foreground">{t("admin.review.intro")}</p>
       </div>
-      <Tabs
+      <SegmentedControl
+        label={t("admin.review.filter")}
         value={filter}
-        onValueChange={(value) => {
-          setFilter(value as Filter);
+        onChange={(value: Filter) => {
+          setFilter(value);
           setPage(1);
         }}
-      >
-        <TabsList aria-label={t("admin.review.filter")}>
-          {(["open", "resolved", "all"] as const).map((value) => (
-            <TabsTrigger key={value} value={value}>
-              {t(`admin.review.tabs.${value}`)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+        options={(["open", "resolved", "all"] as const).map((value) => ({ value, label: t(`admin.review.tabs.${value}`) }))}
+      />
 
       {items.isPending ? (
         <Skeleton className="h-48" />
@@ -200,17 +195,7 @@ export function ReviewQueuePage() {
         <>
           <DataGrid rows={items.data.items} columns={columns} getRowId={(row) => row.id} label={t("admin.review.title")} onRowClicked={setSelected} />
           <p className="text-sm text-muted-foreground">{t("admin.review.hint")}</p>
-          {totalPages > 1 ? (
-            <div className="flex items-center justify-between gap-3">
-              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                {t("cases.previous")}
-              </Button>
-              <span className="text-sm text-muted-foreground">{t("cases.pageOf", { page, total: totalPages })}</span>
-              <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                {t("cases.next")}
-              </Button>
-            </div>
-          ) : null}
+          <Pager page={page} totalPages={totalPages} onPage={setPage} />
         </>
       )}
       <ResolveDialog key={selected?.id ?? "none"} item={selected} onClose={() => setSelected(null)} />

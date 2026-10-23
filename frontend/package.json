@@ -15,7 +15,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:api": "openapi-typescript http://localhost:5000/api/openapi.json -o src/api/schema.d.ts",
-    "gen:api:file": "openapi-typescript ../docs/api/openapi.json -o src/api/schema.d.ts"
+    "gen:api:file": "openapi-typescript ../docs/api/openapi.json -o src/api/schema.d.ts",
+    "e2e": "playwright test",
+    "e2e:a11y": "playwright test e2e/accessibility.spec.ts",
+    "i18n:review": "node scripts/swahili-review.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -53,6 +56,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^7.0.1",
@@ -63,6 +67,7 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^6.1.2",
     "autoprefixer": "^10.6.1",
+    "axe-core": "^4.14.0",
     "eslint": "^9.39.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",

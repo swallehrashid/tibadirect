@@ -9,6 +9,7 @@ import { BillMeter } from "@/components/BillMeter";
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { RiskBand } from "@/components/RiskBand";
+import { ScrollRegion } from "@/components/ScrollRegion";
 import { StatusBadge } from "@/components/StatusBadge";
 import { TrustBadge } from "@/components/TrustBadge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -33,7 +34,9 @@ function Section({ title, children, empty }: { title: string; children?: ReactNo
       <CardHeader>
         <CardTitle className="font-heading text-lg">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="overflow-x-auto">{children ?? <p className="text-sm text-muted-foreground">{empty}</p>}</CardContent>
+      <CardContent>
+        {children ? <ScrollRegion label={title}>{children}</ScrollRegion> : <p className="text-sm text-muted-foreground">{empty}</p>}
+      </CardContent>
     </Card>
   );
 }
@@ -163,6 +166,7 @@ export function AdminCaseDetail() {
   if (query.isError) {
     return isApiError(query.error) && query.error.status === 404 ? (
       <EmptyState
+        headingLevel={1}
         title={t("admin.case.notFound")}
         action={
           <Button asChild>
@@ -171,7 +175,7 @@ export function AdminCaseDetail() {
         }
       />
     ) : (
-      <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+      <ErrorState headingLevel={1} error={query.error} onRetry={() => void query.refetch()} />
     );
   }
   const item = query.data;

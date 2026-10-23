@@ -10,6 +10,7 @@ export function NotFound() {
   return (
     <div className="container py-16">
       <EmptyState
+        headingLevel={1}
         title={t("notFound.title")}
         description={t("notFound.body")}
         action={

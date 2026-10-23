@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { isApiError } from "@/api";
 import { adminApi, useAdminJobs } from "@/api/admin";
 import { EmptyState } from "@/components/EmptyState";
+import { ScrollRegion } from "@/components/ScrollRegion";
 import { ErrorState } from "@/components/ErrorState";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +53,8 @@ export function JobsPage() {
             <CardHeader>
               <CardTitle className="font-heading text-lg">{t("admin.jobs.queues")}</CardTitle>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
+            <CardContent>
+              <ScrollRegion label={t("admin.jobs.queues")}>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-muted-foreground">
@@ -80,6 +82,7 @@ export function JobsPage() {
                   ))}
                 </tbody>
               </table>
+              </ScrollRegion>
             </CardContent>
           </Card>
 

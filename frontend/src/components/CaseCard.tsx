@@ -8,19 +8,20 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 
 /** A public case in a list: who, where, how much is covered, and one link to the full page. */
-export function CaseCard({ item }: { item: PublicCase }) {
+export function CaseCard({ item, headingLevel = 3 }: { item: PublicCase; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const { t } = useTranslation();
   return (
     <Card className="relative flex h-full flex-col gap-4 p-5 transition-shadow focus-within:ring-2 focus-within:ring-ring hover:shadow-md" data-testid="case-card">
       <div className="space-y-2">
         <TrustBadge level={item.trust_level} />
         <div className="min-w-0">
-          <h3 className="font-heading text-lg font-bold leading-snug">
+          <Heading className="font-heading text-lg font-bold leading-snug">
             {/* The whole card is the link target (the ::after covers it), so there is one link to hear, not several. */}
             <Link to={`/c/${item.slug}`} className="rounded-sm after:absolute after:inset-0 after:content-[''] focus-visible:ring-0">
               {item.alias}
             </Link>
-          </h3>
+          </Heading>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
             <MapPin className="size-4 shrink-0" aria-hidden="true" />
             {item.region}

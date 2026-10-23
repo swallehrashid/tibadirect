@@ -51,7 +51,7 @@ describe("role routing", () => {
     const { router } = renderApp("/app");
     await screen.findByRole("heading", { name: "My campaigns" });
     const { default: userEvent } = await import("@testing-library/user-event");
-    await userEvent.click(screen.getByRole("button", { name: "Account menu" }));
+    await userEvent.click(screen.getByRole("button", { name: /Account menu/ }));
     await userEvent.click(await screen.findByRole("menuitem", { name: /Sign out/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
     expect((await screen.findAllByRole("link", { name: "Sign in" })).length).toBeGreaterThan(0);

@@ -12,7 +12,7 @@ import { safeNext } from "@/auth/roles";
 import { LOGIN_EMAIL_KEY, signInErrorMessage } from "@/auth/signIn";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePageTitle } from "@/lib/usePageTitle";
@@ -48,7 +48,7 @@ export function Login() {
     <div className="container flex justify-center py-10 md:py-16">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="font-heading text-2xl">{t("auth.signInTitle")}</CardTitle>
+          <h1 className="font-heading text-2xl font-semibold leading-snug">{t("auth.signInTitle")}</h1>
           <CardDescription>{t("auth.signInIntro")}</CardDescription>
         </CardHeader>
         <CardContent>

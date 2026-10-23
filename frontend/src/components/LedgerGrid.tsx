@@ -40,7 +40,7 @@ export default function LedgerGrid({ rows }: { rows: PublicLedgerRow[] }) {
     [t, language],
   );
   return (
-    <div data-testid="ledger-grid" role="region" aria-label={t("ledger.title")}>
+    <div data-testid="ledger-grid" role="region" aria-label={t("common.tableOf", { name: t("ledger.title") })}>
       <AgGridReact<LedgerLine>
         theme={tibaGridTheme}
         rowData={data}

@@ -4127,7 +4127,7 @@ export interface components {
             /** @description first_bill, or final_bill for a live case's final bill */
             kind?: string;
         };
-        Confirmation: {
+        QueueConfirmation: {
             /** Format: uuid */
             id?: string;
             readonly status?: unknown;
@@ -4147,10 +4147,12 @@ export interface components {
             created_at?: string;
             /** Format: date-time */
             finalized_at?: string | null;
+            readonly case_id?: unknown;
+            readonly case_alias?: unknown;
         };
         Queue: {
             pending?: components["schemas"]["QueueCase"][];
-            awaiting_second_approval?: components["schemas"]["Confirmation"][];
+            awaiting_second_approval?: components["schemas"]["QueueConfirmation"][];
         };
         HospitalCaseDetail: {
             /** Format: uuid */
@@ -4201,6 +4203,27 @@ export interface components {
              * @default null
              */
             note: string | null;
+        };
+        Confirmation: {
+            /** Format: uuid */
+            id?: string;
+            readonly status?: unknown;
+            amount_kes_minor?: number | null;
+            readonly amount_kes?: unknown;
+            invoice_number?: string | null;
+            is_final_bill?: boolean;
+            deposit_kes_minor?: number | null;
+            readonly confirmed_by?: unknown;
+            readonly second_approver?: unknown;
+            query_note?: string | null;
+            /** @description The PayPal invoice issued for this bill, if any */
+            paypal_invoice_id?: string | null;
+            /** @description PayPal's status for that invoice: DRAFT, SENT, PARTIALLY_PAID, PAID, CANCELLED, or FAILED if it could not be issued */
+            invoice_status?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            finalized_at?: string | null;
         };
         DecisionResult: {
             confirmation?: components["schemas"]["Confirmation"];

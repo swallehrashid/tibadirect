@@ -128,6 +128,9 @@ def test_a_bill_waiting_for_a_second_approval_moves_to_its_own_list(
     assert waiting["status"] == "awaiting_second_approval"
     assert waiting["confirmed_by"] == "Clerk One"
     assert waiting["amount_kes_minor"] == 8_500_000
+    # The supervisor needs to know which case this is to send the second code for it.
+    assert waiting["case_id"] == str(ward.case.id)
+    assert waiting["case_alias"] == ward.case.alias
 
 
 def test_case_detail_shows_what_the_hospital_needs_and_no_family_identity(

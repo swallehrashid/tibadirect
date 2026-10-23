@@ -103,9 +103,16 @@ class QueueCaseSchema(ma.Schema):
     )
 
 
+class QueueConfirmationSchema(ConfirmationSchema):
+    """A confirmation waiting for a second approval, with its case so a supervisor can open it."""
+
+    case_id = ma.fields.Function(lambda c: str(c.case_id))
+    case_alias = ma.fields.Function(lambda c: c.case.alias)
+
+
 class QueueSchema(ma.Schema):
     pending = ma.fields.List(ma.fields.Nested(QueueCaseSchema))
-    awaiting_second_approval = ma.fields.List(ma.fields.Nested(ConfirmationSchema))
+    awaiting_second_approval = ma.fields.List(ma.fields.Nested(QueueConfirmationSchema))
 
 
 class BillSchema(ma.Schema):

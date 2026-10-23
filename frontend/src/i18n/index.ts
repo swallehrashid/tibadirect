@@ -16,6 +16,11 @@ function readStored(): Language | null {
   }
 }
 
+/** True once the person has picked a language themselves (the toggle saves it). */
+export function hasStoredLanguage(): boolean {
+  return readStored() !== null;
+}
+
 /** The saved choice, else the browser's language when we have it, else English. */
 export function initialLanguage(): Language {
   const stored = readStored();

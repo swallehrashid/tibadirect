@@ -10,7 +10,7 @@ interface Props {
   length?: number;
   disabled?: boolean;
   invalid?: boolean;
-  autoFocus?: boolean;
+  focusOnMount?: boolean;
   /** Id of text that describes the field (for example an error message). */
   describedBy?: string;
   label?: string;
@@ -23,7 +23,7 @@ const digitsOnly = (text: string) => text.replace(/\D/g, "");
  * whole code fills every box. The first box carries autocomplete="one-time-code" so phones can
  * offer the code from a message.
  */
-export function OtpInput({ value, onChange, onComplete, length = 6, disabled = false, invalid = false, autoFocus = false, describedBy, label }: Props) {
+export function OtpInput({ value, onChange, onComplete, length = 6, disabled = false, invalid = false, focusOnMount = false, describedBy, label }: Props) {
   const { t } = useTranslation();
   const groupId = useId();
   const refs = useRef<(HTMLInputElement | null)[]>([]);
@@ -38,8 +38,8 @@ export function OtpInput({ value, onChange, onComplete, length = 6, disabled = f
   }, [value, length, onComplete]);
 
   useEffect(() => {
-    if (autoFocus) refs.current[0]?.focus();
-  }, [autoFocus]);
+    if (focusOnMount) refs.current[0]?.focus();
+  }, [focusOnMount]);
 
   const focusBox = (index: number) => refs.current[Math.max(0, Math.min(length - 1, index))]?.focus();
 

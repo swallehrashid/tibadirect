@@ -1,3 +1,4 @@
+import type { UserRole } from "./enums";
 import type { components } from "./schema";
 
 type Schemas = components["schemas"];
@@ -14,3 +15,6 @@ type DeepStrict<T> = T extends (infer U)[] ? DeepStrict<U>[] : T extends object 
 export type Model<S, Over extends { [K in keyof Over]: K extends keyof S ? unknown : never } = object> = Omit<DeepStrict<S>, keyof Over> & Over;
 
 export type PublicConfig = Model<Schemas["PublicConfig"]>;
+
+export type HospitalSummary = Model<Schemas["HospitalSummary"], { staff_role: "billing_clerk" | "billing_supervisor" }>;
+export type User = Model<Schemas["User"], { role: UserRole; hospital: HospitalSummary | null; preferred_language: string | null }>;

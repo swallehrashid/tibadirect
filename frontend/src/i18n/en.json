@@ -123,5 +123,62 @@
   "demo": {
     "banner": "Demo: this uses PayPal sandbox money. No real money moves and no real patients are shown.",
     "tag": "Sandbox / simulated"
+  },
+  "nav": {
+    "cases": "Browse cases",
+    "howItWorks": "How it works",
+    "check": "Check an appeal",
+    "signIn": "Sign in",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "myCases": "My cases",
+    "startCampaign": "Start a campaign",
+    "queue": "Queue",
+    "settlements": "Settlements",
+    "overview": "Overview",
+    "review": "Review queue",
+    "audit": "Audit log",
+    "jobs": "Jobs",
+    "agent": "Treasurer agent"
+  },
+  "shell": {
+    "skip": "Skip to main content",
+    "home": "TibaDirect home",
+    "menu": "Menu",
+    "mainNav": "Main",
+    "footerNav": "Footer",
+    "accountMenu": "Account menu",
+    "myArea": "My dashboard",
+    "signOut": "Sign out",
+    "welcome": "Welcome, {{name}}",
+    "area": {
+      "family": "Family",
+      "hospital_staff": "Hospital",
+      "admin": "Admin"
+    }
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInIntro": "Enter your email and we will send you a 6-digit code.",
+    "email": "Email address",
+    "emailRequired": "Enter your email address.",
+    "emailInvalid": "Enter a valid email address.",
+    "sendCode": "Send me a code",
+    "noPassword": "There is no password to remember. If you are new, signing in creates your family account.",
+    "verifyTitle": "Enter your code",
+    "verifyIntro": "We sent a 6-digit code to {{email}}. It works once and lasts 10 minutes.",
+    "signIn": "Sign in",
+    "codeWrong": "That code is not right, or it has expired. Check your email and try again, or ask for a new code.",
+    "resend": "Send a new code",
+    "resendIn": "Send a new code in {{seconds}}s",
+    "resent": "We sent a new code.",
+    "otherEmail": "Use a different email",
+    "backHome": "Back to the home page",
+    "demoTitle": "Demo accounts",
+    "demoBody": "These are made-up accounts for the demo:"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or has moved."
   }
 }

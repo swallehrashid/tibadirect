@@ -123,5 +123,62 @@
   "demo": {
     "banner": "Onyesho: hii inatumia pesa za majaribio za PayPal. Hakuna pesa halisi zinazohamishwa wala wagonjwa halisi wanaoonyeshwa.",
     "tag": "Majaribio / kuigiza"
+  },
+  "nav": {
+    "cases": "Angalia kesi",
+    "howItWorks": "Jinsi inavyofanya kazi",
+    "check": "Kagua ombi la msaada",
+    "signIn": "Ingia",
+    "privacy": "Faragha",
+    "terms": "Masharti",
+    "myCases": "Kesi zangu",
+    "startCampaign": "Anzisha mchango",
+    "queue": "Foleni",
+    "settlements": "Malipo",
+    "overview": "Muhtasari",
+    "review": "Foleni ya ukaguzi",
+    "audit": "Kumbukumbu za ukaguzi",
+    "jobs": "Kazi",
+    "agent": "Msaidizi wa mhazini"
+  },
+  "shell": {
+    "skip": "Ruka hadi maudhui makuu",
+    "home": "Ukurasa wa mwanzo wa TibaDirect",
+    "menu": "Menyu",
+    "mainNav": "Kuu",
+    "footerNav": "Chini ya ukurasa",
+    "accountMenu": "Menyu ya akaunti",
+    "myArea": "Dashibodi yangu",
+    "signOut": "Toka",
+    "welcome": "Karibu, {{name}}",
+    "area": {
+      "family": "Familia",
+      "hospital_staff": "Hospitali",
+      "admin": "Msimamizi"
+    }
+  },
+  "auth": {
+    "signInTitle": "Ingia",
+    "signInIntro": "Weka barua pepe yako nasi tutakutumia msimbo wa tarakimu 6.",
+    "email": "Anwani ya barua pepe",
+    "emailRequired": "Weka anwani yako ya barua pepe.",
+    "emailInvalid": "Weka anwani sahihi ya barua pepe.",
+    "sendCode": "Nitumie msimbo",
+    "noPassword": "Hakuna nenosiri la kukumbuka. Ikiwa wewe ni mgeni, kuingia kunafungua akaunti yako ya familia.",
+    "verifyTitle": "Weka msimbo wako",
+    "verifyIntro": "Tumetuma msimbo wa tarakimu 6 kwa {{email}}. Unatumika mara moja na unadumu dakika 10.",
+    "signIn": "Ingia",
+    "codeWrong": "Msimbo huo si sahihi, au muda wake umeisha. Angalia barua pepe yako kisha ujaribu tena, au omba msimbo mpya.",
+    "resend": "Tuma msimbo mpya",
+    "resendIn": "Tuma msimbo mpya baada ya sekunde {{seconds}}",
+    "resent": "Tumetuma msimbo mpya.",
+    "otherEmail": "Tumia barua pepe nyingine",
+    "backHome": "Rudi ukurasa wa mwanzo",
+    "demoTitle": "Akaunti za onyesho",
+    "demoBody": "Hizi ni akaunti za kubuni za onyesho:"
+  },
+  "notFound": {
+    "title": "Ukurasa haujapatikana",
+    "body": "Ukurasa unaoutafuta haupo au umehamishwa."
   }
 }

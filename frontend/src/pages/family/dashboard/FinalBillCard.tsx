@@ -9,13 +9,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "@/components/ui/toaster";
 import { uploadErrorMessage } from "@/lib/uploadErrors";
 
-/** Once treatment ends the family uploads the hospital's final bill; the hospital confirms it and the case closes when it is paid. */
+/**
+ * Once treatment ends the family uploads the hospital's final bill; the hospital confirms it and the case closes when it is paid.
+ * The API takes it while the case is live or already fully funded, and only while the bill on the case is still an estimate.
+ */
 export function FinalBillCard({ item }: { item: FamilyCase }) {
   const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const upload = useCaseMutation(async ({ caseId, file: chosen }: { caseId: string; file: File }) => familyApi.uploadFinalBill(caseId, chosen));
-  if (item.status !== "live") return null;
+  if ((item.status !== "live" && item.status !== "funded") || !item.money.is_estimate) return null;
 
   async function send() {
     if (!file) return;

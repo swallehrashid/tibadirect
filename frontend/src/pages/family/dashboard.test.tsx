@@ -85,7 +85,7 @@ describe("case dashboard", () => {
 
   it("for a live case shows the public page link, the money, and the final bill upload", async () => {
     const api = setup(
-      { ...live, money: { ...MONEY_ZERO, target_kes_minor: 24_000_000, pledged_kes_minor: 7_204_134, settled_kes_minor: 6_744_507, captured_net_usd_minor: 55_500, donor_count: 6, is_estimate: false } },
+      { ...live, money: { ...MONEY_ZERO, target_kes_minor: 24_000_000, pledged_kes_minor: 7_204_134, settled_kes_minor: 6_744_507, captured_net_usd_minor: 55_500, donor_count: 6, is_estimate: true } },
       { [`POST ${path}/final-bill`]: { status: 201, body: { id: "d2", kind: "final_bill", status: "uploaded", mime_type: "application/pdf", size_bytes: 10, page_count: 1, created_at: "x", raw_available: true, preview_url: null } } },
     );
     const { container } = renderApp(`/app/cases/${CASE_ID}`);
@@ -100,8 +100,20 @@ describe("case dashboard", () => {
     expect(await screen.findByText("Your final bill is being checked and sent to the hospital.", { selector: "p" })).toBeInTheDocument();
   });
 
-  it("offers the final bill only while the case is live", async () => {
-    setup({ status: "funded", trust_level: "hospital_confirmed", timeline: timeline("draft", "pending_triage", "pending_confirmation", "live", "funded") });
+  it("offers the final bill while the case is live or already fully funded, and only on an estimate", async () => {
+    const first = setup({ status: "funded", trust_level: "hospital_confirmed", timeline: timeline("draft", "pending_triage", "pending_confirmation", "live", "funded") });
+    const funded = renderApp(`/app/cases/${CASE_ID}`);
+    expect(await screen.findByRole("heading", { name: "Upload the final bill" })).toBeInTheDocument();
+    funded.unmount();
+    void first;
+
+    setup({ ...live, money: { ...MONEY_ZERO, target_kes_minor: 24_000_000, is_estimate: false } });
+    const final = renderApp(`/app/cases/${CASE_ID}`);
+    await screen.findByRole("heading", { level: 1, name: "Zawadi" });
+    expect(screen.queryByRole("heading", { name: "Upload the final bill" })).not.toBeInTheDocument();
+    final.unmount();
+
+    setup({ status: "pending_confirmation", trust_level: "pending_confirmation", timeline: timeline("draft", "pending_triage", "pending_confirmation") });
     renderApp(`/app/cases/${CASE_ID}`);
     await screen.findByRole("heading", { level: 1, name: "Zawadi" });
     expect(screen.queryByRole("heading", { name: "Upload the final bill" })).not.toBeInTheDocument();

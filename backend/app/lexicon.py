@@ -43,7 +43,12 @@ def _medical_pattern(directory: str) -> re.Pattern[str]:
 
 
 def lexicon_dir() -> str:
-    configured = current_app.config.get("LEXICON_DIR") or str(DEFAULT_LEXICON_DIR)
+    """The configured lexicon folder, or the repository's own when there is no application (the
+    evaluation command and scripts use the word lists too)."""
+    try:
+        configured = current_app.config.get("LEXICON_DIR") or str(DEFAULT_LEXICON_DIR)
+    except RuntimeError:
+        configured = str(DEFAULT_LEXICON_DIR)
     return str(configured)
 
 

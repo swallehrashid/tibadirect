@@ -1,0 +1,10 @@
+Asante kwa kusaidia "{{ alias }}".
+
+Umetoa: {{ amount }}
+Ada ya PayPal: {{ fee }}
+Inayoenda kwenye kesi: {{ net }} (karibu {{ kes_estimate }} kwa kiwango cha leo)
+
+Pesa zako hulipwa hospitalini kwa awamu, kamwe si kwa familia. Tazama kila hatua kwenye leja ya kesi:
+{{ ledger_url }}
+
+Risiti yako: {{ receipt_url }}

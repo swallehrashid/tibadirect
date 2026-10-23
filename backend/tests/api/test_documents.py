@@ -315,8 +315,12 @@ def test_submitting_queues_triage_and_the_worker_moves_the_case_on(
     ]
     triage = browser.get(f"/api/cases/{case.id}/triage").get_json()
     assert triage["ready"] is True
-    assert (triage["risk_band"], triage["route"]) == ("low", "hospital_confirmation")
-    assert triage["reasons_en"] == ["Automatic checks pending"]
+    # a blank page cannot be read and names no hospital: worth a note, never a rejection
+    assert (triage["risk_band"], triage["route"]) == ("medium", "hospital_confirmation")
+    assert triage["reasons_en"] == [
+        "We could not find this hospital in the facility register.",
+        "We could not read all of the bill clearly.",
+    ]
     assert "risk_score" not in triage
     assert "signals" not in triage
 

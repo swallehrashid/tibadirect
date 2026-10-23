@@ -25,3 +25,17 @@ class PublicStatsSchema(ma.Schema):
     settled_kes_minor = ma.fields.Integer(metadata={"description": "Already paid to hospitals"})
     donations = ma.fields.Integer()
     hospitals = ma.fields.Integer()
+
+
+class PublicFxSchema(ma.Schema):
+    base = ma.fields.String(metadata={"example": "USD"})
+    quote = ma.fields.String(metadata={"example": "KES"})
+    rate = ma.fields.String(
+        metadata={"description": "KES for 1 USD, as a decimal string", "example": "129.00000000"}
+    )
+    source = ma.fields.String(metadata={"description": "open_er_api, or static for the fallback"})
+    fetched_at = ma.fields.DateTime()
+    is_live = ma.fields.Boolean(metadata={"description": "False when the rate is the static one"})
+    is_stale = ma.fields.Boolean(
+        metadata={"description": "A live rate that has not been refreshed for six hours"}
+    )

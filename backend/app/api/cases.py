@@ -13,13 +13,14 @@ from app.models.enums import UserRole
 from app.pagination import PaginationArgsSchema, page_of, paginate
 from app.schemas.admin import ReviewRequestedSchema, ReviewRequestSchema
 from app.schemas.cases import (
+    CancelCaseSchema,
     CreateCaseSchema,
     FamilyCaseListItemSchema,
     FamilyCaseSchema,
     UpdateCaseSchema,
 )
 from app.security.permissions import current_account, get_owned_case_or_404
-from app.services import case_service, review_service
+from app.services import case_ending_service, case_service, review_service
 
 blp = TibaBlueprint("cases", __name__, url_prefix="/api/cases", description="My cases")
 
@@ -82,6 +83,23 @@ class CaseDetail(MethodView):
         case_service.delete_draft(get_owned_case_or_404(case_id, user), user)
         db.session.commit()
         return ""
+
+
+@blp.route("/<uuid:case_id>/cancel")
+class CancelCase(MethodView):
+    @blp.secured(UserRole.FAMILY)
+    @blp.arguments(CancelCaseSchema)
+    @blp.response(200, FamilyCaseSchema)
+    @blp.alt_response(409, description="The case cannot be cancelled from where it is")
+    def post(self, payload: dict, case_id: uuid.UUID) -> Case:
+        """End the case: donations stop at once and money the case no longer needs goes back,
+        or on, as each donor chose. Not for drafts (delete those) or closed cases."""
+        user = current_account()
+        case = get_owned_case_or_404(case_id, user)
+        ended = case_ending_service.cancel_case(db.session, case, user, payload["reason"])
+        db.session.commit()
+        case_ending_service.after_commit(ended)
+        return case
 
 
 @blp.route("/<uuid:case_id>/review-request")

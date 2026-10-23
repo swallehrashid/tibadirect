@@ -1,0 +1,9 @@
+The hospital's bill for "{{ alias }}" has been paid in full, so your case is now closed.
+{% if lower_bill %}
+The final bill was lower than the first estimate, so some of the money given was not needed.
+{% endif %}
+Money that was not needed follows each donor's own choice: a refund to their PayPal, the solidarity pool, or a short hold for follow-up care. Nothing goes to anyone else.
+
+Every payment stays on the case page: {{ url }}
+
+Thank you to everyone who helped.

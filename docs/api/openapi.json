@@ -257,6 +257,29 @@
         ]
       }
     },
+    "/api/public/fx": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicFx"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "The latest USD to KES rate. KES amounts on donation receipts use the rate at the time\nof the payment, so this is a guide for choosing an amount, not a quote.",
+        "tags": [
+          "public"
+        ]
+      }
+    },
     "/api/public/stats": {
       "get": {
         "responses": {
@@ -476,6 +499,60 @@
           }
         }
       ]
+    },
+    "/api/public/checker/appeal": {
+      "post": {
+        "responses": {
+          "429": {
+            "description": "More than 20 checks an hour from this address"
+          },
+          "422": {
+            "description": "No readable message"
+          },
+          "404": {
+            "description": "The checker is switched off"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppealResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Score a forwarded appeal. What you send is hashed and never stored.",
+        "tags": [
+          "checker"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppealText"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
     },
     "/api/admin/jobs": {
       "get": {
@@ -1068,7 +1145,70 @@
             }
           }
         },
-        "summary": "Pause a case: it stops being public and stops taking money at once.",
+        "summary": "Pause a case: it stops being public and stops taking money at once, tranches not yet\nsent are cancelled, and every donor is refunded in full. When the refunds are made the\ncase is cancelled with the reason fraud.",
+        "tags": [
+          "admin"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/admin/cases/{case_id}/settlements/run": {
+      "post": {
+        "responses": {
+          "404": {
+            "description": "No such case"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettlementRun"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Check now whether a tranche is due for this case and, if so, create and send it.",
+        "description": "The same check runs after every donation and every 15 minutes; this is for an admin who\nwants it now. A case with nothing due answers 200 with the reason.",
         "tags": [
           "admin"
         ],
@@ -1185,6 +1325,313 @@
           }
         ]
       }
+    },
+    "/api/admin/agent/ask": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "503": {
+            "description": "No language model is configured"
+          },
+          "502": {
+            "description": "The language model could not be reached"
+          },
+          "429": {
+            "description": "More than 30 questions an hour"
+          },
+          "404": {
+            "description": "The agent is switched off, or there is no such case"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ask"
+              }
+            }
+          }
+        },
+        "summary": "Ask about the money. It reads the books and may propose a refund, a payout or a freeze;\na proposal waits in the actions list until an administrator approves it.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/agent/actions": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "default": null,
+              "enum": [
+                "proposed",
+                "approved",
+                "rejected",
+                "executed",
+                "failed",
+                null
+              ],
+              "nullable": true
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentActionPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Proposals, the ones waiting first. Filter by ``status``.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/api/admin/agent/actions/{action_id}/approve": {
+      "post": {
+        "responses": {
+          "409": {
+            "description": "Already decided"
+          },
+          "404": {
+            "description": "No such action"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Approve a proposal and carry it out through the normal service. If it can no longer be\ndone the answer is the action with status ``failed`` and the reason in ``error``.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "action_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
+    "/api/admin/agent/actions/{action_id}/reject": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "Already decided"
+          },
+          "404": {
+            "description": "No such action"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentAction"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reject"
+              }
+            }
+          }
+        },
+        "summary": "Turn a proposal down. A reason is required.",
+        "tags": [
+          "agent"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "action_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
     },
     "/api/hospitals": {
       "get": {
@@ -1775,6 +2222,81 @@
         }
       ]
     },
+    "/api/cases/{case_id}/cancel": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "409": {
+            "description": "The case cannot be cancelled from where it is"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCase"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelCase"
+              }
+            }
+          }
+        },
+        "summary": "End the case: donations stop at once and money the case no longer needs goes back,\nor on, as each donor chose. Not for drafts (delete those) or closed cases.",
+        "tags": [
+          "cases"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
     "/api/cases/{case_id}/review-request": {
       "post": {
         "responses": {
@@ -2118,6 +2640,87 @@
         }
       ]
     },
+    "/api/cases/{case_id}/final-bill": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+          },
+          "415": {
+            "description": "Not a PDF, PNG or JPEG"
+          },
+          "413": {
+            "description": "The file is larger than 10 MB"
+          },
+          "409": {
+            "description": "Not live, the bill is already final, or a final bill is being checked"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed for this role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFile"
+              }
+            }
+          }
+        },
+        "summary": "Upload the hospital's final bill for a live case. It is checked, then sent to the\nhospital to confirm; once confirmed, the case is paid up to the final amount and closes\nwhen that has been settled.",
+        "tags": [
+          "documents"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "case_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    },
     "/api/cases/{case_id}/triage": {
       "get": {
         "responses": {
@@ -2177,6 +2780,134 @@
         }
       ]
     },
+    "/api/donations/orders": {
+      "post": {
+        "responses": {
+          "422": {
+            "description": "Amount, name or choice not valid"
+          },
+          "502": {
+            "description": "PayPal could not be reached"
+          },
+          "409": {
+            "description": "The case is not taking donations (case_not_accepting)"
+          },
+          "404": {
+            "description": "No such public case"
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderCreated"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrder"
+              }
+            }
+          }
+        },
+        "summary": "Start a donation: creates the PayPal order the donor then approves in PayPal.",
+        "tags": [
+          "donations"
+        ]
+      }
+    },
+    "/api/donations/orders/{order_id}/capture": {
+      "post": {
+        "responses": {
+          "502": {
+            "description": "PayPal could not be reached"
+          },
+          "422": {
+            "description": "PayPal declined the payment"
+          },
+          "409": {
+            "description": "Case fully funded (nothing was captured), or payment pending"
+          },
+          "404": {
+            "description": "No such order"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Take the money once the donor has approved the order. Repeating the call returns the\nsame donation. If the case stopped needing money since the order was made, nothing is\ncaptured and the donor is not charged.",
+        "tags": [
+          "donations"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "order_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
+    "/api/donations/receipts/{receipt_token}": {
+      "get": {
+        "responses": {
+          "404": {
+            "description": "No such receipt"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "A donation receipt: amount, fee, KES estimate, excess choice, case and ledger entry.",
+        "tags": [
+          "donations"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "receipt_token",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ]
+    },
     "/api/hospital/queue": {
       "get": {
         "responses": {
@@ -2215,6 +2946,7 @@
           }
         },
         "summary": "Bills waiting for the hospital's decision, and bills waiting for a second approval.",
+        "description": "A bill is either a case's first bill or a final bill added to a case that is live.",
         "tags": [
           "hospital_portal"
         ],
@@ -2585,6 +3317,47 @@
           }
         ]
       }
+    },
+    "/api/webhooks/paypal": {
+      "post": {
+        "responses": {
+          "502": {
+            "description": "PayPal could not be asked to verify; it will resend"
+          },
+          "400": {
+            "description": "Not an event, or the signature did not verify"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookAck"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/DEFAULT_ERROR"
+          }
+        },
+        "summary": "Verify the signature through PayPal, store the event once and process it in the\nbackground. Replaying an event does nothing. Always answers fast.",
+        "tags": [
+          "webhooks"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "A PayPal webhook event, exactly as PayPal sent it",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "security": []
+      }
     }
   },
   "info": {
@@ -2605,8 +3378,16 @@
       "description": "Public pages and data"
     },
     {
+      "name": "checker",
+      "description": "Check a forwarded appeal"
+    },
+    {
       "name": "admin",
       "description": "Admin console"
+    },
+    {
+      "name": "agent",
+      "description": "Treasurer agent (admin)"
     },
     {
       "name": "hospitals",
@@ -2625,8 +3406,16 @@
       "description": "Bills and checks"
     },
     {
+      "name": "donations",
+      "description": "Donate to a case"
+    },
+    {
       "name": "hospital_portal",
       "description": "Hospital portal"
+    },
+    {
+      "name": "webhooks",
+      "description": "Events sent by PayPal"
     }
   ],
   "openapi": "3.0.3",
@@ -2886,6 +3675,41 @@
         },
         "additionalProperties": false
       },
+      "PublicFx": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "string",
+            "example": "USD"
+          },
+          "quote": {
+            "type": "string",
+            "example": "KES"
+          },
+          "rate": {
+            "type": "string",
+            "description": "KES for 1 USD, as a decimal string",
+            "example": "129.00000000"
+          },
+          "source": {
+            "type": "string",
+            "description": "open_er_api, or static for the fallback"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "is_live": {
+            "type": "boolean",
+            "description": "False when the rate is the static one"
+          },
+          "is_stale": {
+            "type": "boolean",
+            "description": "A live rate that has not been refreshed for six hours"
+          }
+        },
+        "additionalProperties": false
+      },
       "PublicStats": {
         "type": "object",
         "properties": {
@@ -3085,6 +3909,98 @@
           "checked_at": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppealText": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000,
+            "description": "The message exactly as received. It is not stored."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "MatchedCase": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "hospital_name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "description": "This appeal matches a hospital-confirmed TibaDirect case"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AppealResult": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer",
+            "description": "0 (no concern) to 100"
+          },
+          "band": {
+            "type": "string",
+            "description": "low, medium or high"
+          },
+          "flagged": {
+            "type": "boolean",
+            "description": "True if it reads as likely a scam"
+          },
+          "reasons_en": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reasons_sw": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "matched_case": {
+            "anyOf": [
+              {
+                "type": "object",
+                "nullable": true
+              },
+              {
+                "$ref": "#/components/schemas/MatchedCase"
+              }
+            ]
+          },
+          "safety_tip_en": {
+            "type": "string"
+          },
+          "safety_tip_sw": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Only when the optional language model is on",
+            "nullable": true
+          },
+          "used_llm": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -3589,6 +4505,37 @@
         ],
         "additionalProperties": false
       },
+      "SettlementRun": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "created, or why no tranche was due: case_not_settleable, no_confirmation, hospital_inactive, hospital_not_ready, cap_reached, nothing_available, below_threshold"
+          },
+          "settlement_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "tranche_no": {
+            "type": "integer",
+            "nullable": true
+          },
+          "amount_usd_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "amount_kes_minor": {
+            "type": "integer",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "AuditEntry": {
         "type": "object",
         "properties": {
@@ -3649,6 +4596,167 @@
             "type": "integer"
           }
         },
+        "additionalProperties": false
+      },
+      "Ask": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000,
+            "description": "What the administrator wants to know or have looked at"
+          },
+          "case_id": {
+            "type": "string",
+            "format": "uuid",
+            "default": null,
+            "description": "The case the question is about, if there is one",
+            "nullable": true
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "additionalProperties": false
+      },
+      "ToolCall": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "input": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string",
+            "description": "How much came back, or why it failed"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AgentAction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action_type": {
+            "readOnly": true
+          },
+          "case_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "case_alias": {
+            "readOnly": true
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "status": {
+            "readOnly": true
+          },
+          "decided_by": {
+            "readOnly": true
+          },
+          "decided_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "executed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "result": {
+            "type": "object",
+            "additionalProperties": {},
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AskResult": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "tool_calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToolCall"
+            }
+          },
+          "proposed_actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgentAction"
+            }
+          },
+          "steps": {
+            "type": "integer"
+          },
+          "stopped_early": {
+            "type": "boolean",
+            "description": "True if it ran out of steps before finishing its answer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AgentActionPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AgentAction"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Reject": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Why, in 10 to 500 characters. Required."
+          }
+        },
+        "required": [
+          "note"
+        ],
         "additionalProperties": false
       },
       "HospitalListItem": {
@@ -4031,6 +5139,24 @@
         },
         "additionalProperties": false
       },
+      "CancelCase": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": [
+              "treatment_cancelled",
+              "patient_deceased",
+              "other"
+            ],
+            "description": "Why the case is ending"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "additionalProperties": false
+      },
       "ReviewRequest": {
         "type": "object",
         "properties": {
@@ -4159,6 +5285,149 @@
         },
         "additionalProperties": false
       },
+      "CreateOrder": {
+        "type": "object",
+        "properties": {
+          "case_slug": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "amount_usd": {
+            "type": "number",
+            "description": "US dollars, $1 to $10,000, at most two decimals",
+            "example": "25.00"
+          },
+          "excess_choice": {
+            "default": "refund",
+            "description": "What happens to money the case does not need",
+            "enum": [
+              "refund",
+              "solidarity_pool",
+              "follow_up_care"
+            ]
+          },
+          "donor_display_name": {
+            "type": "string",
+            "default": null,
+            "description": "Shown beside the donation in the public ledger",
+            "nullable": true
+          },
+          "is_anonymous": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "amount_usd",
+          "case_slug"
+        ],
+        "additionalProperties": false
+      },
+      "OrderCreated": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "Give this to the PayPal button"
+          },
+          "amount_usd_minor": {
+            "type": "integer"
+          },
+          "amount_usd": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Receipt": {
+        "type": "object",
+        "properties": {
+          "receipt_token": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "amount_usd_minor": {
+            "type": "integer"
+          },
+          "amount_usd": {
+            "readOnly": true
+          },
+          "paypal_fee_usd_minor": {
+            "type": "integer"
+          },
+          "paypal_fee_usd": {
+            "readOnly": true
+          },
+          "net_usd_minor": {
+            "type": "integer",
+            "description": "What reaches the case"
+          },
+          "net_usd": {
+            "readOnly": true
+          },
+          "refunded_usd_minor": {
+            "type": "integer"
+          },
+          "kes_estimate_minor": {
+            "type": "integer",
+            "description": "KES value of the net amount at the rate when it was paid"
+          },
+          "kes_estimate": {
+            "readOnly": true
+          },
+          "fx_rate": {
+            "type": "string",
+            "nullable": true
+          },
+          "excess_choice": {
+            "type": "string"
+          },
+          "donor_display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "case_slug": {
+            "type": "string"
+          },
+          "case_alias": {
+            "type": "string"
+          },
+          "hospital_name": {
+            "type": "string"
+          },
+          "ledger_reference": {
+            "type": "string",
+            "description": "The PayPal capture, shortened",
+            "nullable": true
+          },
+          "ledger_hash_short": {
+            "type": "string",
+            "description": "First 12 characters of the ledger entry hash",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CaptureResult": {
+        "type": "object",
+        "properties": {
+          "receipt_token": {
+            "type": "string"
+          },
+          "donation": {
+            "$ref": "#/components/schemas/Receipt"
+          }
+        },
+        "additionalProperties": false
+      },
       "QueueCase": {
         "type": "object",
         "properties": {
@@ -4183,6 +5452,10 @@
           },
           "bills": {
             "type": "integer"
+          },
+          "kind": {
+            "type": "string",
+            "description": "first_bill, or final_bill for a live case's final bill"
           }
         },
         "additionalProperties": false
@@ -4223,6 +5496,16 @@
           },
           "query_note": {
             "type": "string",
+            "nullable": true
+          },
+          "paypal_invoice_id": {
+            "type": "string",
+            "description": "The PayPal invoice issued for this bill, if any",
+            "nullable": true
+          },
+          "invoice_status": {
+            "type": "string",
+            "description": "PayPal's status for that invoice: DRAFT, SENT, PARTIALLY_PAID, PAID, CANCELLED, or FAILED if it could not be issued",
             "nullable": true
           },
           "created_at": {
@@ -4469,6 +5752,16 @@
           },
           "total": {
             "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebhookAck": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "received for a new event, duplicate for one seen before"
           }
         },
         "additionalProperties": false

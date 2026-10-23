@@ -84,8 +84,9 @@ class Donation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
         CheckConstraint("net_usd_minor >= 0", name="net_non_negative"),
         CheckConstraint("allocated_usd_minor >= 0", name="allocated_non_negative"),
         CheckConstraint("refunded_usd_minor >= 0", name="refunded_non_negative"),
+        CheckConstraint("pooled_usd_minor >= 0", name="pooled_non_negative"),
         CheckConstraint(
-            "allocated_usd_minor + refunded_usd_minor <= net_usd_minor",
+            "allocated_usd_minor + refunded_usd_minor + pooled_usd_minor <= net_usd_minor",
             name="allocation_within_net",
         ),
         Index("ix_donations_case_status", "case_id", "status"),
@@ -110,6 +111,7 @@ class Donation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     kes_equivalent_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     allocated_usd_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     refunded_usd_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    pooled_usd_minor: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
     excess_choice: Mapped[ExcessChoice] = mapped_column(
         pg_enum(ExcessChoice),
         default=ExcessChoice.REFUND,
@@ -160,6 +162,7 @@ class Settlement(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     idempotency_key: Mapped[str] = mapped_column(String(64), unique=True)
     external_batch_id: Mapped[str | None] = mapped_column(String(40))
     external_item_id: Mapped[str | None] = mapped_column(String(40))
+    invoice_payment_id: Mapped[str | None] = mapped_column(String(40))
     failure_reason: Mapped[str | None] = mapped_column(String(300))
     requested_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

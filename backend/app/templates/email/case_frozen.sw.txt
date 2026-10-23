@@ -1,0 +1,5 @@
+Tumesitisha kesi yako "{{ alias }}" wakati timu yetu inaichunguza kwa makini zaidi.
+
+Michango mipya imesimamishwa na ukurasa umefichwa. Pesa zilizokwisha tolewa zinarejeshwa kwa waliozitoa, na hakuna malipo zaidi yatakayofanywa kwa hospitali wakati kesi imesitishwa.
+
+Ukiona kuna kosa, jibu ujumbe huu au omba mapitio kutoka ukurasa wa kesi yako.

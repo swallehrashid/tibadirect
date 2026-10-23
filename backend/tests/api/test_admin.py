@@ -38,6 +38,15 @@ def _error(response) -> dict:  # type: ignore[no-untyped-def]
     return response.get_json()["error"]
 
 
+@pytest.fixture(autouse=True)
+def _freeze_stays_frozen(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A freeze ends in a cancellation once the donors are repaid, which the queue does at once in
+    tests; these tests are about the freeze itself, so the follow-up is left unqueued."""
+    from app.services import case_ending_service
+
+    monkeypatch.setattr(case_ending_service, "enqueue_finish", lambda case_id: None)
+
+
 @pytest.fixture
 def admin(browser_for: BrowserFor, db_session) -> Browser:  # type: ignore[no-untyped-def]
     return browser_for(UserFactory(role=UserRole.ADMIN, email="test.admin@example.test"))
@@ -62,6 +71,7 @@ ADMIN_ROUTES = [
     ("get", "/api/admin/audit-log"),
     ("get", f"/api/admin/cases/{uuid.uuid4()}"),
     ("post", f"/api/admin/cases/{uuid.uuid4()}/freeze"),
+    ("post", f"/api/admin/cases/{uuid.uuid4()}/settlements/run"),
     ("post", f"/api/admin/review-items/{uuid.uuid4()}/resolve"),
 ]
 
@@ -469,7 +479,11 @@ def test_the_audit_log_is_newest_first_and_filterable(admin: Browser, db_session
     stamps = [e["created_at"] for e in everything["items"]]
     assert stamps == sorted(stamps, reverse=True)
     mine = admin.get(f"/api/admin/audit-log?target_type=case&target_id={case.id}").get_json()
-    assert {e["action"] for e in mine["items"]} == {"case.transitioned", "admin.case_viewed"}
+    assert {e["action"] for e in mine["items"]} == {
+        "case.transitioned",
+        "case.freeze_signals",
+        "admin.case_viewed",
+    }
     assert all(e["target_id"] == str(case.id) for e in mine["items"])
     assert set(mine["items"][0]) == {
         "id", "created_at", "actor_type", "actor_user_id", "action", "target_type", "target_id",

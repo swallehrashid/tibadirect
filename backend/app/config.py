@@ -172,6 +172,16 @@ class BaseConfig:
         self.PAYPAL_CLIENT_SECRET = _env("PAYPAL_CLIENT_SECRET")
         self.PAYPAL_WEBHOOK_ID = _env("PAYPAL_WEBHOOK_ID")
         self.HOSPITAL_PAYPAL_CREDENTIALS = _env_json("HOSPITAL_PAYPAL_CREDENTIALS", {})
+        # The collector account's PayPal email: the person a hospital's invoice is addressed to.
+        self.PAYPAL_COLLECTOR_EMAIL = _env("PAYPAL_COLLECTOR_EMAIL")
+        # Settings of the offline fake used when PAYPAL_MODE=mock. The store is "redis" so the API
+        # and the worker see the same orders, or "memory" for one process.
+        self.PAYPAL_MOCK_STORE = _env("PAYPAL_MOCK_STORE", "redis")
+        self.PAYPAL_MOCK_FEE_BPS = _env_int("PAYPAL_MOCK_FEE_BPS", 290)
+        self.PAYPAL_MOCK_FEE_FIXED_USD_MINOR = _env_int("PAYPAL_MOCK_FEE_FIXED_USD_MINOR", 30)
+        self.PAYPAL_MOCK_AUTO_APPROVE = _env_bool("PAYPAL_MOCK_AUTO_APPROVE", True)
+        # Seconds before the simulated Kenyan partner reports a payment as paid.
+        self.MOCK_PARTNER_DELAY_SECONDS = _env_int("MOCK_PARTNER_DELAY_SECONDS", 5)
 
         self.LLM_PROVIDER = _env("LLM_PROVIDER", "anthropic")
         self.LLM_API_KEY = _env("LLM_API_KEY")
@@ -195,8 +205,7 @@ class BaseConfig:
 
         self.RAW_DOC_RETENTION_HOURS = _env_int("RAW_DOC_RETENTION_HOURS", 24)
         self.AGENT_ENABLED = _env_bool("AGENT_ENABLED", False)
-        # The checker itself ships in Phase 3, which turns this on by default.
-        self.APPEAL_CHECKER_ENABLED = _env_bool("APPEAL_CHECKER_ENABLED", False)
+        self.APPEAL_CHECKER_ENABLED = _env_bool("APPEAL_CHECKER_ENABLED", True)
         self.APPEAL_CHECKER_USE_LLM = _env_bool("APPEAL_CHECKER_USE_LLM", False)
 
 
@@ -226,6 +235,10 @@ class TestConfig(BaseConfig):
         # Tests that exercise CSRF switch this on for the app under test.
         self.WTF_CSRF_ENABLED = False
         self.PAYPAL_MODE = "mock"
+        self.PAYPAL_MOCK_STORE = "memory"
+        self.PAYPAL_WEBHOOK_ID = "WH-TEST-WEBHOOK-ID"
+        self.PAYPAL_COLLECTOR_EMAIL = "collector@tibadirect.test"
+        self.MOCK_PARTNER_DELAY_SECONDS = 0
         # No endpoint: boto3 uses the AWS address, which moto intercepts in every test, so a test
         # can never reach the MinIO that may be running on a developer's machine.
         self.S3_ENDPOINT_URL = ""

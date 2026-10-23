@@ -15,6 +15,8 @@ from sqlalchemy.orm import scoped_session
 from app import create_app
 from app.extensions import db, limiter
 from app.models.identity import User
+from app.payments.paypal_client import get_client
+from app.payments.paypal_mock import MockPayPal
 from app.services import mail_service
 from tests import support
 from tests.browser import Browser
@@ -207,3 +209,44 @@ def s3(app: Flask) -> Iterator[None]:
         for key in list(storage_service._keys_under("")):
             client.delete_object(Bucket=bucket, Key=key)
         client.delete_bucket(Bucket=bucket)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_paypal_gateway(app: Flask) -> Iterator[None]:
+    """Each test builds its own PayPal client, so the fake's orders never leak between tests."""
+    app.extensions.pop("paypal_gateway", None)
+    yield
+    app.extensions.pop("paypal_gateway", None)
+
+
+@pytest.fixture
+def paypal(app: Flask) -> MockPayPal:
+    """The offline PayPal fake the app is using, to approve orders and inject failures."""
+    with app.app_context():
+        gateway = get_client()
+    assert isinstance(gateway, MockPayPal)
+    return gateway
+
+
+@pytest.fixture
+def manual_settlement(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str]]:
+    """Settlement jobs are recorded instead of run, so a test drives each step itself.
+
+    Tests run the job queue inline, so without this a donation would create, send and follow a
+    tranche on its own, which is right end to end but hides the steps from a test about one.
+    """
+    from app.services import settlement_service
+
+    seen: list[tuple[str, str]] = []
+    monkeypatch.setattr(settlement_service, "_enqueue", lambda func, arg: seen.append((func, arg)))
+    return seen
+
+
+@pytest.fixture
+def manual_refunds(monkeypatch: pytest.MonkeyPatch) -> list:
+    """Refund jobs are recorded instead of run, so a test decides when PayPal is asked."""
+    from app.services import refund_service
+
+    seen: list = []
+    monkeypatch.setattr(refund_service, "enqueue_execute", seen.append)
+    return seen

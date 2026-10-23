@@ -28,6 +28,10 @@ COPY data/lexicons/ data/lexicons/
 COPY data/synthetic/ data/synthetic/
 COPY --from=frontend /dist/ frontend/dist/
 
+# The appeal checker's trained model is not kept in git; training it takes seconds and needs no database.
+RUN cd backend && SYNTHETIC_DATA_DIR=/app/data/synthetic LEXICON_DIR=/app/data/lexicons \
+    flask --app wsgi ai train-appeals
+
 USER tiba
 WORKDIR /app/backend
 ENV PORT=8000

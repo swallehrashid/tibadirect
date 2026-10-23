@@ -1,0 +1,8 @@
+{% if audience == "hospital" %}A payment for the bill "{{ alias }}"{% if invoice %} (invoice {{ invoice }}){% endif %} has been sent to your hospital.{% else %}A payment for "{{ alias }}" has reached the hospital.{% endif %}
+
+Payment {{ tranche }}: {{ amount_kes }} (paid as {{ amount_usd }})
+Reference: {{ reference }}
+{% if simulated %}
+Settlement simulated via PayPal Payouts to the hospital's sandbox account. In production a licensed Kenyan partner pays the hospital's paybill or bank account.
+{% endif %}
+Every payment is shown on the case page: {{ case_url }}

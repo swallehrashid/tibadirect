@@ -22,6 +22,7 @@ from app.models.enums import (
     ActorType,
     CaseStatus,
     CloseReason,
+    ConfirmationStatus,
     ConsentActor,
     ConsentScope,
     DonationStatus,
@@ -132,6 +133,8 @@ def transition(
         case.funded_at = None
     if to == S.CLOSED:
         case.closed_at = stamp
+        case.close_reason = close_reason
+    elif to == S.CANCELLED and close_reason is not None:
         case.close_reason = close_reason
     if to == S.FROZEN:
         case.frozen_at = stamp
@@ -350,6 +353,79 @@ def goal_kes_minor(case: Case) -> int | None:
     if case.target_kes_minor is None:
         return None
     return apply_bps(case.target_kes_minor, 10_000 + case.buffer_bps)
+
+
+def lock_case(session: Session, case_id: uuid.UUID) -> Case:
+    """The case row, locked and freshly read.
+
+    Every money path (capture, webhook, settlement, refund) takes this lock first and only then
+    locks donations, settlements or refunds, so no two of them can wait on each other.
+    """
+    return session.execute(
+        select(Case)
+        .where(Case.id == case_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).scalar_one()
+
+
+def has_reached_goal(case: Case) -> bool:
+    """Pledged money covers the confirmed target plus its buffer."""
+    goal = goal_kes_minor(case)
+    return goal is not None and case.pledged_kes_minor >= goal
+
+
+def sync_funding(case: Case, actor: User | ActorType = ActorType.SYSTEM) -> CaseStatus | None:
+    """Keep ``live`` and ``funded`` in step with the money. Returns the new status if it moved.
+
+    A live case whose pledges cover its goal becomes funded and stops taking donations; a funded
+    case whose pledges fall below the goal (a refund, a reversal, or a larger bill) is live again.
+    Call it after anything that changes the pledged total or the target. The caller commits.
+    """
+    reached = has_reached_goal(case)
+    if case.status == CaseStatus.LIVE and reached:
+        transition(case, CaseStatus.FUNDED, actor, "goal_reached")
+        return CaseStatus.FUNDED
+    if case.status == CaseStatus.FUNDED and not reached:
+        transition(case, CaseStatus.LIVE, actor, "below_goal")
+        return CaseStatus.LIVE
+    return None
+
+
+def final_bill_was_lower(case: Case) -> bool:
+    """True if the latest confirmed bill is for less than the first one the hospital confirmed."""
+    confirmed = sorted(
+        (c for c in case.confirmations if c.status == ConfirmationStatus.CONFIRMED),
+        key=lambda c: (c.finalized_at or c.created_at, c.created_at),
+    )
+    if len(confirmed) < 2:
+        return False
+    return (confirmed[-1].amount_kes_minor or 0) < (confirmed[0].amount_kes_minor or 0)
+
+
+def close_if_fully_settled(case: Case, actor: User | ActorType = ActorType.SYSTEM) -> bool:
+    """Close the case once a final bill is confirmed and all of it has reached the hospital.
+
+    Closed with ``final_bill_lower`` if the final bill was below the first estimate, otherwise
+    ``fully_settled``. A tranche still on its way keeps the case open. Returns True if it closed.
+    The caller commits.
+    """
+    if case.status not in (CaseStatus.LIVE, CaseStatus.FUNDED):
+        return False
+    if case.is_estimate or case.target_kes_minor is None:
+        return False
+    if case.settled_kes_minor < case.target_kes_minor:
+        return False
+    if any(
+        s.status in (SettlementStatus.PENDING, SettlementStatus.PROCESSING)
+        for s in case.settlements
+    ):
+        return False
+    reason = (
+        CloseReason.FINAL_BILL_LOWER if final_bill_was_lower(case) else CloseReason.FULLY_SETTLED
+    )
+    transition(case, CaseStatus.CLOSED, actor, reason.value, close_reason=reason)
+    return True
 
 
 def is_accepting_donations(case: Case) -> bool:

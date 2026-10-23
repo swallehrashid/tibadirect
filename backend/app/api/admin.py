@@ -22,15 +22,18 @@ from app.schemas.admin import (
     RetriedJobSchema,
     ReviewItemSchema,
     ReviewQuerySchema,
+    SettlementRunSchema,
 )
 from app.schemas.ledger import ChainVerificationSchema
 from app.security.permissions import current_account, get_case_for_admin_or_404
 from app.services import (
     admin_service,
     audit_service,
+    case_ending_service,
     job_service,
     ledger_service,
     review_service,
+    settlement_service,
 )
 from app.services.audit_service import Target
 
@@ -159,11 +162,41 @@ class FreezeCase(MethodView):
     @blp.response(200, AdminCaseSchema)
     @blp.alt_response(409, description="The case cannot be frozen from its current status")
     def post(self, payload: dict, case_id: uuid.UUID) -> object:
-        """Pause a case: it stops being public and stops taking money at once."""
+        """Pause a case: it stops being public and stops taking money at once, tranches not yet
+        sent are cancelled, and every donor is refunded in full. When the refunds are made the
+        case is cancelled with the reason fraud."""
         case = get_case_for_admin_or_404(case_id)
-        admin_service.freeze(case, current_account(), payload["reason"])
+        ended = admin_service.freeze(db.session, case, current_account(), payload["reason"])
         db.session.commit()
+        case_ending_service.after_commit(ended, frozen=True, case=case)
         return case
+
+
+@blp.route("/cases/<uuid:case_id>/settlements/run")
+class RunSettlements(MethodView):
+    @blp.secured(UserRole.ADMIN)
+    @blp.response(200, SettlementRunSchema)
+    @blp.alt_response(404, description="No such case")
+    def post(self, case_id: uuid.UUID) -> dict:
+        """Check now whether a tranche is due for this case and, if so, create and send it.
+
+        The same check runs after every donation and every 15 minutes; this is for an admin who
+        wants it now. A case with nothing due answers 200 with the reason."""
+        case = get_case_for_admin_or_404(case_id)
+        audit_service.record(
+            "settlement.check_requested", case, actor=current_account(), details={}
+        )
+        db.session.commit()
+        result = settlement_service.run_settlement_check(db.session, case.id)
+        settlement = result.settlement
+        return {
+            "reason": result.reason,
+            "settlement_id": settlement.id if settlement else None,
+            "tranche_no": settlement.tranche_no if settlement else None,
+            "amount_usd_minor": settlement.amount_usd_minor if settlement else None,
+            "amount_kes_minor": settlement.amount_kes_minor if settlement else None,
+            "status": settlement.status.value if settlement else None,
+        }
 
 
 @blp.route("/audit-log")

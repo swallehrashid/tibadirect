@@ -33,14 +33,15 @@ def _waiting_case(documents: int = 1, **fields):  # type: ignore[no-untyped-def]
     return case, docs
 
 
-def test_the_stub_returns_a_neutral_result_for_the_hospital(db_session) -> None:  # type: ignore[no-untyped-def]
+def test_a_bill_whose_file_is_gone_goes_to_the_hospital_with_a_note(db_session) -> None:  # type: ignore[no-untyped-def]
     outcome = pipeline.analyse(CaseDocumentFactory())
     assert outcome.route == TriageRoute.HOSPITAL_CONFIRMATION
-    assert (outcome.risk_score, outcome.risk_band) == (0, RiskBand.LOW)
-    assert outcome.reasons_en == ["Automatic checks pending"]
+    assert (outcome.risk_score, outcome.risk_band) == (10, RiskBand.LOW)
+    assert outcome.reasons_en == ["We could not read all of the bill clearly."]
     assert outcome.reasons_sw
     assert outcome.used_llm is False
-    assert outcome.model_versions == {"pipeline": "stub-v0"}
+    assert outcome.model_versions == {"pipeline": "v1"}
+    assert outcome.signals[0]["code"] == "low_extraction_confidence"
 
 
 def test_a_document_is_triaged_and_the_case_moves_to_the_hospital(db_session) -> None:  # type: ignore[no-untyped-def]

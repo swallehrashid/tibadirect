@@ -5,7 +5,6 @@ from typing import Any
 from sqlalchemy import Select, func, or_, select
 from sqlalchemy.orm import Session
 
-from app.errors import Conflict
 from app.models.case import Case, ReviewItem
 from app.models.enums import (
     CaseStatus,
@@ -18,7 +17,7 @@ from app.models.identity import User
 from app.models.ledger import LedgerEntry
 from app.models.platform import AuditLog
 from app.models.verification import Confirmation
-from app.services import case_service
+from app.services import case_ending_service
 
 MAX_QUERY_LENGTH = 80
 TRAIL_ENTRIES_SHOWN = 100
@@ -125,16 +124,12 @@ def stats(session: Session) -> dict[str, Any]:
     }
 
 
-def freeze(case: Case, admin: User, reason: str) -> Case:
-    """Pause a case the admin suspects. The caller commits.
+def freeze(session: Session, case: Case, admin: User, reason: str) -> case_ending_service.Ended:
+    """Pause a case the admin suspects and start paying the donors back. The caller commits and
+    then calls ``case_ending_service.after_commit(result, frozen=True, case=case)``.
 
-    The case stops being public and stops taking money at once and its trust level drops. The
-    move is audited by ``transition`` (actor, from and to); the reason is kept on the case. Paying
-    the donors back and cancelling pending settlements are wired in with the payments work; until
-    then a frozen case waits for an admin to cancel it.
+    The case stops being public and stops taking money at once and its trust level drops;
+    unsent tranches are cancelled and every donor's leftover is refunded, whatever they chose.
+    The move is audited by ``transition`` (actor, from and to); the reason is kept on the case.
     """
-    cleaned = " ".join(reason.split())
-    if case.status == CaseStatus.FROZEN:
-        raise Conflict("This case is already frozen.", code="case_already_frozen")
-    case_service.transition(case, CaseStatus.FROZEN, admin, cleaned)
-    return case
+    return case_ending_service.freeze_case(session, case, admin, reason)

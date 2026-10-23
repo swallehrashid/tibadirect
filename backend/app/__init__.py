@@ -43,24 +43,32 @@ def create_app(config_name: str | None = None) -> Flask:
 
 def _register_blueprints() -> None:
     from app.api.admin import blp as admin_blp
+    from app.api.agent import blp as agent_blp
     from app.api.auth import blp as auth_blp
     from app.api.cases import blp as cases_blp
+    from app.api.checker import blp as checker_blp
     from app.api.consents import blp as consents_blp
     from app.api.documents import blp as documents_blp
+    from app.api.donations import blp as donations_blp
     from app.api.health import blp as health_blp
     from app.api.hospital_portal import blp as hospital_portal_blp
     from app.api.hospitals import blp as hospitals_blp
     from app.api.public import blp as public_blp
+    from app.api.webhooks import blp as webhooks_blp
 
     for blueprint in (
         health_blp,
         auth_blp,
         public_blp,
+        checker_blp,
         admin_blp,
+        agent_blp,
         hospitals_blp,
         consents_blp,
         cases_blp,
         documents_blp,
+        donations_blp,
         hospital_portal_blp,
+        webhooks_blp,
     ):
         extensions.api.register_blueprint(blueprint)

@@ -12,8 +12,8 @@ from app.models.ledger import GENESIS_HASH
 from app.pagination import PaginationArgsSchema, page_of, paginate
 from app.schemas.cases import PublicCaseSchema, PublicCasesQuerySchema
 from app.schemas.ledger import CaseVerificationSchema, PublicLedgerRowSchema
-from app.schemas.public import PublicConfigSchema, PublicStatsSchema
-from app.services import case_service, ledger_service
+from app.schemas.public import PublicConfigSchema, PublicFxSchema, PublicStatsSchema
+from app.services import case_service, fx_service, ledger_service
 
 blp = TibaBlueprint(
     "public", __name__, url_prefix="/api/public", description="Public pages and data"
@@ -38,6 +38,26 @@ class PublicConfig(MethodView):
                 "agent": config["AGENT_ENABLED"],
                 "appeal_checker": config["APPEAL_CHECKER_ENABLED"],
             },
+        }
+
+
+@blp.route("/fx")
+class PublicFx(MethodView):
+    decorators = [limiter.limit(PUBLIC_READ_LIMIT, scope="public_fx")]
+
+    @blp.response(200, PublicFxSchema)
+    def get(self) -> dict:
+        """The latest USD to KES rate. KES amounts on donation receipts use the rate at the time
+        of the payment, so this is a guide for choosing an amount, not a quote."""
+        view = fx_service.current_rate(db.session)
+        return {
+            "base": fx_service.BASE,
+            "quote": fx_service.QUOTE,
+            "rate": f"{view.rate:.8f}",
+            "source": view.source,
+            "fetched_at": view.fetched_at,
+            "is_live": view.is_live,
+            "is_stale": view.is_stale(),
         }
 
 

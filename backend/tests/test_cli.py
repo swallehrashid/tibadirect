@@ -126,3 +126,102 @@ def test_synthetic_validate_reports_failing_checks(app: Flask, monkeypatch) -> N
     result = app.test_cli_runner().invoke(args=["synthetic", "validate"])
     assert result.exit_code != 0
     assert "failing checks" in result.output
+
+
+def test_fx_refresh_stores_and_reports_a_rate(migrated_scratch_app: Flask) -> None:
+    from app.cli.fx import fx_group
+
+    result = migrated_scratch_app.test_cli_runner().invoke(fx_group, ["refresh"])
+
+    assert result.exit_code == 0, result.output
+    assert "USD/KES 129.00000000 from static." in result.output
+    assert _count(migrated_scratch_app, "fx_rates") == 1
+
+
+def test_paypal_order_and_capture_commands_walk_a_donation_through(
+    migrated_scratch_app: Flask,
+) -> None:
+    from app.cli.paypal import paypal_group
+
+    runner = migrated_scratch_app.test_cli_runner()
+    runner.invoke(seed_command)
+
+    ordered = runner.invoke(paypal_group, ["order", "demolive2345", "25"])
+    assert ordered.exit_code == 0, ordered.output
+    order_id = re.search(r"Order (\S+) for \$25\.00", ordered.output).group(1)
+    assert "checkoutnow?token=" in ordered.output
+
+    captured = runner.invoke(paypal_group, ["capture", order_id])
+    assert captured.exit_code == 0, captured.output
+    assert "$25.00 gross, $1.03 fee, $23.97 net" in captured.output
+    assert "Receipt token:" in captured.output
+
+
+def test_paypal_commands_explain_why_they_refuse(migrated_scratch_app: Flask) -> None:
+    from app.cli.paypal import paypal_group
+
+    runner = migrated_scratch_app.test_cli_runner()
+    runner.invoke(seed_command)
+
+    unknown = runner.invoke(paypal_group, ["order", "nosuchcase01", "25"])
+    assert unknown.exit_code != 0
+    assert "Case not found" in unknown.output
+    bad_amount = runner.invoke(paypal_group, ["order", "demolive2345", "lots"])
+    assert bad_amount.exit_code != 0
+    missing = runner.invoke(paypal_group, ["capture", "NOSUCHORDER"])
+    assert missing.exit_code != 0
+    assert "donation_not_found" in missing.output
+
+
+def _a_confirmation_at_a_hospital_with_credentials(app: Flask) -> str:
+    """The newest seeded confirmation, with its hospital given PayPal credentials."""
+    from app.models.verification import Confirmation
+
+    with app.app_context():
+        confirmation = (
+            db.session.execute(db.select(Confirmation).order_by(Confirmation.created_at))
+            .scalars()
+            .first()
+        )
+        assert confirmation is not None, "the seed holds no confirmation"
+        code = confirmation.hospital.register_entry.register_code
+        app.config["HOSPITAL_PAYPAL_CREDENTIALS"] = {code: {"client_id": "i", "client_secret": "s"}}
+        return str(confirmation.id)
+
+
+def test_the_invoice_command_issues_the_invoice_and_the_status_command_reads_it(
+    migrated_scratch_app: Flask,
+) -> None:
+    from app.cli.paypal import paypal_group
+
+    runner = migrated_scratch_app.test_cli_runner()
+    runner.invoke(seed_command)
+    confirmation_id = _a_confirmation_at_a_hospital_with_credentials(migrated_scratch_app)
+
+    issued = runner.invoke(paypal_group, ["invoice", confirmation_id])
+    assert issued.exit_code == 0, issued.output
+    assert "Invoice: issued. Status: SENT." in issued.output
+    assert "PayPal invoice ID: INV2-" in issued.output
+
+    status = runner.invoke(paypal_group, ["invoice-status", confirmation_id])
+    assert status.exit_code == 0, status.output
+    assert "Status: SENT" in status.output
+
+
+def test_the_invoice_commands_explain_why_they_refuse(migrated_scratch_app: Flask) -> None:
+    from app.cli.paypal import paypal_group
+
+    runner = migrated_scratch_app.test_cli_runner()
+    runner.invoke(seed_command)
+
+    assert "not a confirmation ID" in runner.invoke(paypal_group, ["invoice", "nope"]).output
+    unknown = runner.invoke(
+        paypal_group, ["invoice-status", "00000000-0000-0000-0000-000000000000"]
+    )
+    assert unknown.exit_code != 0
+    assert "No such confirmation" in unknown.output
+    # a hospital with no credentials is told so, not given an invoice
+    confirmation_id = _a_confirmation_at_a_hospital_with_credentials(migrated_scratch_app)
+    migrated_scratch_app.config["HOSPITAL_PAYPAL_CREDENTIALS"] = {}
+    result = runner.invoke(paypal_group, ["invoice", confirmation_id])
+    assert "Invoice: not_configured." in result.output

@@ -72,6 +72,16 @@ class ConfirmationSchema(ma.Schema):
         lambda c: c.second_approver.user.display_name if c.second_approver else None
     )
     query_note = ma.fields.String(allow_none=True)
+    paypal_invoice_id = ma.fields.String(
+        allow_none=True, metadata={"description": "The PayPal invoice issued for this bill, if any"}
+    )
+    invoice_status = ma.fields.String(
+        allow_none=True,
+        metadata={
+            "description": "PayPal's status for that invoice: DRAFT, SENT, PARTIALLY_PAID, PAID, "
+            "CANCELLED, or FAILED if it could not be issued"
+        },
+    )
     created_at = ma.fields.DateTime()
     finalized_at = ma.fields.DateTime(allow_none=True)
 
@@ -88,6 +98,9 @@ class QueueCaseSchema(ma.Schema):
     submitted_at = ma.fields.DateTime(allow_none=True)
     risk_band = ma.fields.String(allow_none=True)
     bills = ma.fields.Integer()
+    kind = ma.fields.String(
+        metadata={"description": "first_bill, or final_bill for a live case's final bill"}
+    )
 
 
 class QueueSchema(ma.Schema):

@@ -59,7 +59,14 @@ def test_the_blueprint_wires_the_database_and_the_queue_store_to_both_services()
 
 def test_no_secret_value_is_written_into_the_blueprint() -> None:
     text = (ROOT / "render.yaml").read_text()
-    for name in ("S3_SECRET_ACCESS_KEY", "SMTP_PASSWORD", "PAYPAL_CLIENT_SECRET", "LLM_API_KEY"):
+    secrets = (
+        "S3_SECRET_ACCESS_KEY",
+        "SMTP_PASSWORD",
+        "PAYPAL_CLIENT_SECRET",
+        "HOSPITAL_PAYPAL_CREDENTIALS",
+        "LLM_API_KEY",
+    )
+    for name in secrets:
         assert re.search(rf"key: {name}\n\s+sync: false", text), name
 
 
@@ -110,3 +117,16 @@ def test_the_example_settings_cover_the_new_ports() -> None:
     example = (ROOT / ".env.example").read_text()
     for name in ("API_HOST_PORT", "PROXY_FIX_COUNT", "JOBS_ASYNC", "MAIL_BACKEND"):
         assert re.search(rf"^{name}=", example, re.MULTILINE), name
+
+
+def test_invoicing_settings_reach_both_services_and_the_agent_stays_off_by_default() -> None:
+    web, worker = _load("render.yaml")["services"][:2]
+    for service in (
+        web,
+        worker,
+    ):  # the invoice jobs run in the worker, the portal in the web service
+        keys = {v["key"]: v for v in service["envVars"] if "key" in v}
+        assert keys["PAYPAL_COLLECTOR_EMAIL"] == {"key": "PAYPAL_COLLECTOR_EMAIL", "sync": False}
+        assert keys["HOSPITAL_PAYPAL_CREDENTIALS"]["sync"] is False
+    web_keys = {v["key"]: v for v in web["envVars"] if "key" in v}
+    assert web_keys["AGENT_ENABLED"]["value"] == "false"

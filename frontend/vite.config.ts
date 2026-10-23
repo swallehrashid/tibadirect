@@ -16,7 +16,8 @@ export default defineConfig({
     port: 5173,
     proxy: { "/api": { target: apiTarget, changeOrigin: false } },
   },
-  build: { sourcemap: false, target: "es2022" },
+  // The only chunk over the default 500 kB warning is AG Grid, which loads on its own, after the page is usable.
+  build: { sourcemap: false, target: "es2022", chunkSizeWarningLimit: 1300 },
   test: {
     environment: "jsdom",
     globals: true,

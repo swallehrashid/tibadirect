@@ -1,10 +1,17 @@
 # syntax=docker/dockerfile:1
 # One image runs the web service, the worker and the scheduler; only the command differs.
 
-# Stage 1: the web app. Until Phase 4 builds the real one, this carries a placeholder page.
-# Phase 4 replaces this stage with a node:20-alpine build that leaves its result in /dist.
-FROM scratch AS frontend
-COPY backend/app/static/placeholder/ /dist/
+# Stage 1: the web app. `npm ci` installs exactly what package-lock.json says; the build type-checks first.
+# Only this stage needs Node: the final image carries the built files and no JavaScript toolchain.
+FROM node:20-alpine AS frontend
+WORKDIR /web
+# A slow or dropped connection should be retried, not fail the whole image build.
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_FETCH_RETRIES=6 NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=10000 NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 NPM_CONFIG_FETCH_TIMEOUT=180000
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
 
 # Stage 2: the API, with the system tools the bill checks need.
 FROM python:3.12-slim AS runtime
@@ -26,7 +33,7 @@ RUN pip install -r backend/requirements.txt
 COPY backend/ backend/
 COPY data/lexicons/ data/lexicons/
 COPY data/synthetic/ data/synthetic/
-COPY --from=frontend /dist/ frontend/dist/
+COPY --from=frontend /web/dist/ frontend/dist/
 
 # The appeal checker's trained model is not kept in git; training it takes seconds and needs no database.
 RUN cd backend && SYNTHETIC_DATA_DIR=/app/data/synthetic LEXICON_DIR=/app/data/lexicons \

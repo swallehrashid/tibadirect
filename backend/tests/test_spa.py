@@ -109,7 +109,9 @@ def test_without_the_switch_nothing_is_served(dist: Path) -> None:
     assert _app(dist, serve=False).test_client().get("/").status_code == 404
 
 
-def test_with_no_build_the_placeholder_stands_in() -> None:
+def test_with_no_build_the_placeholder_stands_in(monkeypatch: pytest.MonkeyPatch) -> None:
+    # A developer may have built the frontend; the default location must look empty for this test.
+    monkeypatch.setattr("app.spa.DEFAULT_DIST_DIR", Path("/definitely/not/here/dist"))
     for configured in (None, Path("/definitely/not/here")):
         directory = dist_dir(str(configured) if configured else None)
         assert directory == PLACEHOLDER_DIR

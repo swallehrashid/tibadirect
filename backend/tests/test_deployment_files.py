@@ -89,7 +89,15 @@ def test_the_dockerfile_builds_a_non_root_image_that_migrates_then_serves() -> N
     assert "db upgrade" in text
     assert "gunicorn wsgi:app --workers 2 --threads 4" in text
     assert "--bind 0.0.0.0:${PORT}" in text
-    assert "COPY --from=frontend /dist/ frontend/dist/" in text
+    # The web app is built from the lockfile in its own stage; only the built files are copied in.
+    assert "FROM node:20-alpine AS frontend" in text
+    assert re.search(r"^RUN npm ci$", text, re.MULTILINE)
+    assert re.search(r"^RUN npm run build$", text, re.MULTILINE)
+    assert "COPY --from=frontend /web/dist/ frontend/dist/" in text
+    runtime = text.split("AS runtime", 1)[1]
+    assert "node" not in runtime.lower().replace(
+        "nodes", ""
+    )  # no JavaScript toolchain in the final image
 
 
 def test_the_build_context_excludes_secrets_and_tests_but_keeps_the_consent_wording() -> None:

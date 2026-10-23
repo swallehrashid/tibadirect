@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toaster";
 
 /** Copy the link, send it on WhatsApp, or use the phone's own share sheet when there is one. */
-export function ShareButtons({ title }: { title: string }) {
+export function ShareButtons({ title, url: given }: { title: string; url?: string }) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
-  const url = window.location.href.split("#")[0] ?? window.location.href;
+  const url = given ?? window.location.href.split("#")[0] ?? window.location.href;
   const text = `${title} ${url}`;
   const canShare = typeof navigator.share === "function";
 

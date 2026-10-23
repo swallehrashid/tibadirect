@@ -20,7 +20,9 @@
     "required": "Required",
     "optional": "Optional",
     "remove": "Remove",
-    "sandbox": "Sandbox"
+    "sandbox": "Sandbox",
+    "yes": "Yes",
+    "no": "No"
   },
   "trust": {
     "hospital_confirmed": {
@@ -559,6 +561,242 @@
     "notFound": {
       "title": "We could not find that receipt",
       "body": "Check the link in your email, or the one you saved."
+    }
+  },
+  "timeline": {
+    "draft": "Draft started",
+    "pending_triage": "Bill checked",
+    "in_review": "Looked at by our team",
+    "pending_confirmation": "Waiting for the hospital",
+    "live": "Live on TibaDirect",
+    "funded": "Fully funded",
+    "closed": "Closed",
+    "cancelled": "Cancelled",
+    "frozen": "Paused for a check"
+  },
+  "family": {
+    "title": "My campaigns",
+    "empty": {
+      "title": "You have not started a campaign yet",
+      "body": "It takes about five minutes. You will need the hospital bill and the patient or admission number from it."
+    },
+    "continue": "Continue your campaign",
+    "open": "Open",
+    "raised": "{{pledged}} pledged of {{target}}",
+    "next": {
+      "draft": "Finish your campaign and send it for checking",
+      "pending_triage": "We are checking your bill. This usually takes a minute.",
+      "in_review": "A person on our team is looking at your case.",
+      "pending_confirmation": "Waiting for the hospital to confirm your bill.",
+      "live": "Live. Share your page so people can give.",
+      "liveSettling": "Live. Money has been pledged and is being paid to the hospital.",
+      "funded": "Fully funded. The hospital is being paid.",
+      "closed": "Closed. Thank you for sharing your story.",
+      "cancelled": "This campaign has ended.",
+      "frozen": "Paused while we check something. Donors are being refunded."
+    },
+    "frozenNote": "Your page is paused while we check something. Donors who gave are being refunded. If you think this is a mistake, ask for a review below.",
+    "share": {
+      "title": "Your public page",
+      "view": "View your page"
+    },
+    "timeline": {
+      "title": "Where your case is"
+    },
+    "money": {
+      "title": "Money so far",
+      "donors": "Donors",
+      "received": "Received after PayPal fees",
+      "refunded": "Refunded",
+      "note": "Money is paid to the hospital, never to you. You will see it move here as it is paid."
+    },
+    "triage": {
+      "title": "What our checks found",
+      "note": "These are things our checks noticed, not a verdict. A person always decides, and you can ask for a review.",
+      "route": {
+        "hospital_confirmation": "Sent to the hospital's billing office to confirm.",
+        "manual_review": "A person on our team is reviewing it."
+      },
+      "noReasons": "Nothing unusual was found.",
+      "notYet": "The checks have not finished yet.",
+      "notYetDraft": "The checks run after you send your campaign."
+    },
+    "review": {
+      "button": "Ask for a review",
+      "title": "Ask a person to look at your case",
+      "intro": "Tell us what you would like us to look at. Do not include medical details.",
+      "label": "Your message",
+      "hint": "{{count}} of at least 10 characters",
+      "send": "Send request",
+      "sent": "We have your request.",
+      "already": "You already asked for a review. We will look at it soon.",
+      "notNow": "A review can be asked for after a case is sent, and until it ends.",
+      "length": "Please write between 10 and 500 characters."
+    },
+    "confirmations": {
+      "title": "What the hospital said",
+      "status": {
+        "confirmed": "Confirmed",
+        "awaiting_second_approval": "Waiting for a second person at the hospital",
+        "queried": "The hospital has a question",
+        "rejected": "The hospital did not confirm"
+      },
+      "final": "Final bill",
+      "invoice": "Invoice {{number}}",
+      "note": "The hospital says:"
+    },
+    "finalBill": {
+      "title": "Upload the final bill",
+      "intro": "When treatment ends, upload the hospital's final bill. The hospital confirms it, we pay what is still due, and the case closes.",
+      "file": "Final bill",
+      "upload": "Send final bill",
+      "sent": "Your final bill is being checked and sent to the hospital."
+    },
+    "consents": {
+      "title": "Your consents",
+      "intro": "You can take back a consent at any time. Here is what each one changes.",
+      "none": "No active consents.",
+      "withdrawTitle": "Withdraw: {{name}}?",
+      "consequence": {
+        "hospital_verification": "The hospital check is already done for this bill, so withdrawing it will not undo that.",
+        "hospital_verification_unconfirmed": "The hospital has not confirmed your bill yet. If you withdraw this, your campaign ends.",
+        "public_page": "Your page is hidden straight away and people can no longer give.",
+        "ai_processing_abroad": "Automatic checks will use only the version that runs in Kenya from now on.",
+        "receipt_sharing": "We will stop sharing donation receipts with you."
+      }
+    },
+    "end": {
+      "title": "End this campaign",
+      "intro": "If treatment has been cancelled or is no longer needed, you can end the campaign. Donations stop straight away.",
+      "button": "End campaign",
+      "confirm": "End this campaign?",
+      "warning": "Donations stop at once. Money the case no longer needs goes back to donors or on, as each donor chose. This cannot be undone.",
+      "why": "Why is it ending?",
+      "reasons": {
+        "treatment_cancelled": "Treatment was cancelled",
+        "patient_deceased": "The patient has died",
+        "other": "Another reason"
+      },
+      "conflict": "This campaign cannot be ended from where it is.",
+      "ended": "Your campaign has ended.",
+      "deleteTitle": "Delete this draft",
+      "deleteIntro": "This draft was never sent. Deleting it removes it for good.",
+      "deleteButton": "Delete draft",
+      "deleteConfirm": "Delete this draft?",
+      "deleteWarning": "The draft and its uploaded bills will be removed.",
+      "deleted": "Draft deleted."
+    },
+    "dashboard": {
+      "title": "Campaign",
+      "notFound": {
+        "title": "We could not find that campaign",
+        "body": "It may belong to another account, or the link may be wrong."
+      }
+    }
+  },
+  "wizard": {
+    "title": "Start a campaign",
+    "subtitle": "Five short steps. Your progress is saved, so you can stop and come back.",
+    "steps": {
+      "hospital": "Hospital and patient",
+      "consent": "Consent",
+      "bill": "The bill",
+      "page": "Your page",
+      "review": "Review"
+    },
+    "hospital": {
+      "title": "Which hospital issued the bill?",
+      "intro": "Choose the hospital. We will ask its billing office to confirm the bill.",
+      "search": "Search hospitals",
+      "searchPlaceholder": "Hospital name or county",
+      "results_one": "{{count}} hospital shown",
+      "results_other": "{{count}} hospitals shown",
+      "none": "No hospital matches that. Try a different name or county.",
+      "label": "Hospital",
+      "locked": "The hospital cannot be changed once the draft is started. To pick another, delete this draft and start again.",
+      "alias": "Name for your page",
+      "aliasHint": "Use a first name or nickname, not the patient's full name, and no illness words.",
+      "aliasPreview": "On the page it will read: {{alias}} · {{region}}",
+      "region": "County or town",
+      "patientReference": "Patient or admission number from the bill",
+      "patientReferenceHint": "Only you and the hospital can see this. It is never shown on the public page.",
+      "minor": "The patient is a child",
+      "minorHint": "A parent or legal guardian must give consent for a child."
+    },
+    "errors": {
+      "hospital": "Choose a hospital from the list.",
+      "aliasLength": "Use between 2 and 40 characters.",
+      "aliasPersonal": "Do not put an email address or phone number in the name.",
+      "aliasMedical": "Please leave out illness words from the name.",
+      "region": "Enter a county or town, 2 to 40 letters.",
+      "patientReference": "Enter the admission or patient number from the bill (3 to 60 characters).",
+      "storyLength": "Use at most 600 characters.",
+      "storyPersonal": "Do not put an email address, phone number or long number in the story.",
+      "storyMedical": "Please leave out medical words. The hospital bill already shows the care given.",
+      "storyGeneric": "We could not save your story. Please try again."
+    },
+    "consent": {
+      "title": "What you agree to",
+      "intro": "Read each one. The first two are needed to send your campaign. The others are your choice.",
+      "guardianConfirm": "I am this child's parent or legal guardian.",
+      "locked": "You can take this back later from your campaign page.",
+      "requiredNote": "Tick the two required consents to continue.",
+      "outdated": "The wording changed. Please read it again and confirm.",
+      "guardianNeeded": "For a child, a parent or legal guardian must give consent."
+    },
+    "bill": {
+      "title": "Upload the hospital bill",
+      "intro": "A photo or PDF of the bill. We read the amount and remove medical details before anything is stored for checking.",
+      "synthetic": "For this demo, use a made-up bill only. Never upload a real patient's bill.",
+      "uploaded": "Bills uploaded",
+      "kind": "What kind of bill is it?",
+      "kinds": {
+        "invoice": {
+          "label": "An invoice",
+          "body": "The hospital is asking for payment for care already given."
+        },
+        "estimate": {
+          "label": "An estimate",
+          "body": "A quote for care that is planned but not given yet."
+        }
+      },
+      "file": "Bill file",
+      "upload": "Upload this bill",
+      "uploading": "Uploading…",
+      "uploadFailed": "We could not upload that file. Please try again.",
+      "needOne": "Upload at least one bill to continue.",
+      "received": "Received",
+      "removeNamed": "Remove {{kind}}"
+    },
+    "page": {
+      "title": "Your public page",
+      "intro": "This is what donors will read. Write about your family, not the illness.",
+      "story": "Your story (optional)",
+      "storyHelp": "No diagnosis, phone numbers or emails.",
+      "counter": "{{count}} of {{max}} characters",
+      "flagged": "Words to leave out:",
+      "checking": "Checking…",
+      "saved": "Saved. No medical words found.",
+      "photo": "Show a photo",
+      "photoOff": "Photos are switched off in this demo.",
+      "preview": "How your page will look in the list",
+      "previewNote": "The bill amount and the hospital badge appear after the hospital confirms."
+    },
+    "review": {
+      "title": "Check and send",
+      "intro": "Look this over. When you send it, we check the bill and then ask the hospital to confirm it.",
+      "pageName": "Page name",
+      "bills": "Bills",
+      "billCount_one": "{{count}} bill uploaded",
+      "billCount_other": "{{count}} bills uploaded",
+      "story": "Story",
+      "consents": "Consents",
+      "given": "given",
+      "notGiven": "not given",
+      "whatNext": "After you send: we check the bill (usually a minute), then the hospital's billing office confirms it with a code sent to its official email. You can follow each step on your campaign page.",
+      "missing": "Both required consents and at least one bill are needed before you can send.",
+      "submit": "Send for checking",
+      "sent": "Sent. We are checking your bill."
     }
   }
 }

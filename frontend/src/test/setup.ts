@@ -15,6 +15,13 @@ Element.prototype.setPointerCapture ??= () => undefined;
 Element.prototype.releasePointerCapture ??= () => undefined;
 Element.prototype.scrollIntoView ??= () => undefined;
 
+// Radix measures form controls with ResizeObserver.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 afterEach(() => {
   cleanup();
 });

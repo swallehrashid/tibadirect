@@ -3,7 +3,17 @@ export { forgetCsrfToken } from "./csrf";
 export { ApiError, isApiError } from "./errors";
 export type { components, paths } from "./schema";
 export type {
+  CaseDocument,
   CaseVerification,
+  Consent,
+  ConsentText,
+  ConfirmationSummary,
+  FamilyCase,
+  FamilyCaseListItem,
+  MoneySummary,
+  TimelineEntry,
+  TriageStatus,
+  TriageSummary,
   HospitalListItem,
   HospitalSummary,
   LedgerEntryType,

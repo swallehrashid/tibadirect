@@ -1,4 +1,4 @@
-import type { CaseStatus, ExcessChoice, TrustLevel, UserRole } from "./enums";
+import type { CaseStatus, ConsentScope, ExcessChoice, RiskBandValue, TrustLevel, UserRole } from "./enums";
 import type { components } from "./schema";
 
 type Schemas = components["schemas"];
@@ -63,3 +63,83 @@ export type Receipt = Model<
   }
 >;
 export type OrderCreated = Model<Schemas["OrderCreated"]>;
+
+/** The money figures of a case, as the family and admin views carry them (minor units, plus formatted strings). */
+export interface MoneySummary {
+  target_kes_minor: number | null;
+  target_kes: string | null;
+  is_estimate: boolean;
+  usd_goal_minor: number | null;
+  usd_goal: string | null;
+  pledged_kes_minor: number;
+  pledged_kes: string;
+  settled_kes_minor: number;
+  settled_kes: string;
+  captured_net_usd_minor: number;
+  captured_net_usd: string;
+  refunded_usd_minor: number;
+  refunded_usd: string;
+  donor_count: number;
+}
+
+export interface TimelineEntry {
+  status: CaseStatus;
+  at: string;
+}
+
+export type ConfirmationStatus = "awaiting_second_approval" | "confirmed" | "queried" | "rejected";
+
+export interface ConfirmationSummary {
+  status: ConfirmationStatus;
+  amount_kes_minor: number | null;
+  invoice_number: string | null;
+  is_final_bill: boolean;
+  query_note: string | null;
+  created_at: string;
+  finalized_at: string | null;
+}
+
+export interface TriageSummary {
+  risk_band: RiskBandValue;
+  route: "hospital_confirmation" | "manual_review";
+  reasons_en: string[];
+  reasons_sw: string[];
+  created_at: string;
+}
+
+export type HospitalName = Model<Schemas["HospitalName"]>;
+
+export type FamilyCaseListItem = Model<
+  Schemas["FamilyCaseListItem"],
+  { status: CaseStatus; trust_level: TrustLevel; money: MoneySummary }
+>;
+
+export type FamilyCase = Model<
+  Schemas["FamilyCase"],
+  {
+    status: CaseStatus;
+    trust_level: TrustLevel;
+    money: MoneySummary;
+    consents: ConsentScope[];
+    timeline: TimelineEntry[];
+    triage: TriageSummary | null;
+    confirmations: ConfirmationSummary[];
+    is_accepting_donations: boolean;
+    story: string | null;
+    submitted_at: string | null;
+    live_at: string | null;
+    closed_at: string | null;
+  }
+>;
+
+export type DocumentKind = "invoice" | "estimate" | "final_bill" | "photo";
+export type DocumentStatus = "uploaded" | "processing" | "triaged" | "failed";
+
+export type CaseDocument = Model<
+  Schemas["Document"],
+  { kind: DocumentKind; status: DocumentStatus; raw_available: boolean; preview_url: string | null; page_count: number | null }
+>;
+
+export type ConsentText = Model<Schemas["ConsentText"], { scope: ConsentScope; language: "en" | "sw" }>;
+export type Consent = Model<Schemas["Consent"], { scope: ConsentScope; actor: "self" | "guardian"; withdrawn_at: string | null }>;
+export type TriageStatus = Model<Schemas["TriageStatus"], { risk_band: RiskBandValue | null; route: "hospital_confirmation" | "manual_review" | null; checked_at: string | null }>;

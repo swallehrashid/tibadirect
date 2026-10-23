@@ -17,14 +17,15 @@ describe("role routing", () => {
   it("shows a family member their own area", async () => {
     mockApi({ "GET /api/auth/me": familyUser });
     renderApp("/app");
-    expect(await screen.findByRole("heading", { name: "Welcome, Demo Family 1" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Start a campaign" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "My campaigns" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Start a campaign" }).length).toBeGreaterThan(0);
+    expect(screen.getByText("Welcome, Demo Family 1")).toBeInTheDocument();
   });
 
   it("sends someone to their own area when they open another role's", async () => {
     mockApi({ "GET /api/auth/me": familyUser });
     const { router } = renderApp("/admin");
-    expect(await screen.findByRole("heading", { name: /Welcome/ })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "My campaigns" })).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.pathname).toBe("/app"));
   });
 
@@ -48,7 +49,7 @@ describe("role routing", () => {
   it("signs out: tells the API, then shows the public site", async () => {
     const api = mockApi({ "GET /api/auth/me": familyUser, "POST /api/auth/logout": { status: 204 } });
     const { router } = renderApp("/app");
-    await screen.findByRole("heading", { name: /Welcome/ });
+    await screen.findByRole("heading", { name: "My campaigns" });
     const { default: userEvent } = await import("@testing-library/user-event");
     await userEvent.click(screen.getByRole("button", { name: "Account menu" }));
     await userEvent.click(await screen.findByRole("menuitem", { name: /Sign out/ }));

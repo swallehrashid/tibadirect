@@ -33,7 +33,7 @@ describe("email code sign-in", () => {
     await userEvent.click(screen.getAllByRole("textbox")[0]!);
     await userEvent.keyboard("482913");
 
-    expect(await screen.findByRole("heading", { name: "Welcome, Demo Family 1" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "My campaigns" })).toBeInTheDocument();
     expect(api.called("POST", "/api/auth/verify")).toHaveLength(1);
     expect(api.called("POST", "/api/auth/verify")[0]?.body).toEqual({ email: "family1@example.test", code: "482913" });
     await waitFor(() => expect(router.state.location.pathname).toBe("/app"));
@@ -50,7 +50,7 @@ describe("email code sign-in", () => {
     await enterEmail("family1@example.test");
     await userEvent.click((await screen.findAllByRole("textbox"))[0]!);
     await userEvent.keyboard("482913");
-    await screen.findByRole("heading", { name: /Welcome/ });
+    await screen.findByRole("heading", { name: "My campaigns" });
     await waitFor(() => expect(router.state.location.pathname).toBe("/app"));
     const before = api.called("GET", "/api/auth/csrf").length;
     // Focus moves to the page content just after a navigation, which closes a menu opened in that instant; retry the click.
@@ -76,7 +76,7 @@ describe("email code sign-in", () => {
     await enterEmail("family1@example.test");
     await userEvent.click((await screen.findAllByRole("textbox"))[0]!);
     await userEvent.keyboard("111111");
-    await screen.findByRole("heading", { name: /Welcome/ });
+    await screen.findByRole("heading", { name: "My campaigns" });
     await waitFor(() => expect(router.state.location.pathname).toBe("/app"));
   });
 
@@ -123,7 +123,7 @@ describe("email code sign-in", () => {
   it("lets a signed-in person skip the sign-in page", async () => {
     mockApi({ "GET /api/auth/me": familyUser });
     const { router } = renderApp("/login");
-    await screen.findByRole("heading", { name: /Welcome/ });
+    await screen.findByRole("heading", { name: "My campaigns" });
     await waitFor(() => expect(router.state.location.pathname).toBe("/app"));
   });
 });

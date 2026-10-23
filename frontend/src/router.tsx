@@ -29,7 +29,16 @@ export const routes = [
       },
       {
         element: <RequireRole area="family" />,
-        children: [{ element: <AppShell area="family" />, children: [{ path: "/app", element: <AreaHome area="family" /> }] }],
+        children: [
+          {
+            element: <AppShell area="family" />,
+            children: [
+              { path: "/app", lazy: () => import("@/pages/family/FamilyHome") },
+              { path: "/app/new", lazy: () => import("@/pages/family/NewCase") },
+              { path: "/app/cases/:id", lazy: () => import("@/pages/family/CaseDashboard") },
+            ],
+          },
+        ],
       },
       {
         element: <RequireRole area="hospital_staff" />,

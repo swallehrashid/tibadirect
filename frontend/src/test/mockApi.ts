@@ -39,6 +39,7 @@ export function mockApi(handlers: Record<string, Handler | Reply> = {}) {
   const table: Record<string, Handler | Reply> = {
     "GET /api/auth/csrf": { csrf_token: "test-token" },
     "GET /api/public/config": DEFAULT_CONFIG,
+    "GET /api/cases": { items: [], page: 1, page_size: 50, total: 0 },
     ...handlers,
   };
   const fetchMock = vi.fn(async (input: Request | string, init?: RequestInit) => {
@@ -46,8 +47,20 @@ export function mockApi(handlers: Record<string, Handler | Reply> = {}) {
     const url = new URL(request.url);
     let body: unknown = null;
     if (request.method !== "GET") {
-      const text = await request.clone().text();
-      body = text ? JSON.parse(text) : null;
+      if ((request.headers.get("content-type") ?? "").includes("multipart/form-data")) {
+        // Uploads: record the form fields, and the file by name and type. (The body is read as text and split by
+        // hand: the platform's own parser refuses jsdom's File objects.)
+        const text = await request.clone().text();
+        const fields: Record<string, unknown> = {};
+        for (const part of text.matchAll(/Content-Disposition: form-data; name="([^"]+)"(?:; filename="([^"]*)")?\r\n(?:Content-Type: ([^\r\n]*)\r\n)?\r\n([\s\S]*?)\r\n--/gi)) {
+          const [, name, filename, type, value] = part;
+          fields[name!] = filename === undefined ? value : { file: filename, type, size: value!.length };
+        }
+        body = fields;
+      } else {
+        const text = await request.clone().text();
+        body = text ? JSON.parse(text) : null;
+      }
     }
     const call: RecordedCall = { method: request.method, path: url.pathname, body, csrf: request.headers.get("X-CSRFToken") };
     calls.push(call);

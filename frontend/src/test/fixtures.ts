@@ -239,3 +239,78 @@ export function hospitalCase(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
+
+// --- Admin console ----------------------------------------------------------------------------
+
+export const ADMIN = { id: "22222222-2222-4222-8222-222222222222", email: "admin@tibadirect.test", display_name: "Demo Admin", role: "admin", preferred_language: "en", hospital: null };
+export const ADMIN_CASE_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+export const APATH = `/api/admin/cases/${ADMIN_CASE_ID}`;
+
+export const ADMIN_STATS = {
+  cases_by_status: { live: 3, funded: 1, in_review: 2 },
+  cases_total: 6,
+  money: { captured_net_usd_minor: 528_818, refunded_usd_minor: 25_463, settled_usd_minor: 382_082, pledged_kes_minor: 64_932_795, settled_kes_minor: 49_288_507, donations: 19 },
+  waiting: { open_review_items: 2, awaiting_second_approval: 1 },
+  users: { family: 4, hospital_staff: 6, admin: 1 },
+  ledger_entries: 73,
+  queues: [{ name: "triage", queued: 1, started: 0, scheduled: 0, failed: 0 }],
+};
+
+export const JOBS = {
+  queues: [
+    { name: "triage", queued: 1, started: 0, scheduled: 0, failed: 0 },
+    { name: "payments", queued: 0, started: 0, scheduled: 0, failed: 1 },
+  ],
+  failed_jobs: [{ id: "job-1", queue: "payments", function: "app.jobs.tasks.run_settlement_check", enqueued_at: "2026-10-23T08:00:00+00:00", failed_at: "2026-10-23T08:01:00+00:00", retries_left: 0, request_id: "req-9", error: "PayPalError: 502 unavailable" }],
+  scheduler: { last_heartbeat: "2026-10-23T08:02:00+00:00", age_seconds: 20, healthy: true },
+};
+
+export function reviewItem(overrides: Record<string, unknown> = {}) {
+  return { id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", case_id: ADMIN_CASE_ID, case_alias: "Zawadi", case_status: "in_review", source: "ai_flag", status: "open", reason: "The bill looks like another one we have seen", payload: { signals: ["duplicate_fingerprint"], score: 82 }, resolution: null, resolution_note: null, resolved_at: null, created_at: "2026-10-23T08:10:00+00:00", ...overrides };
+}
+
+export function adminListItem(overrides: Record<string, unknown> = {}) {
+  return { id: ADMIN_CASE_ID, public_slug: "zawadi01", alias: "Zawadi", status: "live", trust_level: "hospital_confirmed", hospital_name: "Kilele Mission Hospital", owner_email: "family2@example.test", target_kes_minor: 16_043_000, pledged_kes_minor: 0, settled_kes_minor: 0, created_at: "2026-10-23T08:00:00+00:00", updated_at: "2026-10-23T08:30:00+00:00", ...overrides };
+}
+
+export function auditEntry(overrides: Record<string, unknown> = {}) {
+  return { id: "dddddddd-dddd-4ddd-8ddd-dddddddddddd", created_at: "2026-10-23T08:15:00+00:00", actor_type: "user", actor_user_id: "22222222-2222-4222-8222-222222222222", action: "admin.case_viewed", target_type: "case", target_id: ADMIN_CASE_ID, details: { note: "opened" }, request_id: "req-1", ...overrides };
+}
+
+export function adminCase(overrides: Record<string, unknown> = {}) {
+  return {
+    id: ADMIN_CASE_ID,
+    public_slug: "zawadi01",
+    alias: "Zawadi",
+    region: "Nairobi",
+    story: "We are a family from Nairobi.",
+    patient_reference: "KMH-ADM-7731",
+    is_minor: false,
+    status: "live",
+    trust_level: "hospital_confirmed",
+    close_reason: null,
+    freeze_reason: null,
+    owner: { id: "11111111-1111-4111-8111-111111111111", email: "family2@example.test", display_name: "Demo Family 2" },
+    hospital: { id: "e1aa1af1-95c6-4886-a50b-cbb0dc490a82", display_name: "Kilele Mission Hospital" },
+    money: { ...MONEY_ZERO, target_kes_minor: 16_043_000, is_estimate: false },
+    documents: [documentRecord()],
+    triage: [{ document_id: "d1", risk_score: 12, risk_band: "low", route: "hospital_confirmation", extracted: { facility_name: "Kilele Mission Hospital", total_kes: "160430.00" }, signals: [{ code: "ok", weight: 0 }], reasons_en: ["The amounts add up."], used_llm: false, model_versions: {}, created_at: "2026-10-23T08:05:00+00:00" }],
+    consents: [{ scope: "public_page", actor: "self", wording_version: "v1", language: "en", granted_at: "2026-10-23T08:01:00+00:00", withdrawn_at: null }],
+    confirmations: [],
+    donations: [{ id: "don1", status: "captured", amount_usd_minor: 5000, paypal_fee_usd_minor: 175, net_usd_minor: 4825, allocated_usd_minor: 0, refunded_usd_minor: 0, excess_choice: "refund", donor_display_name: "Amina", is_anonymous: false, captured_at: "2026-10-23T09:00:00+00:00" }],
+    settlements: [{ id: "s1", tranche_no: 1, status: "failed", adapter: "paypal_payouts", amount_usd_minor: 3875, amount_kes_minor: 500_000, external_batch_id: null, failure_reason: "payout_declined", requested_at: "2026-10-23T09:10:00+00:00", completed_at: null }],
+    refunds: [],
+    review_items: [reviewItem()],
+    audit_trail: [auditEntry()],
+    created_at: "2026-10-23T08:00:00+00:00",
+    submitted_at: "2026-10-23T08:20:00+00:00",
+    live_at: "2026-10-23T08:40:00+00:00",
+    closed_at: null,
+    frozen_at: null,
+    ...overrides,
+  };
+}
+
+export function agentAction(overrides: Record<string, unknown> = {}) {
+  return { id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", action_type: "refund", case_id: ADMIN_CASE_ID, case_alias: "Zawadi", payload: { donation_id: "don1", amount_usd_minor: 4825 }, rationale: "The donor chose a refund and the case closed.", status: "proposed", decided_by: null, decided_at: null, executed_at: null, result: null, error: null, created_at: "2026-10-23T09:20:00+00:00", ...overrides };
+}

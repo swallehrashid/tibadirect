@@ -968,5 +968,291 @@
       "emptyTitle": "No payments yet",
       "emptyBody": "Payments appear here once a confirmed case has enough money pledged."
     }
+  },
+  "admin": {
+    "overview": {
+      "title": "Overview",
+      "waiting": "Waiting for a person",
+      "openReviews": "Cases to review",
+      "openReviewsHint": "Flagged by the checks or asked for by a family",
+      "secondApprovals": "Bills awaiting a second approval",
+      "secondApprovalsHint": "At the hospitals",
+      "failedJobs": "Failed background jobs",
+      "ledgerEntries": "Ledger entries",
+      "money": "Money",
+      "donations": "Donations",
+      "captured": "Received (USD)",
+      "capturedHint": "After PayPal fees",
+      "refunded": "Refunded (USD)",
+      "settledUsd": "Paid out (USD)",
+      "pledged": "Pledged (KES)",
+      "settledKes": "Paid to hospitals (KES)",
+      "cases_one": "{{count}} case",
+      "cases_other": "{{count}} cases",
+      "queuesDown": "The job queues cannot be reached.",
+      "ledger": {
+        "title": "Ledger check",
+        "intro": "Recomputes every fingerprint in the whole ledger, across all cases, and says where it breaks if it does.",
+        "verify": "Check the whole ledger",
+        "ok": "The ledger is intact",
+        "okBody": "All {{count}} entries were rechecked and every fingerprint matches.",
+        "broken": "The ledger is broken",
+        "brokenBody": "The chain fails at entry {{seq}}. Stop paying out and find out why."
+      },
+      "queueLine": "Jobs waiting in the queues — {{queues}}"
+    },
+    "cases": {
+      "title": "All cases",
+      "alias": "Alias",
+      "status": "Status",
+      "hospital": "Hospital",
+      "owner": "Owner",
+      "target": "Target",
+      "pledged": "Pledged",
+      "settled": "Paid out",
+      "search": "Search by alias, link name, hospital or owner email",
+      "allStatuses": "All statuses",
+      "searchButton": "Search",
+      "none": "No cases match.",
+      "count_one": "{{count}} case",
+      "count_other": "{{count}} cases",
+      "hint": "Open a case to see everything about it. Opening a case is written to the audit log.",
+      "open": "Open"
+    },
+    "review": {
+      "title": "Review queue",
+      "intro": "Cases the checks flagged, or that a family asked us to look at. Nothing is rejected automatically: a person decides, and must say why.",
+      "filter": "Show",
+      "tabs": {
+        "open": "Open",
+        "resolved": "Resolved",
+        "all": "All"
+      },
+      "emptyTitle": "Nothing here",
+      "emptyBody": "No review items match.",
+      "columns": {
+        "created": "Raised",
+        "case": "Case",
+        "source": "Raised by",
+        "reason": "Reason",
+        "status": "Status"
+      },
+      "sources": {
+        "ai_flag": "The checks",
+        "family_request": "The family",
+        "insider_anomaly": "Insider check",
+        "admin": "An admin"
+      },
+      "status": {
+        "open": "Open",
+        "resolved": "Resolved"
+      },
+      "resolve": "Resolve",
+      "view": "View",
+      "hint": "Use the button on a row, or click the row, to open it.",
+      "resolveTitle": "Resolve this item",
+      "detailsTitle": "Review item",
+      "openCase": "Open the case",
+      "decision": "Your decision",
+      "note": "Why? (required)",
+      "noteHelp": "{{count}} of at least 10 characters",
+      "noteLength": "Write between 10 and 500 characters.",
+      "conflict": "This item was already resolved, or the case cannot take that decision.",
+      "submit": "Record decision",
+      "resolved": "Decision recorded",
+      "resolutions": {
+        "approved_for_confirmation": {
+          "label": "Send to the hospital",
+          "body": "Satisfied. The bill goes to the hospital's billing office to confirm."
+        },
+        "kept_unverified": {
+          "label": "Keep unverified",
+          "body": "The case stays unverified until something changes."
+        },
+        "case_cancelled": {
+          "label": "Cancel the case",
+          "body": "The campaign ends and donors are refunded as they chose."
+        },
+        "no_action": {
+          "label": "No action needed",
+          "body": "Close the item without changing the case."
+        }
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "intro": "Every sign-in, decision and movement of money, newest first. Entries cannot be changed.",
+      "targetType": "Target type",
+      "targetIdFull": "Target ID (the full ID)",
+      "idInvalid": "That is not a full ID.",
+      "filter": "Filter",
+      "clear": "Clear filter",
+      "emptyTitle": "No entries",
+      "emptyBody": "Nothing matches this filter.",
+      "hint": "Open a row to see the details of that entry.",
+      "count_one": "{{count}} entry",
+      "count_other": "{{count}} entries",
+      "requestId": "Request ID",
+      "view": "Details",
+      "columns": {
+        "when": "When",
+        "actor": "Who",
+        "action": "Action",
+        "target": "Target",
+        "targetId": "ID",
+        "details": "Details"
+      }
+    },
+    "jobs": {
+      "title": "Background jobs",
+      "intro": "Bill checks, payments and emails run in the background. A failed job can be put back on its queue.",
+      "schedulerOk": "The scheduler is running",
+      "schedulerDown": "The scheduler has stopped",
+      "heartbeat": "last signal {{when}}",
+      "queues": "Queues",
+      "queue": "Queue",
+      "columns": {
+        "queued": "Waiting",
+        "started": "Running",
+        "scheduled": "Scheduled",
+        "failed": "Failed"
+      },
+      "failed": "Failed jobs",
+      "noneTitle": "No failed jobs",
+      "noneBody": "Everything that ran has finished.",
+      "jobMeta": "{{queue}} queue · failed {{when}} · {{retries}} retries left",
+      "retry": "Retry",
+      "retried": "The job is back on its queue.",
+      "notFailed": "That job has not failed, so it cannot be retried."
+    },
+    "case": {
+      "title": "Case",
+      "notFound": "We could not find that case",
+      "hospital": "Hospital",
+      "owner": "Family account",
+      "minor": "Patient is a child",
+      "slug": "Page address",
+      "created": "Started",
+      "live": "Went live",
+      "closed": "Closed",
+      "freezeReason": "Paused because: {{reason}} ({{when}})",
+      "audited": "Opening this page is written to the audit log.",
+      "documents": "Bills",
+      "noDocuments": "No bills uploaded.",
+      "kind": "Kind",
+      "size": "Size",
+      "pages": "Pages",
+      "checks": "Automatic checks",
+      "noChecks": "The checks have not run yet.",
+      "score": "Risk score {{score}}",
+      "usedModel": "language model used",
+      "localOnly": "local checks only",
+      "noSignals": "No signals were raised.",
+      "donations_one": "{{count}} donation",
+      "donations_other": "{{count}} donations",
+      "noDonations": "No donations yet.",
+      "paid": "Paid",
+      "amount": "Amount",
+      "donor": "Donor",
+      "anonymous": "Anonymous",
+      "refundedColumn": "Refunded",
+      "settlements": "Payments to the hospital",
+      "noSettlements": "Nothing paid yet.",
+      "adapter": "Method",
+      "refunds": "Refunds",
+      "noRefunds": "No refunds.",
+      "reason": "Reason",
+      "by": "By",
+      "scope": "Consent",
+      "version": "Wording",
+      "granted": "Given",
+      "withdrawn": "Withdrawn",
+      "reviews": "Review items",
+      "noReviews": "No review items.",
+      "trail_one": "Audit trail ({{count}} entry)",
+      "trail_other": "Audit trail ({{count}} entries)",
+      "freeze": {
+        "button": "Freeze case",
+        "title": "Freeze {{alias}}?",
+        "warning": "The page stops being public and stops taking money at once. Payments not yet sent are cancelled and every donor is refunded in full, whatever they chose. The case is then cancelled for fraud. This cannot be undone.",
+        "reason": "Why? (required)",
+        "help": "{{count}} of at least 10 characters (at most 300). The family may see a general reason.",
+        "confirm": "Freeze and refund",
+        "done": "The case is frozen and refunds have started.",
+        "conflict": "This case cannot be frozen from where it is."
+      },
+      "settle": {
+        "button": "Check for a payment now",
+        "created": "Payment {{n}} of {{amount}} was created.",
+        "reasons": {
+          "case_not_settleable": "The case is not in a state where it can be paid.",
+          "no_confirmation": "The hospital has not confirmed a bill yet.",
+          "hospital_inactive": "The hospital is not active.",
+          "hospital_not_ready": "The hospital cannot receive payments yet.",
+          "cap_reached": "The most that can be paid before the final bill has been reached.",
+          "nothing_available": "There is no money available to pay out.",
+          "below_threshold": "Not enough has been pledged yet for the next payment."
+        }
+      }
+    },
+    "agent": {
+      "title": "Treasurer agent",
+      "intro": "Ask about the money. It reads the books and can suggest a refund, a payment or a freeze, but it cannot do any of them: you approve or reject each suggestion.",
+      "offTitle": "The treasurer agent is not switched on",
+      "offBody": "An administrator can turn it on in the settings.",
+      "question": "Your question",
+      "placeholder": "For example: which donations on this case are still unrefunded?",
+      "aboutCase": "About a case (optional)",
+      "noCase": "No particular case",
+      "safety": "The agent sees amounts, statuses and IDs only, never donor names, emails or bill text.",
+      "ask": "Ask",
+      "thinking": "Looking at the books…",
+      "answer": "Answer",
+      "stoppedEarly": "The agent ran out of steps before it finished. Try a narrower question.",
+      "trace_one": "What it looked at ({{count}} step)",
+      "trace_other": "What it looked at ({{count}} steps)",
+      "ok": "ok",
+      "failed": "failed",
+      "proposed": "It suggests",
+      "actions": "Suggestions",
+      "waiting": "Waiting for you",
+      "noActions": "No suggestions",
+      "noActionsBody": "When the agent proposes something it appears here.",
+      "errors": {
+        "noModel": "No language model is set up in this environment, so the agent cannot answer.",
+        "unreachable": "The language model could not be reached. Try again shortly.",
+        "tooMany": "Too many questions this hour. Please wait.",
+        "off": "The agent is switched off."
+      },
+      "action": {
+        "types": {
+          "refund": "Refund",
+          "payout": "Payout",
+          "freeze": "Freeze"
+        },
+        "statuses": {
+          "proposed": "Waiting for you",
+          "approved": "Approved",
+          "executed": "Done",
+          "rejected": "Rejected",
+          "failed": "Could not be done"
+        },
+        "approve": "Approve",
+        "reject": "Reject",
+        "approveTitle": "Carry this out now?",
+        "approveBody": {
+          "refund": "The donor is refunded through PayPal straight away.",
+          "payout": "A payment to the hospital is made straight away.",
+          "freeze": "The case is frozen and every donor is refunded."
+        },
+        "rejectTitle": "Turn this suggestion down",
+        "rejectBody": "Say why, so it is on record.",
+        "decidedBy": "Decided by {{name}}",
+        "conflict": "This suggestion was already decided.",
+        "failedToast": "It could not be carried out. See the reason on the card.",
+        "doneToast": "Done.",
+        "rejectedToast": "Suggestion rejected."
+      }
+    }
   }
 }

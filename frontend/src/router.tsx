@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import { RequireRole } from "@/auth/RequireRole";
 import { AppShell } from "@/layouts/AppShell";
 import { PageShell } from "@/layouts/PageShell";
-import { AreaHome } from "@/pages/AreaHome";
 import { Root } from "./Root";
 
 // Pages load on demand (route-level code splitting); shells and guards are part of the main bundle.
@@ -55,7 +54,19 @@ export const routes = [
       },
       {
         element: <RequireRole area="admin" />,
-        children: [{ element: <AppShell area="admin" />, children: [{ path: "/admin", element: <AreaHome area="admin" /> }] }],
+        children: [
+          {
+            element: <AppShell area="admin" />,
+            children: [
+              { path: "/admin", lazy: () => import("@/pages/admin/Overview") },
+              { path: "/admin/review", lazy: () => import("@/pages/admin/ReviewQueue") },
+              { path: "/admin/cases/:id", lazy: () => import("@/pages/admin/CaseDetail") },
+              { path: "/admin/audit", lazy: () => import("@/pages/admin/AuditLog") },
+              { path: "/admin/jobs", lazy: () => import("@/pages/admin/Jobs") },
+              { path: "/admin/agent", lazy: () => import("@/pages/admin/Agent") },
+            ],
+          },
+        ],
       },
     ],
   },

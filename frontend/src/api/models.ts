@@ -231,3 +231,224 @@ export type HospitalCaseDetail = Model<
 export type OtpSent = Model<Schemas["OtpSent"]>;
 export type SettlementStatus = "pending" | "processing" | "succeeded" | "failed";
 export type SettlementItem = Model<Schemas["SettlementItem"], { case_alias: string; status: SettlementStatus; amount_kes: string; external_reference: string | null }>;
+
+// --- Admin console ---------------------------------------------------------------------------
+
+export interface QueueStats {
+  name: string;
+  queued: number;
+  started: number;
+  scheduled: number;
+  failed: number;
+}
+
+export interface FailedJob {
+  id: string;
+  queue: string;
+  function: string;
+  enqueued_at: string | null;
+  failed_at: string | null;
+  retries_left: number;
+  request_id: string | null;
+  error: string;
+}
+
+export interface JobsOverview {
+  queues: QueueStats[];
+  failed_jobs: FailedJob[];
+  scheduler: { last_heartbeat: string | null; age_seconds: number | null; healthy: boolean };
+}
+
+export interface AdminStats {
+  cases_by_status: Partial<Record<CaseStatus, number>>;
+  cases_total: number;
+  money: {
+    captured_net_usd_minor: number;
+    refunded_usd_minor: number;
+    settled_usd_minor: number;
+    pledged_kes_minor: number;
+    settled_kes_minor: number;
+    donations: number;
+  };
+  waiting: { open_review_items: number; awaiting_second_approval: number };
+  users: Record<string, number>;
+  ledger_entries: number;
+  queues: QueueStats[] | null;
+}
+
+export interface ChainVerification {
+  valid: boolean;
+  entries_checked: number;
+  last_hash: string;
+  first_bad_seq: number | null;
+  checked_at: string;
+}
+
+export type ReviewSource = "ai_flag" | "family_request" | "insider_anomaly" | "admin";
+export type ReviewResolution = "approved_for_confirmation" | "kept_unverified" | "case_cancelled" | "no_action";
+
+export interface ReviewItem {
+  id: string;
+  case_id: string;
+  case_alias: string;
+  case_status: CaseStatus;
+  source: ReviewSource;
+  status: "open" | "resolved";
+  reason: string;
+  payload: Record<string, unknown>;
+  resolution: ReviewResolution | null;
+  resolution_note: string | null;
+  resolved_at: string | null;
+  created_at: string;
+}
+
+export interface AdminCaseListItem {
+  id: string;
+  public_slug: string;
+  alias: string;
+  status: CaseStatus;
+  trust_level: TrustLevel;
+  hospital_name: string;
+  owner_email: string;
+  target_kes_minor: number | null;
+  pledged_kes_minor: number;
+  settled_kes_minor: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuditEntry {
+  id: string;
+  created_at: string;
+  actor_type: "user" | "system" | "agent" | "paypal";
+  actor_user_id: string | null;
+  action: string;
+  target_type: string;
+  target_id: string | null;
+  details: Record<string, unknown>;
+  request_id: string | null;
+}
+
+export interface AdminTriage {
+  document_id: string;
+  risk_score: number;
+  risk_band: RiskBandValue;
+  route: "hospital_confirmation" | "manual_review";
+  extracted: ExtractedFields;
+  signals: { code?: string; type?: string; [key: string]: unknown }[];
+  reasons_en: string[];
+  used_llm: boolean;
+  model_versions: Record<string, string>;
+  created_at: string;
+}
+
+export interface AdminDonation {
+  id: string;
+  status: string;
+  amount_usd_minor: number;
+  paypal_fee_usd_minor: number | null;
+  net_usd_minor: number;
+  allocated_usd_minor: number;
+  refunded_usd_minor: number;
+  excess_choice: ExcessChoice | null;
+  donor_display_name: string | null;
+  is_anonymous: boolean;
+  captured_at: string | null;
+}
+
+export interface AdminSettlement {
+  id: string;
+  tranche_no: number;
+  status: SettlementStatus;
+  adapter: string;
+  amount_usd_minor: number;
+  amount_kes_minor: number;
+  external_batch_id: string | null;
+  failure_reason: string | null;
+  requested_at: string;
+  completed_at: string | null;
+}
+
+export interface AdminRefund {
+  id: string;
+  donation_id: string;
+  amount_usd_minor: number;
+  reason: string;
+  status: string;
+  requested_by: string;
+  completed_at: string | null;
+}
+
+export interface AdminCase {
+  id: string;
+  public_slug: string;
+  alias: string;
+  region: string;
+  story: string | null;
+  patient_reference: string;
+  is_minor: boolean;
+  status: CaseStatus;
+  trust_level: TrustLevel;
+  close_reason: string | null;
+  freeze_reason: string | null;
+  owner: { id: string; email: string; display_name: string };
+  hospital: { id: string; display_name: string };
+  money: MoneySummary;
+  documents: CaseDocument[];
+  triage: AdminTriage[];
+  consents: { scope: ConsentScope; actor: string; wording_version: string; language: string; granted_at: string; withdrawn_at: string | null }[];
+  confirmations: HospitalConfirmation[];
+  donations: AdminDonation[];
+  settlements: AdminSettlement[];
+  refunds: AdminRefund[];
+  review_items: ReviewItem[];
+  audit_trail: AuditEntry[];
+  created_at: string;
+  submitted_at: string | null;
+  live_at: string | null;
+  closed_at: string | null;
+  frozen_at: string | null;
+}
+
+export interface SettlementRun {
+  reason: string;
+  settlement_id: string | null;
+  tranche_no: number | null;
+  amount_usd_minor: number | null;
+  amount_kes_minor: number | null;
+  status: SettlementStatus | null;
+}
+
+export type AgentActionType = "refund" | "payout" | "freeze";
+export type AgentActionStatus = "proposed" | "approved" | "rejected" | "executed" | "failed";
+
+export interface AgentAction {
+  id: string;
+  action_type: AgentActionType;
+  case_id: string | null;
+  case_alias: string | null;
+  payload: Record<string, unknown>;
+  rationale: string;
+  status: AgentActionStatus;
+  decided_by: string | null;
+  decided_at: string | null;
+  executed_at: string | null;
+  result: Record<string, unknown> | null;
+  error: string | null;
+  created_at: string;
+}
+
+export interface AgentToolCall {
+  name: string;
+  input: Record<string, unknown>;
+  ok: boolean;
+  summary: string;
+}
+
+export interface AgentAnswer {
+  answer: string;
+  tool_calls: AgentToolCall[];
+  proposed_actions: AgentAction[];
+  steps: number;
+  stopped_early: boolean;
+}

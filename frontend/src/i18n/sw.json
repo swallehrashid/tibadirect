@@ -968,5 +968,291 @@
       "emptyTitle": "Hakuna malipo bado",
       "emptyBody": "Malipo yanaonekana hapa kesi iliyothibitishwa ikishapata pesa za kutosha zilizoahidiwa."
     }
+  },
+  "admin": {
+    "overview": {
+      "title": "Muhtasari",
+      "waiting": "Vinavyosubiri mtu",
+      "openReviews": "Kesi za kukagua",
+      "openReviewsHint": "Zimealamishwa na ukaguzi au familia imeomba",
+      "secondApprovals": "Bili zinazosubiri idhini ya pili",
+      "secondApprovalsHint": "Hospitalini",
+      "failedJobs": "Kazi za nyuma zilizoshindwa",
+      "ledgerEntries": "Rekodi za leja",
+      "money": "Pesa",
+      "donations": "Michango",
+      "captured": "Zilizopokelewa (USD)",
+      "capturedHint": "Baada ya ada za PayPal",
+      "refunded": "Zilizorudishwa (USD)",
+      "settledUsd": "Zilizolipwa (USD)",
+      "pledged": "Zilizoahidiwa (KES)",
+      "settledKes": "Zilizolipwa hospitalini (KES)",
+      "cases_one": "Kesi {{count}}",
+      "cases_other": "Kesi {{count}}",
+      "queuesDown": "Foleni za kazi hazifikiki.",
+      "ledger": {
+        "title": "Ukaguzi wa leja",
+        "intro": "Inakokotoa upya kila alama ya kidijitali kwenye leja nzima, kwa kesi zote, na inasema inapovunjika.",
+        "verify": "Kagua leja nzima",
+        "ok": "Leja iko salama",
+        "okBody": "Rekodi zote {{count}} zimekaguliwa tena na kila alama ya kidijitali inalingana.",
+        "broken": "Leja imevunjika",
+        "brokenBody": "Mnyororo unashindwa kwenye rekodi {{seq}}. Acha kulipa kisha ujue sababu."
+      },
+      "queueLine": "Kazi zinazosubiri kwenye foleni — {{queues}}"
+    },
+    "cases": {
+      "title": "Kesi zote",
+      "alias": "Jina",
+      "status": "Hali",
+      "hospital": "Hospitali",
+      "owner": "Mmiliki",
+      "target": "Lengo",
+      "pledged": "Iliyoahidiwa",
+      "settled": "Iliyolipwa",
+      "search": "Tafuta kwa jina, jina la kiungo, hospitali au barua pepe ya mmiliki",
+      "allStatuses": "Hali zote",
+      "searchButton": "Tafuta",
+      "none": "Hakuna kesi zinazolingana.",
+      "count_one": "Kesi {{count}}",
+      "count_other": "Kesi {{count}}",
+      "hint": "Fungua kesi uone kila kitu kuhusu hiyo. Kufungua kesi kunaandikwa kwenye kumbukumbu za ukaguzi.",
+      "open": "Fungua"
+    },
+    "review": {
+      "title": "Foleni ya ukaguzi",
+      "intro": "Kesi ambazo ukaguzi uliziwekea alama, au familia iliomba tuziangalie. Hakuna kinachokataliwa kiotomatiki: mtu anaamua, na lazima aseme kwa nini.",
+      "filter": "Onyesha",
+      "tabs": {
+        "open": "Wazi",
+        "resolved": "Zilizoshughulikiwa",
+        "all": "Zote"
+      },
+      "emptyTitle": "Hakuna kitu hapa",
+      "emptyBody": "Hakuna vipengee vya ukaguzi vinavyolingana.",
+      "columns": {
+        "created": "Ilianzishwa",
+        "case": "Kesi",
+        "source": "Ilianzishwa na",
+        "reason": "Sababu",
+        "status": "Hali"
+      },
+      "sources": {
+        "ai_flag": "Ukaguzi",
+        "family_request": "Familia",
+        "insider_anomaly": "Ukaguzi wa ndani",
+        "admin": "Msimamizi"
+      },
+      "status": {
+        "open": "Wazi",
+        "resolved": "Imeshughulikiwa"
+      },
+      "resolve": "Shughulikia",
+      "view": "Tazama",
+      "hint": "Tumia kitufe kwenye safu, au bonyeza safu, ili kuifungua.",
+      "resolveTitle": "Shughulikia kipengee hiki",
+      "detailsTitle": "Kipengee cha ukaguzi",
+      "openCase": "Fungua kesi",
+      "decision": "Uamuzi wako",
+      "note": "Kwa nini? (lazima)",
+      "noteHelp": "Herufi {{count}} kati ya angalau 10",
+      "noteLength": "Andika herufi kati ya 10 na 500.",
+      "conflict": "Kipengee hiki tayari kimeshughulikiwa, au kesi haiwezi kupokea uamuzi huo.",
+      "submit": "Rekodi uamuzi",
+      "resolved": "Uamuzi umerekodiwa",
+      "resolutions": {
+        "approved_for_confirmation": {
+          "label": "Tuma hospitalini",
+          "body": "Nimeridhika. Bili inaenda kwa ofisi ya malipo ya hospitali kuthibitisha."
+        },
+        "kept_unverified": {
+          "label": "Weka bila uthibitisho",
+          "body": "Kesi inabaki bila uthibitisho hadi kitu kibadilike."
+        },
+        "case_cancelled": {
+          "label": "Ghairi kesi",
+          "body": "Mchango unaisha na wachangiaji wanarudishiwa kama walivyochagua."
+        },
+        "no_action": {
+          "label": "Hakuna hatua inayohitajika",
+          "body": "Funga kipengee bila kubadilisha kesi."
+        }
+      }
+    },
+    "audit": {
+      "title": "Kumbukumbu za ukaguzi",
+      "intro": "Kila kuingia, uamuzi na uhamishaji wa pesa, wa hivi karibuni kwanza. Rekodi haziwezi kubadilishwa.",
+      "targetType": "Aina ya lengo",
+      "targetIdFull": "Kitambulisho cha lengo (kamili)",
+      "idInvalid": "Hicho si kitambulisho kamili.",
+      "filter": "Chuja",
+      "clear": "Futa kichujio",
+      "emptyTitle": "Hakuna rekodi",
+      "emptyBody": "Hakuna kinacholingana na kichujio hiki.",
+      "hint": "Fungua safu uone maelezo ya rekodi hiyo.",
+      "count_one": "Rekodi {{count}}",
+      "count_other": "Rekodi {{count}}",
+      "requestId": "Kitambulisho cha ombi",
+      "view": "Maelezo",
+      "columns": {
+        "when": "Lini",
+        "actor": "Nani",
+        "action": "Hatua",
+        "target": "Lengo",
+        "targetId": "Kitambulisho",
+        "details": "Maelezo"
+      }
+    },
+    "jobs": {
+      "title": "Kazi za nyuma",
+      "intro": "Ukaguzi wa bili, malipo na barua pepe hufanyika nyuma. Kazi iliyoshindwa inaweza kurudishwa kwenye foleni yake.",
+      "schedulerOk": "Mpangaji wa kazi unafanya kazi",
+      "schedulerDown": "Mpangaji wa kazi umesimama",
+      "heartbeat": "ishara ya mwisho {{when}}",
+      "queues": "Foleni",
+      "queue": "Foleni",
+      "columns": {
+        "queued": "Zinasubiri",
+        "started": "Zinaendelea",
+        "scheduled": "Zilizopangwa",
+        "failed": "Zilizoshindwa"
+      },
+      "failed": "Kazi zilizoshindwa",
+      "noneTitle": "Hakuna kazi zilizoshindwa",
+      "noneBody": "Kila kilichoendeshwa kimekamilika.",
+      "jobMeta": "Foleni ya {{queue}} · imeshindwa {{when}} · majaribio {{retries}} yamebaki",
+      "retry": "Jaribu tena",
+      "retried": "Kazi imerudi kwenye foleni yake.",
+      "notFailed": "Kazi hiyo haijashindwa, kwa hiyo haiwezi kujaribiwa tena."
+    },
+    "case": {
+      "title": "Kesi",
+      "notFound": "Hatukuweza kupata kesi hiyo",
+      "hospital": "Hospitali",
+      "owner": "Akaunti ya familia",
+      "minor": "Mgonjwa ni mtoto",
+      "slug": "Anwani ya ukurasa",
+      "created": "Ilianza",
+      "live": "Ilianza kutumika",
+      "closed": "Ilifungwa",
+      "freezeReason": "Imesimamishwa kwa sababu: {{reason}} ({{when}})",
+      "audited": "Kufungua ukurasa huu kunaandikwa kwenye kumbukumbu za ukaguzi.",
+      "documents": "Bili",
+      "noDocuments": "Hakuna bili zilizopakiwa.",
+      "kind": "Aina",
+      "size": "Ukubwa",
+      "pages": "Kurasa",
+      "checks": "Ukaguzi wa kiotomatiki",
+      "noChecks": "Ukaguzi bado haujaendeshwa.",
+      "score": "Alama ya hatari {{score}}",
+      "usedModel": "modeli ya lugha ilitumika",
+      "localOnly": "ukaguzi wa ndani pekee",
+      "noSignals": "Hakuna ishara zilizotolewa.",
+      "donations_one": "Mchango {{count}}",
+      "donations_other": "Michango {{count}}",
+      "noDonations": "Hakuna michango bado.",
+      "paid": "Ilipwa",
+      "amount": "Kiasi",
+      "donor": "Mchangiaji",
+      "anonymous": "Bila jina",
+      "refundedColumn": "Iliyorudishwa",
+      "settlements": "Malipo kwa hospitali",
+      "noSettlements": "Hakuna kilicholipwa bado.",
+      "adapter": "Njia",
+      "refunds": "Marejesho",
+      "noRefunds": "Hakuna marejesho.",
+      "reason": "Sababu",
+      "by": "Na",
+      "scope": "Ridhaa",
+      "version": "Maneno",
+      "granted": "Imetolewa",
+      "withdrawn": "Imeondolewa",
+      "reviews": "Vipengee vya ukaguzi",
+      "noReviews": "Hakuna vipengee vya ukaguzi.",
+      "trail_one": "Kumbukumbu za ukaguzi (rekodi {{count}})",
+      "trail_other": "Kumbukumbu za ukaguzi (rekodi {{count}})",
+      "freeze": {
+        "button": "Simamisha kesi",
+        "title": "Kusimamisha {{alias}}?",
+        "warning": "Ukurasa unaacha kuwa wa umma na kuacha kupokea pesa mara moja. Malipo ambayo hayajatumwa yanaghairiwa na kila mchangiaji anarudishiwa pesa zote, bila kujali alichochagua. Kesi kisha inaghairiwa kwa udanganyifu. Hili haliwezi kutenduliwa.",
+        "reason": "Kwa nini? (lazima)",
+        "help": "Herufi {{count}} kati ya angalau 10 (zisizozidi 300). Familia inaweza kuona sababu ya jumla.",
+        "confirm": "Simamisha na rudisha pesa",
+        "done": "Kesi imesimamishwa na marejesho yameanza.",
+        "conflict": "Kesi hii haiwezi kusimamishwa ilipo sasa."
+      },
+      "settle": {
+        "button": "Angalia kama kuna malipo sasa",
+        "created": "Malipo ya {{n}} ya {{amount}} yameundwa.",
+        "reasons": {
+          "case_not_settleable": "Kesi haiko katika hali ya kulipwa.",
+          "no_confirmation": "Hospitali bado haijathibitisha bili.",
+          "hospital_inactive": "Hospitali haifanyi kazi.",
+          "hospital_not_ready": "Hospitali bado haiwezi kupokea malipo.",
+          "cap_reached": "Kiwango cha juu kinachoweza kulipwa kabla ya bili ya mwisho kimefikiwa.",
+          "nothing_available": "Hakuna pesa za kulipa.",
+          "below_threshold": "Hakuna pesa za kutosha zilizoahidiwa kwa malipo yanayofuata."
+        }
+      }
+    },
+    "agent": {
+      "title": "Msaidizi wa mhazini",
+      "intro": "Uliza kuhusu pesa. Husoma vitabu na anaweza kupendekeza marejesho, malipo au kusimamisha kesi, lakini hawezi kufanya lolote kati ya hayo: wewe unaidhinisha au kukataa kila pendekezo.",
+      "offTitle": "Msaidizi wa mhazini hajawashwa",
+      "offBody": "Msimamizi anaweza kumwasha kwenye mipangilio.",
+      "question": "Swali lako",
+      "placeholder": "Kwa mfano: ni michango ipi kwenye kesi hii ambayo bado haijarudishwa?",
+      "aboutCase": "Kuhusu kesi (si lazima)",
+      "noCase": "Hakuna kesi maalum",
+      "safety": "Msaidizi anaona kiasi, hali na vitambulisho pekee, kamwe si majina ya wachangiaji, barua pepe wala maandishi ya bili.",
+      "ask": "Uliza",
+      "thinking": "Anaangalia vitabu…",
+      "answer": "Jibu",
+      "stoppedEarly": "Msaidizi alikosa hatua kabla ya kumaliza. Jaribu swali finyu zaidi.",
+      "trace_one": "Alichoangalia (hatua {{count}})",
+      "trace_other": "Alichoangalia (hatua {{count}})",
+      "ok": "sawa",
+      "failed": "imeshindwa",
+      "proposed": "Anapendekeza",
+      "actions": "Mapendekezo",
+      "waiting": "Yanakusubiri",
+      "noActions": "Hakuna mapendekezo",
+      "noActionsBody": "Msaidizi akipendekeza kitu kitaonekana hapa.",
+      "errors": {
+        "noModel": "Hakuna modeli ya lugha iliyowekwa kwenye mazingira haya, kwa hiyo msaidizi hawezi kujibu.",
+        "unreachable": "Modeli ya lugha haikufikiwa. Jaribu tena baadaye kidogo.",
+        "tooMany": "Maswali mengi sana saa hii. Tafadhali subiri.",
+        "off": "Msaidizi amezimwa."
+      },
+      "action": {
+        "types": {
+          "refund": "Marejesho",
+          "payout": "Malipo",
+          "freeze": "Kusimamisha"
+        },
+        "statuses": {
+          "proposed": "Yanakusubiri",
+          "approved": "Imeidhinishwa",
+          "executed": "Imefanyika",
+          "rejected": "Imekataliwa",
+          "failed": "Haikuweza kufanyika"
+        },
+        "approve": "Idhinisha",
+        "reject": "Kataa",
+        "approveTitle": "Kufanya hili sasa?",
+        "approveBody": {
+          "refund": "Mchangiaji anarudishiwa pesa kupitia PayPal mara moja.",
+          "payout": "Malipo kwa hospitali yanafanywa mara moja.",
+          "freeze": "Kesi inasimamishwa na kila mchangiaji anarudishiwa pesa."
+        },
+        "rejectTitle": "Kataa pendekezo hili",
+        "rejectBody": "Sema kwa nini, ili iwe kwenye kumbukumbu.",
+        "decidedBy": "Imeamuliwa na {{name}}",
+        "conflict": "Pendekezo hili tayari limeamuliwa.",
+        "failedToast": "Haikuweza kufanyika. Angalia sababu kwenye kadi.",
+        "doneToast": "Imefanyika.",
+        "rejectedToast": "Pendekezo limekataliwa."
+      }
+    }
   }
 }

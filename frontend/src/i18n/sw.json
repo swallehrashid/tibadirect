@@ -418,5 +418,147 @@
         "body": "Onyesho hili linatumia pesa za majaribio na hospitali na bili za kubuni. Hakuna kinachoonekana hapa ni mchango halisi."
       }
     }
+  },
+  "donate": {
+    "title": "Toa mchango",
+    "intro": "Toa kwa dola za Marekani kupitia PayPal. Hospitali ndiyo inayolipwa, si familia.",
+    "amount": "Kiasi kwa dola za Marekani",
+    "presets": "Viasi vya haraka",
+    "estimate": "Takriban {{kes}} kwa kiwango cha leo. Kiasi kamili kinawekwa unapolipa.",
+    "estimateWait": "Kiasi cha shilingi kitaonekana kiwango cha leo kikipakiwa.",
+    "range": "Weka kiasi kati ya $1 na $10,000.",
+    "name": "Jina litakaloonekana kwenye leja ya wazi (si lazima)",
+    "anonymous": "Toa bila kujitambulisha",
+    "working": "Inakamilisha mchango wako…",
+    "payMock": "Changia {{amount}} kwa PayPal (kuigiza)",
+    "secure": "Unalipa kwenye dirisha la PayPal lenyewe. Hatuoni kadi wala nenosiri lako.",
+    "feeNote": "PayPal huchukua ada ndogo kwa kila malipo, kwa hiyo kiasi kidogo kuliko mchango wako hufika kwenye kesi. Risiti yako inaonyesha kiasi kamili.",
+    "funded": {
+      "title": "Kesi hii imekamilika kuchangiwa",
+      "body": "Asante kwa wote waliotoa. Hakuna michango zaidi inayohitajika kwa bili hii."
+    },
+    "closed": {
+      "title": "Kesi hii imefungwa",
+      "body": "Bili imelipwa na ukurasa huu unahifadhiwa kama kumbukumbu ya wazi."
+    },
+    "excess": {
+      "title": "Pesa zikibaki",
+      "intro": "Wakati mwingine pesa nyingi kuliko bili zinahitaji hufika. Chagua kitakachotokea kwa sehemu yako.",
+      "refund": {
+        "label": "Nirudishie",
+        "body": "Sehemu yako inayobaki inarudi kwako kupitia PayPal. Chini ya $1 huenda kwenye mfuko wa mshikamano."
+      },
+      "solidarity_pool": {
+        "label": "Mfuko wa mshikamano",
+        "body": "Sehemu yako inayobaki inaenda kwenye mfuko wa pamoja, na inaandikwa kwenye leja ya wazi."
+      },
+      "follow_up_care": {
+        "label": "Weka kwa matibabu ya kufuatilia",
+        "body": "Inashikiliwa hadi siku 14 kwa bili inayofuata iliyothibitishwa ya mgonjwa huyu, kisha inarudishwa."
+      }
+    },
+    "errors": {
+      "fullyFunded": "Kesi hii haihitaji tena michango zaidi. Hujakatwa pesa.",
+      "notAccepting": "Kesi hii haipokei michango kwa sasa.",
+      "pending": "PayPal bado inakagua malipo haya. Tutakutumia risiti kwa barua pepe yakikamilika.",
+      "declined": "PayPal haikukamilisha malipo haya. Hujakatwa pesa. Tafadhali jaribu njia nyingine ya kulipa.",
+      "amount": "Weka kiasi kati ya $1 na $10,000.",
+      "paypalDown": "PayPal haikufikiwa. Hujakatwa pesa. Tafadhali jaribu tena baadaye kidogo.",
+      "generic": "Hatukuweza kukamilisha mchango wako. Hujakatwa pesa. Tafadhali jaribu tena."
+    }
+  },
+  "ledger": {
+    "title": "Leja ya wazi",
+    "intro": "Kila uhamishaji wa pesa wa kesi hii, wa zamani kwanza. Kila rekodi ina alama ya kidijitali inayotegemea ile iliyotangulia, kwa hiyo rekodi haiwezi kubadilishwa au kuondolewa bila kuvunja mnyororo.",
+    "empty": "Hakuna pesa zilizohamishwa bado.",
+    "columns": {
+      "when": "Lini",
+      "what": "Kilichotokea",
+      "account": "Akaunti",
+      "amount": "Kiasi",
+      "reference": "Rejea",
+      "fingerprint": "Alama ya kidijitali"
+    },
+    "types": {
+      "donation_captured": "Mchango umepokelewa",
+      "paypal_fee": "Ada ya PayPal",
+      "settlement_sent": "Imelipwa hospitalini",
+      "refund_issued": "Marejesho kwa mchangiaji",
+      "pool_transfer": "Imehamishiwa mfuko wa mshikamano",
+      "reversal": "Malipo yamerudishwa",
+      "adjustment": "Marekebisho"
+    },
+    "accounts": {
+      "case_funds": "Pesa za kesi",
+      "paypal_fees": "Ada za PayPal",
+      "hospital_settled": "Iliyolipwa hospitalini",
+      "donor_refunds": "Marejesho kwa wachangiaji",
+      "solidarity_pool": "Mfuko wa mshikamano"
+    },
+    "fromDonor": "{{what}} kutoka kwa {{name}}",
+    "verify": "Thibitisha leja",
+    "verifying": "Inakagua…",
+    "verifyHelp": "Inakokotoa upya kila alama ya kidijitali ya kesi hii kwenye seva yetu.",
+    "valid": {
+      "title": "Leja iko salama",
+      "body": "Tumekagua tena rekodi zote {{count}} za kesi hii na kila alama ya kidijitali inalingana. Ya hivi karibuni inaanza na {{hash}}."
+    },
+    "invalid": {
+      "title": "Ukaguzi wa leja umeshindwa",
+      "body": "Kuna kitu kwenye mnyororo kisicholingana. Tafadhali tuambie ili tuchunguze, na uwe mwangalifu kuhusu kutoa hadi tutakapomaliza."
+    }
+  },
+  "tranches": {
+    "title": "Malipo kwa hospitali",
+    "none": "Hakuna kilicholipwa hospitalini bado. Malipo hufanywa pesa za kutosha zikishaahidiwa.",
+    "item": "Malipo ya {{n}}: {{amount}}",
+    "simulated": "Malipo kwa hospitali yanaigizwa hapa: yanaenda kwenye akaunti ya majaribio ya PayPal ya hospitali. Kwa matumizi halisi, mshirika mwenye leseni nchini Kenya angelipa paybill au akaunti ya benki ya hospitali."
+  },
+  "casePage": {
+    "title": "Kesi",
+    "back": "Kesi zote",
+    "bill": "Bili ya hospitali",
+    "story": "Hadithi ya familia",
+    "noStory": "Familia haijaongeza hadithi bado.",
+    "noDiagnosis": "Tunathibitisha bili, si ugonjwa. Hakuna utambuzi wa ugonjwa unaoonyeshwa kwenye kesi yoyote.",
+    "estimateNote": "Hili ni makadirio. Hadi bili ya mwisho ithibitishwe, si zaidi ya 80% hulipwa hospitalini.",
+    "closedNote": "Kesi hii imefungwa. Ukurasa unabaki kama kumbukumbu ya wazi.",
+    "notFound": {
+      "title": "Hatukuweza kupata kesi hiyo",
+      "body": "Huenda ni ya faragha, imesimamishwa kwa ukaguzi, au kiungo si sahihi."
+    }
+  },
+  "share": {
+    "title": "Shiriki kesi hii",
+    "copy": "Nakili kiungo",
+    "copied": "Kiungo kimenakiliwa",
+    "copyFailed": "Hatukuweza kunakili kiungo",
+    "opensNewTab": "inafunguka kwenye kichupo kipya",
+    "more": "Shiriki",
+    "text": "Tafadhali saidia bili ya hospitali ya {{alias}} kwenye TibaDirect:"
+  },
+  "receipt": {
+    "title": "Risiti ya mchango",
+    "thanks": "Asante",
+    "lead": "Mchango wako wa {{amount}} kwa {{alias}} unaelekea {{hospital}}.",
+    "amount": "Ulitoa",
+    "fee": "Ada ya PayPal",
+    "net": "Kinachofika kwenye kesi",
+    "kes": "Thamani takriban",
+    "kesNote": "Kiasi cha shilingi kinatumia kiwango cha kubadilisha fedha wakati ulipolipa. Ni makadirio.",
+    "excess": "Pesa zikibaki",
+    "name": "Jina kwenye leja",
+    "date": "Ulilipa",
+    "reference": "Rejea ya PayPal",
+    "fingerprint": "Alama ya kidijitali ya leja",
+    "seeLedger": "Ione kwenye leja ya wazi",
+    "print": "Chapisha risiti",
+    "keepLink": "Hifadhi kiungo hiki. Ni risiti yako na yeyote mwenye kiungo anaweza kuiona.",
+    "refunded": "Mchango huu umerudishwa wote.",
+    "partiallyRefunded": "{{amount}} za mchango huu zimerudishwa.",
+    "notFound": {
+      "title": "Hatukuweza kupata risiti hiyo",
+      "body": "Angalia kiungo kwenye barua pepe yako, au ulichohifadhi."
+    }
   }
 }

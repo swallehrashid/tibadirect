@@ -15,6 +15,8 @@ export const routes = [
         children: [
           { path: "/", lazy: () => import("@/pages/Landing") },
           { path: "/cases", lazy: () => import("@/pages/Cases") },
+          { path: "/c/:slug", lazy: () => import("@/pages/CasePage") },
+          { path: "/receipt/:token", lazy: () => import("@/pages/ReceiptPage") },
           { path: "/how-it-works", lazy: () => import("@/pages/HowItWorks") },
           { path: "/privacy", lazy: () => import("@/pages/Privacy") },
           { path: "/terms", lazy: () => import("@/pages/Terms") },

@@ -1,4 +1,4 @@
-import type { CaseStatus, TrustLevel, UserRole } from "./enums";
+import type { CaseStatus, ExcessChoice, TrustLevel, UserRole } from "./enums";
 import type { components } from "./schema";
 
 type Schemas = components["schemas"];
@@ -44,3 +44,22 @@ export interface Page<T> {
   page_size: number;
   total: number;
 }
+
+export const LEDGER_ENTRY_TYPES = ["donation_captured", "paypal_fee", "settlement_sent", "refund_issued", "pool_transfer", "reversal", "adjustment"] as const;
+export type LedgerEntryType = (typeof LEDGER_ENTRY_TYPES)[number];
+
+export type PublicLedgerRow = Model<Schemas["PublicLedgerRow"], { entry_type: LedgerEntryType; reference: string | null; donor_name: string | null }>;
+export type CaseVerification = Model<Schemas["CaseVerification"]>;
+
+export type Receipt = Model<
+  Schemas["Receipt"],
+  {
+    amount_usd: string;
+    paypal_fee_usd: string;
+    net_usd: string;
+    kes_estimate: string;
+    excess_choice: ExcessChoice;
+    status: string;
+  }
+>;
+export type OrderCreated = Model<Schemas["OrderCreated"]>;

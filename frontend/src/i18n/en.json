@@ -418,5 +418,147 @@
         "body": "This demo runs on sandbox money with made-up hospitals and bills. Nothing here is a real fundraiser."
       }
     }
+  },
+  "donate": {
+    "title": "Make a donation",
+    "intro": "Give in US dollars through PayPal. The hospital is paid, never the family.",
+    "amount": "Amount in US dollars",
+    "presets": "Quick amounts",
+    "estimate": "About {{kes}} at today's rate. The exact amount is set when you pay.",
+    "estimateWait": "The Kenyan shilling amount appears once today's rate loads.",
+    "range": "Enter an amount between $1 and $10,000.",
+    "name": "Name shown in the public ledger (optional)",
+    "anonymous": "Give anonymously",
+    "working": "Completing your donation…",
+    "payMock": "Donate {{amount}} with PayPal (simulated)",
+    "secure": "You pay in PayPal's own window. We never see your card or password.",
+    "feeNote": "PayPal takes a small fee from each payment, so a little less than your gift reaches the case. Your receipt shows the exact amount.",
+    "funded": {
+      "title": "This case is fully funded",
+      "body": "Thank you to everyone who gave. No more donations are needed for this bill."
+    },
+    "closed": {
+      "title": "This case is closed",
+      "body": "The bill has been paid and this page is kept as a public record."
+    },
+    "excess": {
+      "title": "If there is money left over",
+      "intro": "Sometimes more money arrives than the bill needs. Choose what should happen to your share.",
+      "refund": {
+        "label": "Refund me",
+        "body": "Your leftover share goes back to you through PayPal. Under $1 goes to the solidarity pool."
+      },
+      "solidarity_pool": {
+        "label": "Solidarity pool",
+        "body": "Your leftover share goes into a shared pool, written in the public ledger."
+      },
+      "follow_up_care": {
+        "label": "Keep for follow-up care",
+        "body": "Held for up to 14 days for this patient's next confirmed bill, then refunded."
+      }
+    },
+    "errors": {
+      "fullyFunded": "This case no longer needs more donations. You have not been charged.",
+      "notAccepting": "This case is not taking donations right now.",
+      "pending": "PayPal is still checking this payment. We will email your receipt when it clears.",
+      "declined": "PayPal did not complete this payment. You have not been charged. Please try another way to pay.",
+      "amount": "Enter an amount between $1 and $10,000.",
+      "paypalDown": "PayPal could not be reached. You have not been charged. Please try again shortly.",
+      "generic": "We could not complete your donation. You have not been charged. Please try again."
+    }
+  },
+  "ledger": {
+    "title": "Public ledger",
+    "intro": "Every movement of money for this case, oldest first. Each entry carries a fingerprint that depends on the one before it, so an entry cannot be changed or removed without breaking the chain.",
+    "empty": "No money has moved yet.",
+    "columns": {
+      "when": "When",
+      "what": "What happened",
+      "account": "Account",
+      "amount": "Amount",
+      "reference": "Reference",
+      "fingerprint": "Fingerprint"
+    },
+    "types": {
+      "donation_captured": "Donation received",
+      "paypal_fee": "PayPal fee",
+      "settlement_sent": "Paid to the hospital",
+      "refund_issued": "Refund to donor",
+      "pool_transfer": "Moved to the solidarity pool",
+      "reversal": "Payment reversed",
+      "adjustment": "Adjustment"
+    },
+    "accounts": {
+      "case_funds": "Case funds",
+      "paypal_fees": "PayPal fees",
+      "hospital_settled": "Paid to the hospital",
+      "donor_refunds": "Refunds to donors",
+      "solidarity_pool": "Solidarity pool"
+    },
+    "fromDonor": "{{what}} from {{name}}",
+    "verify": "Verify ledger",
+    "verifying": "Checking…",
+    "verifyHelp": "Recomputes every fingerprint for this case on our server.",
+    "valid": {
+      "title": "The ledger is intact",
+      "body": "We rechecked all {{count}} entries for this case and every fingerprint matches. The newest one starts with {{hash}}."
+    },
+    "invalid": {
+      "title": "The ledger check failed",
+      "body": "Something in the chain does not match. Please tell us so we can look into it, and be careful about giving until we have."
+    }
+  },
+  "tranches": {
+    "title": "Payments to the hospital",
+    "none": "Nothing has been paid to the hospital yet. A payment is made once enough has been pledged.",
+    "item": "Payment {{n}}: {{amount}}",
+    "simulated": "Payments to the hospital are simulated here: they go to the hospital's sandbox PayPal account. In production a licensed Kenyan partner pays the hospital's paybill or bank account."
+  },
+  "casePage": {
+    "title": "Case",
+    "back": "All cases",
+    "bill": "The hospital bill",
+    "story": "The family's story",
+    "noStory": "The family has not added a story yet.",
+    "noDiagnosis": "We verify the bill, not the illness. No diagnosis is shown on any case.",
+    "estimateNote": "This is an estimate. Until the final bill is confirmed, no more than 80% of it is paid to the hospital.",
+    "closedNote": "This case is closed. The page stays as a public record.",
+    "notFound": {
+      "title": "We could not find that case",
+      "body": "It may be private, paused for a check, or the link may be wrong."
+    }
+  },
+  "share": {
+    "title": "Share this case",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "copyFailed": "Could not copy the link",
+    "opensNewTab": "opens in a new tab",
+    "more": "Share",
+    "text": "Please help with {{alias}}'s hospital bill on TibaDirect:"
+  },
+  "receipt": {
+    "title": "Donation receipt",
+    "thanks": "Thank you",
+    "lead": "Your {{amount}} donation to {{alias}} is on its way to {{hospital}}.",
+    "amount": "You gave",
+    "fee": "PayPal fee",
+    "net": "Reaches the case",
+    "kes": "Worth about",
+    "kesNote": "The shilling amount uses the exchange rate at the time you paid. It is an estimate.",
+    "excess": "If money is left over",
+    "name": "Name in the ledger",
+    "date": "Paid",
+    "reference": "PayPal reference",
+    "fingerprint": "Ledger fingerprint",
+    "seeLedger": "See it in the public ledger",
+    "print": "Print receipt",
+    "keepLink": "Keep this link. It is your receipt and anyone with it can see it.",
+    "refunded": "This donation has been refunded in full.",
+    "partiallyRefunded": "{{amount}} of this donation has been refunded.",
+    "notFound": {
+      "title": "We could not find that receipt",
+      "body": "Check the link in your email, or the one you saved."
+    }
   }
 }

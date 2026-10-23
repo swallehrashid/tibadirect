@@ -4,7 +4,7 @@ COMPOSE ?= docker compose
 VENV    ?= $(CURDIR)/backend/.venv
 BIN     := $(VENV)/bin
 
-.PHONY: help up down up-app worker scheduler migrate seed reset-demo test lint fmt gen-api openapi synthetic eval e2e
+.PHONY: help up down up-app worker scheduler migrate seed reset-demo test lint fmt gen-api openapi synthetic eval e2e web web-check
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -48,6 +48,12 @@ openapi: ## Write the OpenAPI snapshot to docs/api/openapi.json
 
 gen-api: ## Regenerate frontend API types from the running backend
 	cd frontend && npm run gen:api
+
+web: ## Run the frontend dev server (proxies /api to the Flask server on port 5000)
+	cd frontend && npm run dev
+
+web-check: ## Lint, type-check, test and build the frontend
+	cd frontend && npm run lint && npm run typecheck && npm test && npm run build
 
 synthetic: ## Generate the synthetic dataset
 	cd backend && $(BIN)/flask --app wsgi synthetic generate

@@ -1,0 +1,11 @@
+{
+  "app": {
+    "name": "TibaDirect",
+    "tagline": "Verified medical fundraising that pays the hospital, not a stranger's phone number."
+  },
+  "status": {
+    "checking": "Checking the service…",
+    "ok": "The service is running.",
+    "down": "The service is not reachable right now."
+  }
+}

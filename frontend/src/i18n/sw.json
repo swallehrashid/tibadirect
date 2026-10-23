@@ -1,0 +1,11 @@
+{
+  "app": {
+    "name": "TibaDirect",
+    "tagline": "Uchangishaji wa matibabu uliothibitishwa, unaolipa hospitali moja kwa moja."
+  },
+  "status": {
+    "checking": "Inakagua huduma…",
+    "ok": "Huduma inafanya kazi.",
+    "down": "Huduma haipatikani kwa sasa."
+  }
+}

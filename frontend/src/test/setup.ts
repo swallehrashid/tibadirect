@@ -9,6 +9,12 @@ configure({ asyncUtilTimeout: 5000 });
 // jsdom does not implement scrolling; the router calls it on navigation.
 window.scrollTo = () => undefined;
 
+// Radix Select and menus call pointer and scroll APIs that jsdom lacks.
+Element.prototype.hasPointerCapture ??= () => false;
+Element.prototype.setPointerCapture ??= () => undefined;
+Element.prototype.releasePointerCapture ??= () => undefined;
+Element.prototype.scrollIntoView ??= () => undefined;
+
 afterEach(() => {
   cleanup();
 });

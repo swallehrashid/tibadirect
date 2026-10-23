@@ -14,6 +14,10 @@ export const routes = [
         element: <PageShell />,
         children: [
           { path: "/", lazy: () => import("@/pages/Landing") },
+          { path: "/cases", lazy: () => import("@/pages/Cases") },
+          { path: "/how-it-works", lazy: () => import("@/pages/HowItWorks") },
+          { path: "/privacy", lazy: () => import("@/pages/Privacy") },
+          { path: "/terms", lazy: () => import("@/pages/Terms") },
           { path: "/login", lazy: () => import("@/pages/Login") },
           { path: "/login/verify", lazy: () => import("@/pages/LoginVerify") },
           // The showcase is only downloaded when someone opens it.

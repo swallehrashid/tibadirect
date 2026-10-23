@@ -180,5 +180,243 @@
   "notFound": {
     "title": "Page not found",
     "body": "The page you are looking for does not exist or has moved."
+  },
+  "cases": {
+    "title": "Cases you can support",
+    "intro": "Every case here has a bill that the hospital itself has confirmed, or is waiting for the hospital to confirm. Pick one to see the details.",
+    "county": "Hospital county",
+    "allCounties": "All counties",
+    "count_one": "{{count}} case",
+    "count_other": "{{count}} cases",
+    "donors_one": "{{count}} donor",
+    "donors_other": "{{count}} donors",
+    "empty": {
+      "title": "No open cases right now",
+      "body": "New cases appear here once a hospital has confirmed the bill. Please check again soon."
+    },
+    "emptyCounty": {
+      "title": "No open cases in {{county}}",
+      "body": "Try another county, or look at all counties."
+    },
+    "pages": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{total}}"
+  },
+  "landing": {
+    "hero": {
+      "title": "Pay the hospital, not a stranger's phone number.",
+      "body": "Families share a hospital bill that the hospital itself confirms. Donors anywhere in the world give in US dollars through PayPal, and the money goes to the hospital in parts as it is needed.",
+      "browse": "Browse cases",
+      "start": "Start a campaign",
+      "motto": "We verify the bill, not the illness."
+    },
+    "promise": {
+      "title": "The money never touches a middleman",
+      "body": "Donations are paid out to the hospital, never to the family or to us. Every movement of money is written in a public ledger anyone can check."
+    },
+    "flow": {
+      "title": "How your money reaches the hospital",
+      "intro": "Four steps, from the family's bill to the hospital's account.",
+      "step": "Step {{n}}",
+      "more": "See the full money flow",
+      "share": {
+        "title": "The family shares the bill",
+        "body": "They upload the hospital bill. Medical details are removed before anything is checked."
+      },
+      "confirm": {
+        "title": "The hospital confirms it",
+        "body": "The hospital's billing office confirms the amount with a code sent to its official email."
+      },
+      "donate": {
+        "title": "You give with PayPal",
+        "body": "Choose an amount in US dollars. You also choose what happens to anything left over."
+      },
+      "pay": {
+        "title": "The hospital is paid",
+        "body": "Money is paid to the hospital in parts as it arrives. It is never paid to the family."
+      }
+    },
+    "live": {
+      "title": "Cases open now",
+      "previous": "Previous cases",
+      "next": "Next cases",
+      "all": "See all cases"
+    },
+    "check": {
+      "title": "Got a fundraising message on WhatsApp?",
+      "body": "Paste it or upload a screenshot and we will tell you what looks risky, and whether it matches a confirmed case. We do not keep what you paste.",
+      "cta": "Check an appeal"
+    },
+    "stats": {
+      "title": "So far",
+      "cases": "Public cases",
+      "hospitals": "Hospitals",
+      "donations": "Donations",
+      "settled": "Paid to hospitals",
+      "note": "These are demo figures from made-up cases and sandbox money."
+    }
+  },
+  "howItWorks": {
+    "title": "How TibaDirect works",
+    "intro": "Two things have to be true before you give: the bill is real, and the money reaches the hospital. We handle them separately, so you can check each one.",
+    "legsTitle": "The two parts of every case",
+    "motto": "We verify the bill, not the illness. The donor's money touches the hospital, never a middleman.",
+    "trust": {
+      "title": "Is the bill real?",
+      "intro": "The trust part. It happens before any money is accepted.",
+      "s1": {
+        "title": "The family shares the bill",
+        "body": "A family member signs in, chooses the hospital, agrees to what we may do with the bill, and uploads it. Medical details are removed before anything is stored or analysed."
+      },
+      "s2": {
+        "title": "A helper reads and checks it",
+        "body": "Software reads the amount and looks for edits, copies and scam patterns. It only explains what it finds. It never turns a family away: a person reviews anything that looks risky."
+      },
+      "s3": {
+        "title": "The hospital confirms it",
+        "body": "The hospital's billing office gets a one-time code at the official email address in the facility register, never an address printed on the bill. Large bills need two people to agree."
+      },
+      "s4": {
+        "title": "The page goes live",
+        "body": "The case page shows a hospital-confirmed badge, the amount and the family's story. It never shows a diagnosis."
+      }
+    },
+    "money": {
+      "title": "Does the money reach the hospital?",
+      "intro": "The money part. It follows the hospital's confirmed bill.",
+      "s1": {
+        "title": "You give in US dollars",
+        "body": "Pay with PayPal. The page shows the bill in Kenyan shillings, with a small buffer for exchange-rate changes and fees."
+      },
+      "s2": {
+        "title": "It is written in a public ledger",
+        "body": "Every movement is recorded in a chain of fingerprints that anyone can check. TibaDirect does not keep donations for itself."
+      },
+      "s3": {
+        "title": "The hospital is paid in parts",
+        "body": "As money arrives, the hospital is paid in tranches. While the bill is only an estimate, no more than 80% is paid until the final bill is confirmed."
+      },
+      "s4": {
+        "title": "The final bill closes the case",
+        "body": "When the final bill has been paid, the case closes and the page says so."
+      },
+      "s5": {
+        "title": "Anything left over follows your choice",
+        "body": "If there is money left, it goes where each donor chose when they gave. See below."
+      }
+    },
+    "excess": {
+      "title": "What happens to leftover money",
+      "intro": "When you give, you choose what should happen if more money arrives than the bill needs, or the treatment ends sooner than planned.",
+      "refund": {
+        "title": "Refund me",
+        "body": "Your share goes back to you through PayPal. Leftovers under $1 go to the solidarity pool instead, because the refund would cost more than it returns."
+      },
+      "pool": {
+        "title": "Solidarity pool",
+        "body": "Your share goes into a shared solidarity pool. The transfer is written in the public ledger like any other movement."
+      },
+      "follow": {
+        "title": "Keep for follow-up care",
+        "body": "Your share is held for up to 14 days for the same patient's next confirmed bill. If none comes, it is refunded."
+      },
+      "freeze": "If a case is frozen because something looks wrong, every donor is refunded, whatever they chose."
+    },
+    "real": {
+      "title": "What is real and what is simulated",
+      "realTitle": "Real",
+      "simTitle": "Simulated in this demo",
+      "r1": "The bill checks, the hospital confirmation steps and the review by a person.",
+      "r2": "The public ledger and its fingerprints, which you can verify on every case.",
+      "r3": "The rules for tranches, refunds and leftover money.",
+      "r4": "Sign-in by emailed code and the privacy rules for what is stored.",
+      "m1": "The money: payments run on PayPal's sandbox, so no real money moves.",
+      "m2": "Payments to the hospital go to a sandbox account. In production a licensed Kenyan settlement partner would pay the hospital's paybill or bank account.",
+      "m3": "The hospitals, families and bills are made up, and no real patient is shown.",
+      "m4": "Emails go to a test inbox, not to real addresses."
+    },
+    "faq": {
+      "title": "Questions",
+      "q1": {
+        "q": "Does TibaDirect hold my money?",
+        "a": "No. Payments go through PayPal and are paid out to the hospital in parts. We do not spend or keep donations, and the public ledger shows where each one went."
+      },
+      "q2": {
+        "q": "Who can see the patient's details?",
+        "a": "Donors see an alias, a region, the hospital and the amounts. The patient reference is only visible to the family and the hospital, and bill files are deleted 24 hours after the hospital confirms."
+      },
+      "q3": {
+        "q": "What if the final bill is lower than the estimate?",
+        "a": "The hospital is paid only the confirmed amount. Anything left over follows each donor's choice."
+      },
+      "q4": {
+        "q": "What if a case turns out to be fake?",
+        "a": "An administrator can freeze a case at any time. Every donor is then refunded."
+      },
+      "q5": {
+        "q": "Do I need an account to give?",
+        "a": "No. You only need PayPal. You can give anonymously or with a name of your choice."
+      }
+    }
+  },
+  "legal": {
+    "draft": "This is a short summary written for the demo. The full notice will be published after legal review.",
+    "privacy": {
+      "title": "Privacy",
+      "intro": "What we collect, why, and how long we keep it.",
+      "p1": {
+        "title": "We collect as little as we can",
+        "body": "Families give an email address, a patient reference and the bill. Donors give an email address for the receipt. We do not ask for anything else."
+      },
+      "p2": {
+        "title": "Medical details are removed early",
+        "body": "Diagnoses and similar details are removed from the bill text before it is stored or sent for analysis. Pages never show a diagnosis."
+      },
+      "p3": {
+        "title": "Your choices are separate",
+        "body": "Each use of the bill (hospital check, public page, analysis outside Kenya, receipts) has its own consent. You can withdraw a consent at any time from your dashboard."
+      },
+      "p4": {
+        "title": "Analysis outside Kenya needs your consent",
+        "body": "Only the redacted text of a bill can leave our servers, and only if you agreed. Without that consent a local fallback is used."
+      },
+      "p5": {
+        "title": "Files are deleted",
+        "body": "Bill files are deleted 24 hours after the hospital confirms them. Donor names appear on the public ledger only if the donor gave one and did not ask to be anonymous."
+      },
+      "p6": {
+        "title": "People decide",
+        "body": "Software never rejects a case. A person reviews anything flagged, and a family can ask for a review at any time."
+      }
+    },
+    "terms": {
+      "title": "Terms of use",
+      "intro": "The main rules for using TibaDirect.",
+      "p1": {
+        "title": "We do not hold or keep donations",
+        "body": "Donations are paid out to the confirmed hospital. TibaDirect does not pay families and does not keep donations for itself."
+      },
+      "p2": {
+        "title": "Money is paid in parts",
+        "body": "The hospital is paid in tranches as money arrives. While a bill is an estimate, no more than 80% is paid until the final bill is confirmed."
+      },
+      "p3": {
+        "title": "Leftover money follows the donor's choice",
+        "body": "If the final bill is lower or treatment ends early, leftover money is refunded, moved to the solidarity pool, or held briefly for follow-up care, as the donor chose."
+      },
+      "p4": {
+        "title": "Cases can be frozen",
+        "body": "If a case looks fraudulent we can freeze it. Every donor is then refunded, whatever they chose."
+      },
+      "p5": {
+        "title": "Families must tell the truth",
+        "body": "Families must upload their own real bill and must not give false information. A false case is closed and reported."
+      },
+      "p6": {
+        "title": "Demo notice",
+        "body": "This demo runs on sandbox money with made-up hospitals and bills. Nothing here is a real fundraiser."
+      }
+    }
   }
 }

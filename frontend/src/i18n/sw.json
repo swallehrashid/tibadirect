@@ -180,5 +180,243 @@
   "notFound": {
     "title": "Ukurasa haujapatikana",
     "body": "Ukurasa unaoutafuta haupo au umehamishwa."
+  },
+  "cases": {
+    "title": "Kesi unazoweza kusaidia",
+    "intro": "Kila kesi hapa ina bili ambayo hospitali yenyewe imethibitisha, au inasubiri hospitali kuithibitisha. Chagua moja uone maelezo.",
+    "county": "Kaunti ya hospitali",
+    "allCounties": "Kaunti zote",
+    "count_one": "Kesi {{count}}",
+    "count_other": "Kesi {{count}}",
+    "donors_one": "Mchangiaji {{count}}",
+    "donors_other": "Wachangiaji {{count}}",
+    "empty": {
+      "title": "Hakuna kesi wazi sasa hivi",
+      "body": "Kesi mpya huonekana hapa hospitali ikishathibitisha bili. Tafadhali angalia tena baadaye."
+    },
+    "emptyCounty": {
+      "title": "Hakuna kesi wazi katika {{county}}",
+      "body": "Jaribu kaunti nyingine, au tazama kaunti zote."
+    },
+    "pages": "Kurasa",
+    "previous": "Iliyotangulia",
+    "next": "Inayofuata",
+    "pageOf": "Ukurasa wa {{page}} kati ya {{total}}"
+  },
+  "landing": {
+    "hero": {
+      "title": "Lipa hospitali, si simu ya mtu usiyemjua.",
+      "body": "Familia zinashiriki bili ya hospitali ambayo hospitali yenyewe inathibitisha. Wachangiaji popote duniani wanatoa kwa dola za Marekani kupitia PayPal, na pesa hulipwa hospitalini kwa awamu kadiri zinavyohitajika.",
+      "browse": "Angalia kesi",
+      "start": "Anzisha mchango",
+      "motto": "Tunathibitisha bili, si ugonjwa."
+    },
+    "promise": {
+      "title": "Pesa hazipiti kwa mtu wa kati",
+      "body": "Michango hulipwa hospitalini, kamwe si kwa familia wala kwetu. Kila uhamishaji wa pesa unaandikwa kwenye leja ya wazi ambayo yeyote anaweza kuikagua."
+    },
+    "flow": {
+      "title": "Jinsi pesa zako zinavyofika hospitalini",
+      "intro": "Hatua nne, kutoka bili ya familia hadi akaunti ya hospitali.",
+      "step": "Hatua ya {{n}}",
+      "more": "Tazama mtiririko kamili wa pesa",
+      "share": {
+        "title": "Familia inashiriki bili",
+        "body": "Wanapakia bili ya hospitali. Maelezo ya kitabibu huondolewa kabla ya ukaguzi wowote."
+      },
+      "confirm": {
+        "title": "Hospitali inaithibitisha",
+        "body": "Ofisi ya malipo ya hospitali inathibitisha kiasi kwa msimbo unaotumwa kwa barua pepe yake rasmi."
+      },
+      "donate": {
+        "title": "Unatoa kwa PayPal",
+        "body": "Chagua kiasi kwa dola za Marekani. Pia unachagua kitakachotokea kwa pesa zitakazobaki."
+      },
+      "pay": {
+        "title": "Hospitali inalipwa",
+        "body": "Pesa hulipwa hospitalini kwa awamu kadiri zinavyofika. Kamwe hazilipwi kwa familia."
+      }
+    },
+    "live": {
+      "title": "Kesi zilizo wazi sasa",
+      "previous": "Kesi zilizotangulia",
+      "next": "Kesi zinazofuata",
+      "all": "Tazama kesi zote"
+    },
+    "check": {
+      "title": "Umepata ujumbe wa kuchangisha kwenye WhatsApp?",
+      "body": "Bandika ujumbe au pakia picha ya skrini nasi tutakuambia kinachoonekana hatari, na kama unalingana na kesi iliyothibitishwa. Hatuhifadhi unachobandika.",
+      "cta": "Kagua ombi la msaada"
+    },
+    "stats": {
+      "title": "Hadi sasa",
+      "cases": "Kesi za umma",
+      "hospitals": "Hospitali",
+      "donations": "Michango",
+      "settled": "Iliyolipwa hospitalini",
+      "note": "Hizi ni takwimu za onyesho kutoka kesi za kubuni na pesa za majaribio."
+    }
+  },
+  "howItWorks": {
+    "title": "Jinsi TibaDirect inavyofanya kazi",
+    "intro": "Mambo mawili lazima yawe kweli kabla ya kutoa: bili ni halisi, na pesa zinafika hospitalini. Tunayashughulikia kando, ili uweze kukagua kila moja.",
+    "legsTitle": "Sehemu mbili za kila kesi",
+    "motto": "Tunathibitisha bili, si ugonjwa. Pesa ya mchangiaji hufika hospitalini, kamwe si kwa mtu wa kati.",
+    "trust": {
+      "title": "Je, bili ni halisi?",
+      "intro": "Sehemu ya uaminifu. Hufanyika kabla pesa yoyote kukubaliwa.",
+      "s1": {
+        "title": "Familia inashiriki bili",
+        "body": "Mwanafamilia anaingia, anachagua hospitali, anakubali tunachoweza kufanya na bili, na kuipakia. Maelezo ya kitabibu huondolewa kabla ya kuhifadhi au kuchambua chochote."
+      },
+      "s2": {
+        "title": "Msaidizi anasoma na kukagua",
+        "body": "Programu inasoma kiasi na kutafuta mabadiliko, nakala na mbinu za utapeli. Inaeleza tu inachokipata. Kamwe haikatai familia: mtu hukagua chochote kinachoonekana hatari."
+      },
+      "s3": {
+        "title": "Hospitali inaithibitisha",
+        "body": "Ofisi ya malipo ya hospitali hupokea msimbo wa mara moja kwenye barua pepe rasmi iliyo kwenye daftari la vituo vya afya, kamwe si anwani iliyochapishwa kwenye bili. Bili kubwa zinahitaji watu wawili kukubali."
+      },
+      "s4": {
+        "title": "Ukurasa unaanza kutumika",
+        "body": "Ukurasa wa kesi unaonyesha alama ya kuthibitishwa na hospitali, kiasi na hadithi ya familia. Kamwe haonyeshi utambuzi wa ugonjwa."
+      }
+    },
+    "money": {
+      "title": "Je, pesa zinafika hospitalini?",
+      "intro": "Sehemu ya pesa. Inafuata bili iliyothibitishwa na hospitali.",
+      "s1": {
+        "title": "Unatoa kwa dola za Marekani",
+        "body": "Lipa kwa PayPal. Ukurasa unaonyesha bili kwa shilingi za Kenya, pamoja na ziada ndogo kwa mabadiliko ya viwango vya kubadilisha fedha na ada."
+      },
+      "s2": {
+        "title": "Inaandikwa kwenye leja ya wazi",
+        "body": "Kila uhamishaji unarekodiwa kwenye mnyororo wa alama za kidijitali ambazo yeyote anaweza kuzikagua. TibaDirect haihifadhi michango kwa manufaa yake."
+      },
+      "s3": {
+        "title": "Hospitali inalipwa kwa awamu",
+        "body": "Pesa zinapofika, hospitali hulipwa kwa awamu. Bili ikiwa makadirio tu, si zaidi ya 80% hulipwa hadi bili ya mwisho ithibitishwe."
+      },
+      "s4": {
+        "title": "Bili ya mwisho inafunga kesi",
+        "body": "Bili ya mwisho ikishalipwa, kesi inafungwa na ukurasa unasema hivyo."
+      },
+      "s5": {
+        "title": "Kinachobaki kinafuata chaguo lako",
+        "body": "Ikiwa pesa zimebaki, zinaenda kule kila mchangiaji alikochagua alipotoa. Tazama hapa chini."
+      }
+    },
+    "excess": {
+      "title": "Pesa zinazobaki hufanywaje",
+      "intro": "Unapotoa, unachagua kitakachotokea ikiwa pesa nyingi kuliko bili zinahitajika zitafika, au matibabu yakiisha mapema kuliko ilivyopangwa.",
+      "refund": {
+        "title": "Nirudishie",
+        "body": "Sehemu yako inarudishwa kwako kupitia PayPal. Salio chini ya $1 huenda kwenye mfuko wa mshikamano, kwa sababu kurudisha kungegharimu zaidi ya kinachorudishwa."
+      },
+      "pool": {
+        "title": "Mfuko wa mshikamano",
+        "body": "Sehemu yako inaenda kwenye mfuko wa pamoja wa mshikamano. Uhamishaji unaandikwa kwenye leja ya wazi kama mwingine wowote."
+      },
+      "follow": {
+        "title": "Weka kwa matibabu ya kufuatilia",
+        "body": "Sehemu yako inashikiliwa hadi siku 14 kwa ajili ya bili inayofuata iliyothibitishwa ya mgonjwa yule yule. Isipokuja, inarudishwa."
+      },
+      "freeze": "Kesi ikisimamishwa kwa sababu kuna kitu kinaonekana si sawa, kila mchangiaji hurudishiwa pesa, bila kujali alichochagua."
+    },
+    "real": {
+      "title": "Kipi ni halisi na kipi ni cha kuigiza",
+      "realTitle": "Halisi",
+      "simTitle": "Vinaigizwa kwenye onyesho hili",
+      "r1": "Ukaguzi wa bili, hatua za uthibitisho wa hospitali na ukaguzi wa mtu.",
+      "r2": "Leja ya wazi na alama zake za kidijitali, unazoweza kuzithibitisha kwenye kila kesi.",
+      "r3": "Kanuni za awamu za malipo, marejesho na pesa zinazobaki.",
+      "r4": "Kuingia kwa msimbo wa barua pepe na kanuni za faragha kuhusu kinachohifadhiwa.",
+      "m1": "Pesa: malipo yanaendeshwa kwenye mazingira ya majaribio ya PayPal, kwa hiyo hakuna pesa halisi zinazohamishwa.",
+      "m2": "Malipo kwa hospitali yanaenda kwenye akaunti ya majaribio. Kwa matumizi halisi, mshirika wa malipo mwenye leseni nchini Kenya angelipa paybill au akaunti ya benki ya hospitali.",
+      "m3": "Hospitali, familia na bili ni za kubuni, na hakuna mgonjwa halisi anayeonyeshwa.",
+      "m4": "Barua pepe zinaenda kwenye kisanduku cha majaribio, si kwa anwani halisi."
+    },
+    "faq": {
+      "title": "Maswali",
+      "q1": {
+        "q": "Je, TibaDirect inashikilia pesa zangu?",
+        "a": "Hapana. Malipo yanapita PayPal na kulipwa hospitalini kwa awamu. Hatutumii wala kuhifadhi michango, na leja ya wazi inaonyesha kila mchango ulikoenda."
+      },
+      "q2": {
+        "q": "Nani anaweza kuona maelezo ya mgonjwa?",
+        "a": "Wachangiaji wanaona jina la utambulisho, eneo, hospitali na kiasi. Rejea ya mgonjwa inaonekana kwa familia na hospitali pekee, na faili za bili hufutwa saa 24 baada ya hospitali kuthibitisha."
+      },
+      "q3": {
+        "q": "Je, bili ya mwisho ikiwa ndogo kuliko makadirio?",
+        "a": "Hospitali inalipwa kiasi kilichothibitishwa tu. Kinachobaki kinafuata chaguo la kila mchangiaji."
+      },
+      "q4": {
+        "q": "Je, kesi ikionekana ni ya uongo?",
+        "a": "Msimamizi anaweza kusimamisha kesi wakati wowote. Kila mchangiaji hurudishiwa pesa."
+      },
+      "q5": {
+        "q": "Je, nahitaji akaunti ili kutoa?",
+        "a": "Hapana. Unahitaji PayPal tu. Unaweza kutoa bila kujitambulisha au kwa jina utakalochagua."
+      }
+    }
+  },
+  "legal": {
+    "draft": "Hii ni muhtasari mfupi ulioandikwa kwa ajili ya onyesho. Notisi kamili itachapishwa baada ya ukaguzi wa kisheria.",
+    "privacy": {
+      "title": "Faragha",
+      "intro": "Tunachokusanya, kwa nini, na tunakihifadhi kwa muda gani.",
+      "p1": {
+        "title": "Tunakusanya kidogo iwezekanavyo",
+        "body": "Familia hutoa barua pepe, rejea ya mgonjwa na bili. Wachangiaji hutoa barua pepe kwa ajili ya risiti. Hatuombi kitu kingine."
+      },
+      "p2": {
+        "title": "Maelezo ya kitabibu huondolewa mapema",
+        "body": "Utambuzi wa ugonjwa na maelezo kama hayo huondolewa kwenye maandishi ya bili kabla ya kuhifadhiwa au kutumwa kuchambuliwa. Kurasa kamwe hazionyeshi utambuzi."
+      },
+      "p3": {
+        "title": "Chaguo zako ni tofauti",
+        "body": "Kila matumizi ya bili (ukaguzi wa hospitali, ukurasa wa umma, uchambuzi nje ya Kenya, risiti) lina ridhaa yake. Unaweza kuondoa ridhaa wakati wowote kutoka dashibodi yako."
+      },
+      "p4": {
+        "title": "Uchambuzi nje ya Kenya unahitaji ridhaa yako",
+        "body": "Maandishi ya bili yaliyoondolewa maelezo pekee ndiyo yanaweza kutoka kwenye seva zetu, na ni ikiwa ulikubali tu. Bila ridhaa hiyo, mfumo wa ndani hutumika."
+      },
+      "p5": {
+        "title": "Faili hufutwa",
+        "body": "Faili za bili hufutwa saa 24 baada ya hospitali kuzithibitisha. Majina ya wachangiaji huonekana kwenye leja ya wazi tu ikiwa mchangiaji alitoa jina na hakuomba kutotambulika."
+      },
+      "p6": {
+        "title": "Watu ndio wanaoamua",
+        "body": "Programu kamwe haikatai kesi. Mtu hukagua chochote kilichoalamishwa, na familia inaweza kuomba ukaguzi wakati wowote."
+      }
+    },
+    "terms": {
+      "title": "Masharti ya matumizi",
+      "intro": "Kanuni kuu za kutumia TibaDirect.",
+      "p1": {
+        "title": "Hatushikilii wala kuhifadhi michango",
+        "body": "Michango hulipwa kwa hospitali iliyothibitishwa. TibaDirect hailipi familia na haihifadhi michango kwa manufaa yake."
+      },
+      "p2": {
+        "title": "Pesa hulipwa kwa awamu",
+        "body": "Hospitali hulipwa kwa awamu pesa zinapofika. Bili ikiwa makadirio, si zaidi ya 80% hulipwa hadi bili ya mwisho ithibitishwe."
+      },
+      "p3": {
+        "title": "Pesa zinazobaki zinafuata chaguo la mchangiaji",
+        "body": "Bili ya mwisho ikiwa ndogo au matibabu yakiisha mapema, pesa zinazobaki hurudishwa, kuhamishiwa mfuko wa mshikamano, au kushikiliwa kwa muda mfupi kwa matibabu ya kufuatilia, kama mchangiaji alivyochagua."
+      },
+      "p4": {
+        "title": "Kesi zinaweza kusimamishwa",
+        "body": "Kesi ikionekana ya udanganyifu tunaweza kuisimamisha. Kila mchangiaji hurudishiwa pesa, bila kujali alichochagua."
+      },
+      "p5": {
+        "title": "Familia lazima zisimulie ukweli",
+        "body": "Familia lazima zipakie bili yao halisi na zisitoe taarifa za uongo. Kesi ya uongo hufungwa na kuripotiwa."
+      },
+      "p6": {
+        "title": "Tangazo la onyesho",
+        "body": "Onyesho hili linatumia pesa za majaribio na hospitali na bili za kubuni. Hakuna kinachoonekana hapa ni mchango halisi."
+      }
+    }
   }
 }

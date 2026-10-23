@@ -1,0 +1,70 @@
+/*
+ * TibaDirect design tokens. Raw colours come first, then the semantic roles the components use.
+ * Colour meaning is fixed across the app:
+ *   Teal  = hospital-confirmed / settled      Amber = pending / needs attention
+ *   Sky   = pledged / information             Blue  = action / brand
+ * Contrast of every text pair used is checked by src/design/tokens.test.ts.
+ */
+:root {
+  /* Brand blue */
+  --tiba-blue-900: #0a2463;
+  --tiba-blue-700: #1748a8;
+  --tiba-blue-600: #1d5fd1;
+  --tiba-blue-100: #dce8fb;
+  --tiba-blue-50: #eef4fd;
+
+  /* Accent 1: Sky (pledged, information). Use navy text on the solid colour, never white. */
+  --sky-500: #38bdf8;
+  --sky-100: #e0f4fe;
+  --sky-800: #075985;
+
+  /* Accent 2: Uzima Teal (hospital-confirmed, settled, success) */
+  --uzima-600: #0e8c7e;
+  --uzima-700: #0f766e;
+  --uzima-100: #d3efeb;
+  --uzima-50: #e9f7f5;
+
+  /* Accent 3: Jua Amber (pending, attention). Fill only with navy text; text variant for words. */
+  --jua-400: #f4b400;
+  --jua-700: #b45309;
+  --jua-100: #fdefc2;
+  --jua-50: #fef7dc;
+
+  /* Errors only; a semantic colour, not part of the brand */
+  --danger-600: #dc2626;
+  --danger-700: #b91c1c;
+  --danger-50: #fef2f2;
+
+  /* Neutrals (Tailwind slate) */
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --surface: #ffffff;
+
+  /* Semantic roles */
+  --background: var(--tiba-blue-50);
+  --foreground: var(--tiba-blue-900);
+  --card: var(--surface);
+  --card-foreground: var(--tiba-blue-900);
+  --popover: var(--surface);
+  --popover-foreground: var(--tiba-blue-900);
+  --primary: var(--tiba-blue-600);
+  --primary-hover: var(--tiba-blue-700);
+  --primary-foreground: #ffffff;
+  --secondary: var(--tiba-blue-100);
+  --secondary-foreground: var(--tiba-blue-900);
+  --muted: var(--slate-100);
+  --muted-foreground: var(--slate-600);
+  --border: var(--slate-200);
+  --input: #7b8aa3; /* form borders need 3:1 against their background */
+  --ring: var(--tiba-blue-600);
+  --destructive: var(--danger-600);
+  --destructive-foreground: #ffffff;
+
+  --radius: 10px;
+  --shadow-card: 0 1px 2px rgb(10 36 99 / 0.06), 0 2px 8px rgb(10 36 99 / 0.06);
+}

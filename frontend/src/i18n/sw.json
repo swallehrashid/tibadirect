@@ -7,5 +7,121 @@
     "checking": "Inakagua huduma…",
     "ok": "Huduma inafanya kazi.",
     "down": "Huduma haipatikani kwa sasa."
+  },
+  "common": {
+    "close": "Funga",
+    "retry": "Jaribu tena",
+    "loading": "Inapakia…",
+    "back": "Rudi",
+    "next": "Endelea",
+    "submit": "Tuma",
+    "cancel": "Ghairi",
+    "save": "Hifadhi",
+    "required": "Lazima",
+    "optional": "Si lazima",
+    "remove": "Ondoa",
+    "sandbox": "Majaribio"
+  },
+  "trust": {
+    "hospital_confirmed": {
+      "label": "Imethibitishwa na hospitali",
+      "explain": "Ofisi ya malipo ya hospitali imethibitisha bili hii kwa msimbo uliotumwa kwa barua pepe rasmi ya hospitali."
+    },
+    "pending_confirmation": {
+      "label": "Inasubiri uthibitisho",
+      "explain": "Familia imeshiriki bili. Tunasubiri hospitali iithibitishe. Michango bado haijalipwa."
+    },
+    "unverified": {
+      "label": "Haijathibitishwa",
+      "explain": "Bili hii haijakaguliwa na hospitali. Kuwa mwangalifu na usitume pesa nje ya TibaDirect."
+    },
+    "about": "Alama hii inamaanisha nini"
+  },
+  "risk": {
+    "label": "Matokeo ya ukaguzi",
+    "low": "Wasiwasi mdogo",
+    "medium": "Inahitaji uangalizi zaidi",
+    "high": "Wasiwasi mkubwa"
+  },
+  "caseStatus": {
+    "draft": "Rasimu",
+    "pending_triage": "Bili inakaguliwa",
+    "in_review": "Iko kwa timu yetu ya ukaguzi",
+    "pending_confirmation": "Inasubiri hospitali",
+    "live": "Hai",
+    "funded": "Imekamilika kuchangiwa",
+    "closed": "Imefungwa",
+    "cancelled": "Imeghairiwa",
+    "frozen": "Imesimamishwa kwa ukaguzi"
+  },
+  "meter": {
+    "target": "Bili ya hospitali",
+    "targetEstimate": "Makadirio ya bili",
+    "noTarget": "Kiasi kitaonekana hapa hospitali itakapothibitisha bili.",
+    "pledged": "Iliyoahidiwa na wachangiaji",
+    "settled": "Iliyolipwa hospitalini",
+    "percent": "{{percent}}% imeahidiwa",
+    "summary": "{{pledged}} zimeahidiwa na {{settled}} zimelipwa hospitalini, kati ya {{target}}.",
+    "summaryNone": "{{pledged}} zimeahidiwa na {{settled}} zimelipwa hospitalini. Kiasi cha bili bado hakijathibitishwa.",
+    "usdGoal": "Takriban {{usd}} za kuchangia"
+  },
+  "stepper": {
+    "label": "Maendeleo",
+    "stepOf": "Hatua ya {{current}} kati ya {{total}}",
+    "done": "Imekamilika"
+  },
+  "consent": {
+    "agree": "Nakubali",
+    "required": "Lazima ili kuendelea",
+    "optional": "Si lazima",
+    "guardian": "Unatoa ridhaa hii kwa niaba ya mgonjwa.",
+    "read": "Soma maelezo kamili",
+    "hide": "Ficha maelezo kamili",
+    "withdraw": "Ondoa ridhaa"
+  },
+  "upload": {
+    "drop": "Weka bili hapa, au chagua faili",
+    "choose": "Chagua faili",
+    "camera": "Piga picha",
+    "hint": "PDF, PNG au JPEG, hadi MB 10.",
+    "replace": "Chagua faili nyingine",
+    "preview": "Muonekano wa bili uliyochagua",
+    "errors": {
+      "type": "Tafadhali chagua faili ya PDF, PNG au JPEG.",
+      "size": "Faili hii ni kubwa kuliko MB 10.",
+      "empty": "Faili hii ni tupu."
+    }
+  },
+  "otp": {
+    "label": "Msimbo wa tarakimu 6",
+    "digit": "Tarakimu ya {{n}} kati ya 6",
+    "entered": "Msimbo umeingizwa",
+    "incomplete": "Tarakimu {{count}} kati ya 6 zimeingizwa"
+  },
+  "money": {
+    "usdLabel": "Kiasi kwa dola za Marekani",
+    "kesLabel": "Kiasi kwa shilingi za Kenya",
+    "invalid": "Weka kiasi kama 25 au 25.50."
+  },
+  "error": {
+    "title": "Kuna tatizo",
+    "body": "Tafadhali jaribu tena. Likiendelea, wasiliana nasi na utaje namba ya rejea hapa chini.",
+    "reference": "Rejea: {{id}}",
+    "offline": "Hatukuweza kufikia huduma. Angalia mtandao wako kisha ujaribu tena.",
+    "rateLimited": "Umejaribu mara nyingi. Tafadhali subiri sekunde {{seconds}} kisha ujaribu tena.",
+    "notFound": "Hatukuweza kupata hicho."
+  },
+  "empty": {
+    "title": "Hakuna kitu hapa bado"
+  },
+  "language": {
+    "label": "Lugha",
+    "en": "English",
+    "sw": "Kiswahili",
+    "switchTo": "Badilisha lugha"
+  },
+  "demo": {
+    "banner": "Onyesho: hii inatumia pesa za majaribio za PayPal. Hakuna pesa halisi zinazohamishwa wala wagonjwa halisi wanaoonyeshwa.",
+    "tag": "Majaribio / kuigiza"
   }
 }

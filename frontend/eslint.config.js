@@ -19,7 +19,12 @@ export default tseslint.config(
     },
   },
   {
-    files: ["vite.config.ts", "eslint.config.js"],
+    // shadcn-style primitives export their style helpers (buttonVariants, toast) beside the component.
+    files: ["src/components/ui/**"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
+  {
+    files: ["vite.config.ts", "tailwind.config.ts", "postcss.config.js", "eslint.config.js"],
     languageOptions: { globals: globals.node },
   },
 );

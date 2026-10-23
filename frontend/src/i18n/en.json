@@ -7,5 +7,121 @@
     "checking": "Checking the service…",
     "ok": "The service is running.",
     "down": "The service is not reachable right now."
+  },
+  "common": {
+    "close": "Close",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "required": "Required",
+    "optional": "Optional",
+    "remove": "Remove",
+    "sandbox": "Sandbox"
+  },
+  "trust": {
+    "hospital_confirmed": {
+      "label": "Hospital-confirmed",
+      "explain": "The hospital's billing office confirmed this bill using a code sent to its official email."
+    },
+    "pending_confirmation": {
+      "label": "Pending confirmation",
+      "explain": "The family has shared a bill. We are waiting for the hospital to confirm it. Donations are not paid out yet."
+    },
+    "unverified": {
+      "label": "Unverified",
+      "explain": "This bill has not been checked by the hospital. Be careful and do not send money outside TibaDirect."
+    },
+    "about": "What this badge means"
+  },
+  "risk": {
+    "label": "Check result",
+    "low": "Low concern",
+    "medium": "Needs a closer look",
+    "high": "High concern"
+  },
+  "caseStatus": {
+    "draft": "Draft",
+    "pending_triage": "Checking the bill",
+    "in_review": "With our review team",
+    "pending_confirmation": "Waiting for the hospital",
+    "live": "Live",
+    "funded": "Fully funded",
+    "closed": "Closed",
+    "cancelled": "Cancelled",
+    "frozen": "Paused for a check"
+  },
+  "meter": {
+    "target": "Hospital bill",
+    "targetEstimate": "Estimated bill",
+    "noTarget": "The amount will show here once the hospital confirms the bill.",
+    "pledged": "Pledged by donors",
+    "settled": "Paid to the hospital",
+    "percent": "{{percent}}% pledged",
+    "summary": "{{pledged}} pledged and {{settled}} paid to the hospital, out of {{target}}.",
+    "summaryNone": "{{pledged}} pledged and {{settled}} paid to the hospital. The bill amount is not confirmed yet.",
+    "usdGoal": "About {{usd}} to give"
+  },
+  "stepper": {
+    "label": "Progress",
+    "stepOf": "Step {{current}} of {{total}}",
+    "done": "Done"
+  },
+  "consent": {
+    "agree": "I agree",
+    "required": "Required to continue",
+    "optional": "Optional",
+    "guardian": "You are giving this on behalf of the patient.",
+    "read": "Read the full wording",
+    "hide": "Hide the full wording",
+    "withdraw": "Withdraw"
+  },
+  "upload": {
+    "drop": "Drop the bill here, or choose a file",
+    "choose": "Choose a file",
+    "camera": "Take a photo",
+    "hint": "PDF, PNG or JPEG, up to 10 MB.",
+    "replace": "Choose a different file",
+    "preview": "Preview of the chosen bill",
+    "errors": {
+      "type": "Please choose a PDF, PNG or JPEG file.",
+      "size": "This file is larger than 10 MB.",
+      "empty": "This file is empty."
+    }
+  },
+  "otp": {
+    "label": "6-digit code",
+    "digit": "Digit {{n}} of 6",
+    "entered": "Code entered",
+    "incomplete": "{{count}} of 6 digits entered"
+  },
+  "money": {
+    "usdLabel": "Amount in US dollars",
+    "kesLabel": "Amount in Kenyan shillings",
+    "invalid": "Enter an amount like 25 or 25.50."
+  },
+  "error": {
+    "title": "Something went wrong",
+    "body": "Please try again. If it keeps happening, contact us and mention the reference below.",
+    "reference": "Reference: {{id}}",
+    "offline": "We could not reach the service. Check your connection and try again.",
+    "rateLimited": "Too many tries. Please wait {{seconds}} seconds and try again.",
+    "notFound": "We could not find that."
+  },
+  "empty": {
+    "title": "Nothing here yet"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "sw": "Kiswahili",
+    "switchTo": "Switch language"
+  },
+  "demo": {
+    "banner": "Demo: this uses PayPal sandbox money. No real money moves and no real patients are shown.",
+    "tag": "Sandbox / simulated"
   }
 }

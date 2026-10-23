@@ -64,6 +64,8 @@ export type Receipt = Model<
 >;
 export type OrderCreated = Model<Schemas["OrderCreated"]>;
 
+export type DocumentKind = "invoice" | "estimate" | "final_bill" | "photo";
+
 /** The money figures of a case, as the family and admin views carry them (minor units, plus formatted strings). */
 export interface MoneySummary {
   target_kes_minor: number | null;
@@ -132,7 +134,6 @@ export type FamilyCase = Model<
   }
 >;
 
-export type DocumentKind = "invoice" | "estimate" | "final_bill" | "photo";
 export type DocumentStatus = "uploaded" | "processing" | "triaged" | "failed";
 
 export type CaseDocument = Model<
@@ -143,3 +144,90 @@ export type CaseDocument = Model<
 export type ConsentText = Model<Schemas["ConsentText"], { scope: ConsentScope; language: "en" | "sw" }>;
 export type Consent = Model<Schemas["Consent"], { scope: ConsentScope; actor: "self" | "guardian"; withdrawn_at: string | null }>;
 export type TriageStatus = Model<Schemas["TriageStatus"], { risk_band: RiskBandValue | null; route: "hospital_confirmation" | "manual_review" | null; checked_at: string | null }>;
+
+// --- Hospital portal -------------------------------------------------------------------------
+
+export type HospitalConfirmation = Model<
+  Schemas["Confirmation"],
+  {
+    status: ConfirmationStatus;
+    amount_kes: string | null;
+    confirmed_by: string;
+    second_approver: string | null;
+    deposit_kes_minor: number | null;
+  }
+>;
+
+export type QueueConfirmation = Model<
+  Schemas["QueueConfirmation"],
+  {
+    status: ConfirmationStatus;
+    amount_kes: string | null;
+    confirmed_by: string;
+    second_approver: string | null;
+    deposit_kes_minor: number | null;
+    case_id: string;
+    case_alias: string;
+  }
+>;
+
+export type QueueCase = Model<Schemas["QueueCase"], { risk_band: RiskBandValue | null; kind: "first_bill" | "final_bill" }>;
+
+export interface HospitalQueue {
+  pending: QueueCase[];
+  awaiting_second_approval: QueueConfirmation[];
+}
+
+export interface BillLine {
+  label: string;
+  amount_kes: string;
+  quantity: number | null;
+  unit_kes: string | null;
+}
+
+/** What the reader found on the bill. Every field may be missing when the bill could not be read. */
+export interface ExtractedFields {
+  facility_name?: string | null;
+  invoice_number?: string | null;
+  invoice_date?: string | null;
+  document_type?: "invoice" | "estimate" | "final_bill" | "unknown";
+  line_items?: BillLine[];
+  total_kes?: string | null;
+  balance_due_kes?: string | null;
+  deposit_kes?: string | null;
+  currency?: "KES" | "USD" | "unknown";
+  confidence?: number;
+}
+
+export interface HospitalBill {
+  id: string;
+  kind: DocumentKind;
+  mime_type: string;
+  page_count: number | null;
+  created_at: string;
+  preview_url: string | null;
+}
+
+export interface HospitalTriage {
+  risk_band: RiskBandValue;
+  reasons_en: string[];
+  reasons_sw: string[];
+  extracted: ExtractedFields;
+  created_at: string;
+}
+
+export type HospitalCaseDetail = Model<
+  Schemas["HospitalCaseDetail"],
+  {
+    status: CaseStatus;
+    bills: HospitalBill[];
+    triage: HospitalTriage | null;
+    confirmations: HospitalConfirmation[];
+    two_person_threshold_kes_minor: number;
+    otp_destination_masked: string;
+  }
+>;
+
+export type OtpSent = Model<Schemas["OtpSent"]>;
+export type SettlementStatus = "pending" | "processing" | "succeeded" | "failed";
+export type SettlementItem = Model<Schemas["SettlementItem"], { case_alias: string; status: SettlementStatus; amount_kes: string; external_reference: string | null }>;

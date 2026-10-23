@@ -174,3 +174,68 @@ export const FAMILY_BASE = {
   "GET /api/hospitals": HOSPITALS,
   "GET /api/consents/texts": CONSENT_TEXTS,
 };
+
+// --- Hospital portal --------------------------------------------------------------------------
+
+export const CLERK = { id: "33333333-3333-4333-8333-333333333333", email: "clerk@kilele-hospital.test", display_name: "Kilele Mission Hospital clerk", role: "hospital_staff", preferred_language: "en", hospital: { ...HOSPITAL_NAME, staff_role: "billing_clerk" } };
+export const SUPERVISOR = { ...CLERK, id: "44444444-4444-4444-8444-444444444444", email: "supervisor@kilele-hospital.test", display_name: "Kilele Mission Hospital supervisor", hospital: { ...HOSPITAL_NAME, staff_role: "billing_supervisor" } };
+
+export const HOSPITAL_CASE_ID = "55555555-5555-4555-8555-555555555555";
+export const HPATH = `/api/hospital/cases/${HOSPITAL_CASE_ID}`;
+
+export function confirmationRecord(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "66666666-6666-4666-8666-666666666666",
+    status: "awaiting_second_approval",
+    amount_kes_minor: 25_000_000,
+    amount_kes: "250000.00",
+    invoice_number: "KMH/26/9",
+    is_final_bill: false,
+    deposit_kes_minor: null,
+    confirmed_by: "Kilele Mission Hospital clerk",
+    second_approver: null,
+    query_note: null,
+    paypal_invoice_id: null,
+    invoice_status: null,
+    created_at: "2026-10-23T09:00:00+00:00",
+    finalized_at: null,
+    ...overrides,
+  };
+}
+
+export function hospitalCase(overrides: Record<string, unknown> = {}) {
+  return {
+    id: HOSPITAL_CASE_ID,
+    alias: "Zawadi",
+    region: "Nairobi",
+    patient_reference: "KMH-ADM-7731",
+    status: "pending_confirmation",
+    submitted_at: "2026-10-23T08:30:00+00:00",
+    bills: [{ id: "77777777-7777-4777-8777-777777777777", kind: "invoice", mime_type: "application/pdf", page_count: 1, created_at: "2026-10-23T08:20:00+00:00", preview_url: "https://files.example.test/bill.pdf?signature=abc" }],
+    triage: {
+      risk_band: "low",
+      reasons_en: ["The amounts add up."],
+      reasons_sw: ["Viwango vinajumlishana."],
+      extracted: {
+        facility_name: "Kilele Mission Hospital",
+        invoice_number: "KMH/26/024405",
+        invoice_date: "2026-07-06",
+        document_type: "invoice",
+        total_kes: "160430.00",
+        balance_due_kes: "160430.00",
+        deposit_kes: "0.00",
+        currency: "KES",
+        confidence: 1,
+        line_items: [
+          { label: "General ward bed (per day)", amount_kes: "67200.00", quantity: 8, unit_kes: "8400.00" },
+          { label: "Nursing care (per day)", amount_kes: "22800.00", quantity: 8, unit_kes: "2850.00" },
+        ],
+      },
+      created_at: "2026-10-23T08:25:00+00:00",
+    },
+    confirmations: [],
+    two_person_threshold_kes_minor: 20_000_000,
+    otp_destination_masked: "bil***@kilele-hospital.test",
+    ...overrides,
+  };
+}

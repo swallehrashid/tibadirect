@@ -56,3 +56,8 @@ export function percentOf(part: number, target: number | null | undefined): numb
   if (!target || target <= 0 || part <= 0) return 0;
   return Math.min(100, Math.floor((part * 100) / target));
 }
+
+/** "25.00" for 2500 minor units: the exact decimal string the API takes for amounts. */
+export function minorToDecimal(minor: number): string {
+  return `${Math.floor(minor / 100)}.${String(minor % 100).padStart(2, "0")}`;
+}

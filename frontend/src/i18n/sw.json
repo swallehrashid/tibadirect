@@ -798,5 +798,175 @@
       "submit": "Tuma ikaguliwe",
       "sent": "Imetumwa. Tunakagua bili yako."
     }
+  },
+  "hospital": {
+    "queue": {
+      "title": "Bili zinazokusubiri",
+      "intro": "Bili ambazo familia zimetuma kwa {{hospital}} ili kuthibitisha. Fungua moja uilinganishe na asili kisha uamue.",
+      "waiting": "Zinasubiri uamuzi wako",
+      "emptyTitle": "Hakuna kinachosubiri",
+      "emptyBody": "Bili mpya huonekana hapa familia inapotuma.",
+      "second": "Zinasubiri idhini ya pili",
+      "secondIntro": "Bili kubwa zinahitaji mtu wa pili. Msimamizi mwingine wa malipo huziidhinisha kwa msimbo mpya.",
+      "secondNone": "Hakuna bili zinazosubiri idhini ya pili.",
+      "finalBill": "Bili ya mwisho",
+      "submitted": "Imetumwa {{when}}",
+      "bills_one": "Bili {{count}}",
+      "bills_other": "Bili {{count}}",
+      "review": "Kagua",
+      "invoice": "Ankara {{number}}",
+      "confirmedBy": "Imethibitishwa na {{name}}",
+      "approve": "Idhinisha",
+      "needsSupervisor": "Msimamizi wa malipo lazima aidhinishe"
+    },
+    "review": {
+      "title": "Kagua bili",
+      "notFound": {
+        "title": "Hatukuweza kupata bili hiyo",
+        "body": "Huenda ni ya hospitali nyingine, au kiungo si sahihi."
+      },
+      "patientReference": "Namba ya mgonjwa au ya kulazwa",
+      "region": "Kaunti au mji wa familia",
+      "privacy": "Unaona jina la utambulisho na namba ya mgonjwa kwenye bili pekee, ili uilinganishe na kumbukumbu zako. Mawasiliano ya familia hayaonyeshwi kamwe.",
+      "nothingToDecide": "Bili hii haisubiri uamuzi."
+    },
+    "bill": {
+      "title": "Bili ya asili",
+      "which": "Bili ipi",
+      "kinds": {
+        "invoice": "Ankara",
+        "estimate": "Makadirio",
+        "final_bill": "Bili ya mwisho",
+        "photo": "Picha"
+      },
+      "none": "Hakuna bili iliyopakiwa kwa kesi hii.",
+      "imageAlt": "Bili ya hospitali iliyopakiwa",
+      "pdfTitle": "Bili ya hospitali iliyopakiwa (PDF)",
+      "open": "Fungua kwenye kichupo kipya",
+      "gone": "Faili ya asili imefutwa. Faili huondolewa saa 24 baada ya hospitali kuthibitisha bili.",
+      "hint": "Linganisha kiasi, namba ya ankara na namba ya mgonjwa na kumbukumbu zako mwenyewe."
+    },
+    "extracted": {
+      "title": "Programu yetu ilisoma nini",
+      "intro": "Tumia hii kulinganisha na asili. Inaweza kukosea, kwa hiyo amua kwa kumbukumbu zako mwenyewe.",
+      "none": "Bili bado haijakaguliwa.",
+      "facility": "Hospitali kwenye bili",
+      "invoice": "Namba ya ankara",
+      "date": "Tarehe",
+      "type": "Aina",
+      "total": "Jumla",
+      "balance": "Salio",
+      "deposit": "Amana iliyolipwa",
+      "confidence": "Msomaji alikuwa na uhakika kiasi gani",
+      "lines": "Vipengee",
+      "item": "Kipengee",
+      "qty": "Idadi",
+      "lineAmount": "Kiasi",
+      "checks": "Ukaguzi uliona nini"
+    },
+    "otp": {
+      "title": "Msimbo wa mara moja",
+      "intro": "Ili kulinda hospitali, msimbo hutumwa tu kwenye anwani iliyo kwenye daftari la vituo vya afya: {{address}}. Mtu aliye huko atakusomea.",
+      "send": "Tuma msimbo kwa {{address}}",
+      "sent": "Msimbo umetumwa kwa {{address}}. Unafanya kazi hadi {{time}}.",
+      "label": "Msimbo wa tarakimu 6 kutoka anwani hiyo",
+      "resend": "Tuma msimbo mpya",
+      "resendIn": "Tuma msimbo mpya baada ya sekunde {{seconds}}",
+      "tooMany": "Misimbo mingi sana imetumwa kwa bili hii. Tafadhali jaribu tena baada ya saa moja.",
+      "notSent": "Msimbo haukuweza kutumwa kwa barua pepe. Tafadhali jaribu tena baadaye kidogo.",
+      "notWaiting": "Bili hii haisubiri hatua hiyo.",
+      "needCode": "Tuma msimbo na uuweke kabla ya kuwasilisha.",
+      "incomplete": "Weka tarakimu zote 6 za msimbo.",
+      "wrong": "Msimbo huo si sahihi. Uangalie kisha ujaribu tena.",
+      "expired": "Muda wa msimbo huo umeisha. Tuma mpya.",
+      "locked": "Umekosea mara nyingi. Tuma msimbo mpya."
+    },
+    "decision": {
+      "title": "Uamuzi wako",
+      "intro": "Thibitisha bili tu ikiwa ni bili halisi kutoka hospitali yako. Unaweza pia kuiuliza familia swali au kuikataa.",
+      "choose": "Unaamua nini?",
+      "options": {
+        "confirmed": {
+          "label": "Thibitisha bili",
+          "body": "Ni bili yetu. Ukurasa wa familia unaanza kutumika kwa kiasi hiki.",
+          "submit": "Thibitisha bili"
+        },
+        "queried": {
+          "label": "Uliza familia swali",
+          "body": "Kuna kitu kisicholingana. Familia inaona ujumbe wako na inaweza kurekebisha.",
+          "submit": "Tuma swali"
+        },
+        "rejected": {
+          "label": "Hii si bili yetu",
+          "body": "Hatukuitoa sisi. Mtu kwenye timu yetu ataangalia kesi.",
+          "submit": "Kataa bili"
+        }
+      },
+      "amount": "Jumla ya kulipwa (KES)",
+      "amountHelp": "Andika kiasi kutoka kwenye kumbukumbu zako. Hakijajazwa kwa niaba yako.",
+      "matches": "Hii inalingana na kiasi kilichosomwa na programu yetu.",
+      "differs": "Hii ni tofauti na {{total}} iliyosomwa na programu yetu. Angalia asili.",
+      "invoice": "Namba ya ankara",
+      "deposit": "Amana iliyokwisha lipwa (si lazima)",
+      "depositHelp": "Familia ikiwa imelipa sehemu ya bili tayari, weka sehemu hiyo ili wachangiaji wasiombwe.",
+      "final": "Hii ni bili ya mwisho",
+      "finalHelp": "Matibabu yamekamilika na hii ndiyo bili ya mwisho.",
+      "finalNote": "Hii ni bili ya mwisho kwa kesi iliyo hai tayari. Kesi inafungwa ikishalipwa.",
+      "twoPerson": "Bili za {{amount}} au zaidi zinahitaji idhini ya pili. Baada ya kuthibitisha, msimamizi mwingine wa malipo lazima aidhinishe kwa msimbo mpya kabla ukurasa kuanza kutumika.",
+      "noteQuery": "Swali lako kwa familia",
+      "noteReject": "Kwa nini hii si bili yenu?",
+      "noteHelp": "Familia inaona hili. Usiweke maelezo ya kitabibu.",
+      "recorded": "Uamuzi umerekodiwa",
+      "result": {
+        "confirmed": "Bili imethibitishwa. Ukurasa wa familia sasa uko hai na malipo ya kwanza yatafuata pesa zinapofika.",
+        "queried": "Swali lako limeenda kwa familia. Wanaweza kurekebisha bili na kuituma tena.",
+        "rejected": "Bili haikuthibitishwa. Mtu kwenye timu yetu ataangalia kesi."
+      },
+      "resultSecond": "Imethibitishwa. Kiasi hiki kinahitaji idhini ya pili kutoka kwa msimamizi mwingine wa malipo kabla ukurasa kuanza kutumika.",
+      "notWaiting": "Bili hii haisubiri tena uamuzi. Ukurasa umesasishwa.",
+      "errors": {
+        "amount": "Weka jumla kutoka kwenye bili.",
+        "amountLarge": "Kiasi hicho ni kikubwa mno. Kiangalie.",
+        "invoice": "Weka namba ya ankara kutoka kwenye bili.",
+        "invoiceUsed": "Namba hiyo ya ankara tayari imetumika kwenye kesi nyingine katika hospitali hii.",
+        "deposit": "Amana haiwezi kuwa kubwa kuliko bili.",
+        "note": "Andika angalau maneno machache kwa familia."
+      }
+    },
+    "second": {
+      "title": "Idhini ya pili inahitajika",
+      "intro": "{{name}} amethibitisha {{amount}} (ankara {{invoice}}). Kwa kuwa ni bili kubwa, msimamizi mwingine wa malipo lazima aiidhinishe.",
+      "approve": "Idhinisha bili",
+      "approved": "Imeidhinishwa",
+      "approvedBody": "Idhini zote mbili zimepatikana. Ukurasa wa familia sasa uko hai.",
+      "samePerson": "Msimamizi mwingine wa malipo lazima atoe idhini ya pili. Wewe ndiye uliyethibitisha bili hii.",
+      "needSupervisor": "Msimamizi wa malipo pekee ndiye anayeweza kutoa idhini ya pili."
+    },
+    "history": {
+      "title": "Maamuzi ya awali",
+      "invoiceStatus": "Ankara ya PayPal: {{status}}",
+      "by": "{{name}} · {{when}}",
+      "second": "idhini ya pili na {{name}}",
+      "note": "Ujumbe:"
+    },
+    "settlements": {
+      "title": "Malipo yaliyopokelewa",
+      "intro": "Kila malipo ambayo TibaDirect imefanya kwa hospitali yako, ya hivi karibuni kwanza.",
+      "requested": "Yaliyoombwa",
+      "case": "Kesi",
+      "tranche": "Malipo namba",
+      "amount": "Kiasi",
+      "status": "Hali",
+      "statuses": {
+        "pending": "Yanasubiri",
+        "processing": "Yanalipwa",
+        "succeeded": "Yamelipwa",
+        "failed": "Yameshindwa"
+      },
+      "reference": "Rejea",
+      "completed": "Yamekamilika",
+      "emptyTitle": "Hakuna malipo bado",
+      "emptyBody": "Malipo yanaonekana hapa kesi iliyothibitishwa ikishapata pesa za kutosha zilizoahidiwa."
+    }
   }
 }

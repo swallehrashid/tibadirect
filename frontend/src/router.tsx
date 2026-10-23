@@ -42,7 +42,16 @@ export const routes = [
       },
       {
         element: <RequireRole area="hospital_staff" />,
-        children: [{ element: <AppShell area="hospital_staff" />, children: [{ path: "/hospital", element: <AreaHome area="hospital_staff" /> }] }],
+        children: [
+          {
+            element: <AppShell area="hospital_staff" />,
+            children: [
+              { path: "/hospital", lazy: () => import("@/pages/hospital/Queue") },
+              { path: "/hospital/cases/:id", lazy: () => import("@/pages/hospital/CaseReview") },
+              { path: "/hospital/settlements", lazy: () => import("@/pages/hospital/Settlements") },
+            ],
+          },
+        ],
       },
       {
         element: <RequireRole area="admin" />,

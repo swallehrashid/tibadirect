@@ -91,8 +91,11 @@
     "errors": {
       "type": "Please choose a PDF, PNG or JPEG file.",
       "size": "This file is larger than 10 MB.",
-      "empty": "This file is empty."
-    }
+      "empty": "This file is empty.",
+      "imageType": "Please choose a PNG or JPEG picture."
+    },
+    "dropImage": "Drop the screenshot here, or choose a picture",
+    "hintImage": "PNG or JPEG, up to 10 MB."
   },
   "otp": {
     "label": "6-digit code",
@@ -1253,6 +1256,56 @@
         "doneToast": "Done.",
         "rejectedToast": "Suggestion rejected."
       }
+    }
+  },
+  "checker": {
+    "title": "Check an appeal",
+    "intro": "Got a message asking for money for a hospital bill? Paste it here, or upload a screenshot, and we will tell you what looks risky.",
+    "privacy": "We do not keep what you paste or upload. Only a fingerprint of it is kept, to count how many times the same message goes around.",
+    "how": "How to give us the message",
+    "tabs": {
+      "text": "Paste the message",
+      "image": "Upload a screenshot"
+    },
+    "textLabel": "The message, exactly as you received it",
+    "textHelp": "Paste at least {{count}} characters.",
+    "textCount": "{{count}} of {{max}} characters",
+    "imageLabel": "Screenshot of the message",
+    "imageHelp": "We read the words from the picture. If we cannot read enough, paste the message instead.",
+    "check": "Check this appeal",
+    "checking": "Checking…",
+    "again": "Check another message",
+    "score": "How worrying this message looks",
+    "scoreText": "Score {{score}} out of 100",
+    "reasons": "Why",
+    "explanation": "In more detail",
+    "tip": "Staying safe",
+    "notProof": "This is a guide, not proof. A message that looks fine can still be a scam, and a confirmed case is the only way to be sure the money reaches the hospital.",
+    "offTitle": "The appeal checker is switched off",
+    "offBody": "It is not available in this environment.",
+    "band": {
+      "low": {
+        "title": "Nothing worrying found",
+        "body": "We did not find the usual signs of a scam. Still, only give through a page where the hospital has confirmed the bill."
+      },
+      "medium": {
+        "title": "Be careful with this one",
+        "body": "Some things about this message are often seen in scams. Check it with the hospital before you give."
+      },
+      "high": {
+        "title": "This looks like a scam",
+        "body": "It has several of the signs that fake appeals use. Do not send money, and do not share it."
+      }
+    },
+    "match": {
+      "title": "This matches a confirmed case",
+      "body": "The appeal looks like {{alias}}'s case at {{hospital}}, which the hospital has confirmed.",
+      "link": "Open the confirmed case"
+    },
+    "errors": {
+      "off": "The appeal checker is not available right now.",
+      "unreadable": "We could not read enough text in that picture. Paste the message instead.",
+      "invalid": "Please paste a message of at least 20 characters."
     }
   }
 }

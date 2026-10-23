@@ -3,6 +3,8 @@ export { forgetCsrfToken } from "./csrf";
 export { ApiError, isApiError } from "./errors";
 export type { components, paths } from "./schema";
 export type {
+  AppealResult,
+  MatchedCase,
   AdminCase,
   AdminCaseListItem,
   AdminDonation,

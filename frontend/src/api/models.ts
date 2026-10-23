@@ -452,3 +452,26 @@ export interface AgentAnswer {
   steps: number;
   stopped_early: boolean;
 }
+
+// --- Appeal checker --------------------------------------------------------------------------
+
+export interface MatchedCase {
+  slug: string;
+  alias: string;
+  hospital_name: string;
+  url: string;
+  note: string;
+}
+
+export interface AppealResult {
+  score: number;
+  band: RiskBandValue;
+  flagged: boolean;
+  reasons_en: string[];
+  reasons_sw: string[];
+  matched_case: MatchedCase | null;
+  safety_tip_en: string;
+  safety_tip_sw: string;
+  explanation: string | null;
+  used_llm: boolean;
+}

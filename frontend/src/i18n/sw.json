@@ -91,8 +91,11 @@
     "errors": {
       "type": "Tafadhali chagua faili ya PDF, PNG au JPEG.",
       "size": "Faili hii ni kubwa kuliko MB 10.",
-      "empty": "Faili hii ni tupu."
-    }
+      "empty": "Faili hii ni tupu.",
+      "imageType": "Tafadhali chagua picha ya PNG au JPEG."
+    },
+    "dropImage": "Weka picha ya skrini hapa, au chagua picha",
+    "hintImage": "PNG au JPEG, hadi MB 10."
   },
   "otp": {
     "label": "Msimbo wa tarakimu 6",
@@ -1253,6 +1256,56 @@
         "doneToast": "Imefanyika.",
         "rejectedToast": "Pendekezo limekataliwa."
       }
+    }
+  },
+  "checker": {
+    "title": "Kagua ombi la msaada",
+    "intro": "Umepata ujumbe unaoomba pesa kwa bili ya hospitali? Bandika hapa, au pakia picha ya skrini, nasi tutakuambia kinachoonekana hatari.",
+    "privacy": "Hatuhifadhi unachobandika au kupakia. Alama ya kidijitali yake tu ndiyo huhifadhiwa, ili kuhesabu mara ambazo ujumbe ule ule unasambaa.",
+    "how": "Jinsi ya kutupa ujumbe",
+    "tabs": {
+      "text": "Bandika ujumbe",
+      "image": "Pakia picha ya skrini"
+    },
+    "textLabel": "Ujumbe, kama ulivyoupokea",
+    "textHelp": "Bandika angalau herufi {{count}}.",
+    "textCount": "Herufi {{count}} kati ya {{max}}",
+    "imageLabel": "Picha ya skrini ya ujumbe",
+    "imageHelp": "Tunasoma maneno kutoka kwenye picha. Tusipoweza kusoma ya kutosha, bandika ujumbe badala yake.",
+    "check": "Kagua ombi hili",
+    "checking": "Inakagua…",
+    "again": "Kagua ujumbe mwingine",
+    "score": "Ujumbe huu unavyotia wasiwasi",
+    "scoreText": "Alama {{score}} kati ya 100",
+    "reasons": "Kwa nini",
+    "explanation": "Kwa undani zaidi",
+    "tip": "Kujilinda",
+    "notProof": "Huu ni mwongozo, si ushahidi. Ujumbe unaoonekana sawa bado unaweza kuwa utapeli, na kesi iliyothibitishwa ndiyo njia pekee ya kuwa na uhakika pesa zinafika hospitalini.",
+    "offTitle": "Kikagua maombi kimezimwa",
+    "offBody": "Hakipatikani kwenye mazingira haya.",
+    "band": {
+      "low": {
+        "title": "Hakuna kinachotia wasiwasi",
+        "body": "Hatukuona dalili za kawaida za utapeli. Hata hivyo, changia tu kupitia ukurasa ambapo hospitali imethibitisha bili."
+      },
+      "medium": {
+        "title": "Kuwa mwangalifu na huu",
+        "body": "Baadhi ya mambo kuhusu ujumbe huu huonekana mara nyingi kwenye utapeli. Uliza hospitali kabla ya kutoa."
+      },
+      "high": {
+        "title": "Huu unaonekana kuwa utapeli",
+        "body": "Una dalili kadhaa zinazotumiwa na maombi ya uongo. Usitume pesa, na usiusambaze."
+      }
+    },
+    "match": {
+      "title": "Huu unalingana na kesi iliyothibitishwa",
+      "body": "Ombi hili linafanana na kesi ya {{alias}} katika {{hospital}}, ambayo hospitali imethibitisha.",
+      "link": "Fungua kesi iliyothibitishwa"
+    },
+    "errors": {
+      "off": "Kikagua maombi hakipatikani sasa hivi.",
+      "unreadable": "Hatukuweza kusoma maandishi ya kutosha kwenye picha hiyo. Bandika ujumbe badala yake.",
+      "invalid": "Tafadhali bandika ujumbe wa angalau herufi 20."
     }
   }
 }

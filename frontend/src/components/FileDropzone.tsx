@@ -2,7 +2,7 @@ import { Camera, FileText, UploadCloud, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ACCEPT_ATTRIBUTE, validateUpload } from "@/lib/uploads";
+import { ACCEPT_ATTRIBUTE, ACCEPT_IMAGES_ATTRIBUTE, validateUpload } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -14,10 +14,12 @@ interface Props {
   /** An error from outside (for example the server refusing the file). */
   error?: string | null;
   label?: string;
+  /** Pictures only (PNG or JPEG), for screenshots. */
+  imagesOnly?: boolean;
 }
 
 /** Drag and drop, file picker and camera, with a preview and the same checks the server makes. */
-export function FileDropzone({ file, onChange, allowCamera = true, disabled = false, error = null, label }: Props) {
+export function FileDropzone({ file, onChange, allowCamera = true, disabled = false, error = null, label, imagesOnly = false }: Props) {
   const { t } = useTranslation();
   const inputId = useId();
   const hintId = useId();
@@ -40,9 +42,9 @@ export function FileDropzone({ file, onChange, allowCamera = true, disabled = fa
 
   function accept(candidate: File | undefined) {
     if (!candidate) return;
-    const issue = validateUpload(candidate);
+    const issue = validateUpload(candidate, { imagesOnly });
     if (issue) {
-      setProblem(t(`upload.errors.${issue}`));
+      setProblem(t(issue === "type" && imagesOnly ? "upload.errors.imageType" : `upload.errors.${issue}`));
       return;
     }
     setProblem(null);
@@ -96,7 +98,7 @@ export function FileDropzone({ file, onChange, allowCamera = true, disabled = fa
         ) : (
           <>
             <UploadCloud className="size-10 text-primary" aria-hidden="true" />
-            <p className="font-semibold">{t("upload.drop")}</p>
+            <p className="font-semibold">{imagesOnly ? t("upload.dropImage") : t("upload.drop")}</p>
             <div className="flex flex-wrap justify-center gap-2">
               <Button variant="default" disabled={disabled} onClick={() => pickRef.current?.click()}>
                 {t("upload.choose")}
@@ -110,13 +112,13 @@ export function FileDropzone({ file, onChange, allowCamera = true, disabled = fa
           </>
         )}
         <p id={hintId} className="text-sm text-muted-foreground">
-          {t("upload.hint")}
+          {imagesOnly ? t("upload.hintImage") : t("upload.hint")}
         </p>
         <input
           id={inputId}
           ref={pickRef}
           type="file"
-          accept={ACCEPT_ATTRIBUTE}
+          accept={imagesOnly ? ACCEPT_IMAGES_ATTRIBUTE : ACCEPT_ATTRIBUTE}
           className="sr-only"
           disabled={disabled}
           aria-describedby={describedBy}

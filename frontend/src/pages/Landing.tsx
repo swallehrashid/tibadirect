@@ -36,7 +36,7 @@ function Stats() {
         ? Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-20" />)
         : tiles.map((tile) => (
             <Card key={tile.label} className="p-4">
-              <dd className="font-heading text-2xl font-extrabold tracking-tight">{tile.value}</dd>
+              <dd className="font-heading text-xl font-extrabold tracking-tight [overflow-wrap:anywhere] sm:text-2xl">{tile.value}</dd>
               <dt className="text-sm text-muted-foreground">{tile.label}</dt>
             </Card>
           ))}

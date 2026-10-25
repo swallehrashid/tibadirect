@@ -24,7 +24,6 @@ export default function LedgerGrid({ rows }: { rows: PublicLedgerRow[] }) {
     () => [
       { field: "createdAt", headerName: t("ledger.columns.when"), valueFormatter: (p) => formatWhen(p.value as string, language), minWidth: 175, flex: 1 },
       { field: "what", headerName: t("ledger.columns.what"), minWidth: 290, flex: 2 },
-      { field: "account", headerName: t("ledger.columns.account"), minWidth: 170, flex: 1.2 },
       {
         field: "amount",
         headerName: t("ledger.columns.amount"),
@@ -34,6 +33,7 @@ export default function LedgerGrid({ rows }: { rows: PublicLedgerRow[] }) {
         cellClass: (p) => ((p.data?.amountMinor ?? 0) < 0 ? "text-danger-700 font-semibold" : "font-semibold"),
         comparator: (_a, _b, nodeA, nodeB) => (nodeA.data?.amountMinor ?? 0) - (nodeB.data?.amountMinor ?? 0),
       },
+      { field: "account", headerName: t("ledger.columns.account"), minWidth: 170, flex: 1.2 },
       { field: "reference", headerName: t("ledger.columns.reference"), minWidth: 140, flex: 1, cellClass: "font-mono text-xs" },
       { field: "fingerprint", headerName: t("ledger.columns.fingerprint"), minWidth: 150, flex: 1, cellClass: "font-mono text-xs" },
     ],

@@ -72,7 +72,7 @@ def test_the_revision_is_recorded(scratch_app: Flask) -> None:
     with scratch_app.app_context():
         flask_migrate.upgrade(directory=MIGRATIONS_DIR)
     assert (
-        _count(scratch_app, "SELECT count(*) FROM alembic_version WHERE version_num = '0003'") == 1
+        _count(scratch_app, "SELECT count(*) FROM alembic_version WHERE version_num = '0004'") == 1
     )
 
 
@@ -146,3 +146,34 @@ def test_a_donation_cannot_hold_more_than_its_net_across_paid_refunded_and_poole
                 refunded_usd_minor=300,
                 pooled_usd_minor=400,
             )
+
+
+def test_the_query_indexes_arrive_with_0004_and_leave_with_a_downgrade(scratch_app: Flask) -> None:
+    """Revision 0004 adds the indexes found by reading the plans of the main queries."""
+    names = [
+        "ix_audit_log_created_at",
+        "ix_cases_created_at",
+        "ix_review_items_status_created_at",
+        "ix_settlements_open",
+        "ix_webhook_events_unprocessed",
+        "ix_confirmations_document_id",
+        "ix_confirmations_hospital_status",
+        "ix_ledger_entries_ref",
+        "ix_case_documents_raw_held",
+    ]
+
+    def present() -> list[int]:
+        return [
+            _count(scratch_app, f"SELECT count(*) FROM pg_indexes WHERE indexname = '{name}'")
+            for name in names
+        ]
+
+    with scratch_app.app_context():
+        flask_migrate.upgrade(directory=MIGRATIONS_DIR)
+        assert present() == [1] * len(names)
+
+        flask_migrate.downgrade(directory=MIGRATIONS_DIR, revision="0003")
+        assert present() == [0] * len(names)
+
+        flask_migrate.upgrade(directory=MIGRATIONS_DIR)
+        assert present() == [1] * len(names)

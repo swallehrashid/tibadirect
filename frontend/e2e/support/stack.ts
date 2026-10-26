@@ -173,6 +173,8 @@ export interface StartedCase {
   alias: string;
   invoice: string;
   total: number;
+  /** When the family's "send for checking" was answered, in milliseconds since 1970. */
+  submittedAt: number;
 }
 
 /** A family signs in, names a case at Kilele Mission Hospital, agrees, uploads a bill and sends it for checking. */
@@ -189,7 +191,7 @@ export async function startCase(family: Api, options: { alias?: string; bill?: {
   }
   await family.expectOk(family.upload(`/api/cases/${made.id}/documents`, "bill.pdf", bill.pdf, { kind: options.kind ?? "invoice" }));
   await family.expectOk(family.post(`/api/cases/${made.id}/submit`));
-  return { id: made.id, alias, invoice: bill.invoice, total: bill.total };
+  return { id: made.id, alias, invoice: bill.invoice, total: bill.total, submittedAt: Date.now() };
 }
 
 export async function caseStatus(family: Api, id: string): Promise<string> {

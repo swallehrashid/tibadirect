@@ -141,6 +141,12 @@ class Settlement(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
         UniqueConstraint("case_id", "tranche_no", name="uq_settlements_case_id_tranche_no"),
         CheckConstraint("amount_usd_minor > 0", name="amount_usd_positive"),
         CheckConstraint("amount_kes_minor > 0", name="amount_kes_positive"),
+        # The payout poll looks only at tranches still on their way, every few seconds.
+        Index(
+            "ix_settlements_open",
+            "status",
+            postgresql_where=text("status IN ('pending', 'processing')"),
+        ),
     )
 
     case_id: Mapped[uuid.UUID] = mapped_column(

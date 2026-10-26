@@ -1,13 +1,17 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import i18n from "@/i18n";
 import { mockApi } from "@/test/mockApi";
 import { casePage, HOSPITALS, publicCase, STATS } from "@/test/fixtures";
 import { renderApp } from "@/test/renderApp";
 
 const anonymous = { "GET /api/auth/me": { status: 401, body: { error: { code: "unauthenticated", message: "x" } } } };
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(async () => {
+  vi.unstubAllGlobals();
+  await i18n.changeLanguage("en");
+});
 
 describe("landing page", () => {
   it("explains the product, shows live cases and the figures", async () => {
@@ -144,14 +148,35 @@ describe("how it works", () => {
 });
 
 describe("legal pages and not found", () => {
-  it("shows the privacy and terms summaries, marked as drafts", async () => {
+  it("shows the full privacy notice, with what is kept and for how long, and says it is not yet reviewed", async () => {
     mockApi(anonymous);
-    const first = renderApp("/privacy");
-    expect(await screen.findByRole("heading", { level: 1, name: "Privacy" })).toBeInTheDocument();
-    expect(screen.getByText(/full notice will be published after legal review/)).toBeInTheDocument();
-    first.unmount();
+    renderApp("/privacy");
+    expect(await screen.findByRole("heading", { level: 1, name: "Privacy notice" })).toBeInTheDocument();
+    expect(screen.getByText(/has not been reviewed by a lawyer yet/)).toBeInTheDocument();
+    for (const heading of ["What we collect and why", "Health data and children", "Analysis outside Kenya", "How long we keep it", "Your rights", "Complaints"]) {
+      expect(screen.getByRole("heading", { level: 2, name: heading })).toBeInTheDocument();
+    }
+    expect(screen.getByText(/deleted 24 hours after the hospital confirms it/)).toBeInTheDocument();
+    expect(screen.getByText(/Office of the Data Protection Commissioner of Kenya/)).toBeInTheDocument();
+  });
+
+  it("shows the terms with the leftover-money choices, the 80% cap and what a freeze does", async () => {
+    mockApi(anonymous);
     renderApp("/terms");
     expect(await screen.findByRole("heading", { level: 1, name: "Terms of use" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Leftover money: your choice when you give" })).toBeInTheDocument();
+    for (const choice of [/Refund me:/, /Solidarity pool:/, /Follow-up care:/]) expect(screen.getByText(choice)).toBeInTheDocument();
+    expect(screen.getByText(/no more than 80% of it is paid/)).toBeInTheDocument();
+    expect(screen.getByText(/every donor is refunded in full, whatever they chose/)).toBeInTheDocument();
+    expect(screen.getByText(/approved partner or a registered non-profit/)).toBeInTheDocument();
+  });
+
+  it("shows the notices in Swahili", async () => {
+    await i18n.changeLanguage("sw");
+    mockApi(anonymous);
+    renderApp("/privacy");
+    expect(await screen.findByRole("heading", { level: 1, name: "Taarifa ya faragha" })).toBeInTheDocument();
+    expect(screen.getByText(/bado haijakaguliwa na mwanasheria/)).toBeInTheDocument();
   });
 
   it("shows a friendly page for an unknown address", async () => {

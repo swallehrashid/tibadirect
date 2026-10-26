@@ -368,63 +368,8 @@
     }
   },
   "legal": {
-    "draft": "This is a short summary written for the demo. The full notice will be published after legal review.",
-    "privacy": {
-      "title": "Privacy",
-      "intro": "What we collect, why, and how long we keep it.",
-      "p1": {
-        "title": "We collect as little as we can",
-        "body": "Families give an email address, a patient reference and the bill. Donors give an email address for the receipt. We do not ask for anything else."
-      },
-      "p2": {
-        "title": "Medical details are removed early",
-        "body": "Diagnoses and similar details are removed from the bill text before it is stored or sent for analysis. Pages never show a diagnosis."
-      },
-      "p3": {
-        "title": "Your choices are separate",
-        "body": "Each use of the bill (hospital check, public page, analysis outside Kenya, receipts) has its own consent. You can withdraw a consent at any time from your dashboard."
-      },
-      "p4": {
-        "title": "Analysis outside Kenya needs your consent",
-        "body": "Only the redacted text of a bill can leave our servers, and only if you agreed. Without that consent a local fallback is used."
-      },
-      "p5": {
-        "title": "Files are deleted",
-        "body": "Bill files are deleted 24 hours after the hospital confirms them. Donor names appear on the public ledger only if the donor gave one and did not ask to be anonymous."
-      },
-      "p6": {
-        "title": "People decide",
-        "body": "Software never rejects a case. A person reviews anything flagged, and a family can ask for a review at any time."
-      }
-    },
-    "terms": {
-      "title": "Terms of use",
-      "intro": "The main rules for using TibaDirect.",
-      "p1": {
-        "title": "We do not hold or keep donations",
-        "body": "Donations are paid out to the confirmed hospital. TibaDirect does not pay families and does not keep donations for itself."
-      },
-      "p2": {
-        "title": "Money is paid in parts",
-        "body": "The hospital is paid in tranches as money arrives. While a bill is an estimate, no more than 80% is paid until the final bill is confirmed."
-      },
-      "p3": {
-        "title": "Leftover money follows the donor's choice",
-        "body": "If the final bill is lower or treatment ends early, leftover money is refunded, moved to the solidarity pool, or held briefly for follow-up care, as the donor chose."
-      },
-      "p4": {
-        "title": "Cases can be frozen",
-        "body": "If a case looks fraudulent we can freeze it. Every donor is then refunded, whatever they chose."
-      },
-      "p5": {
-        "title": "Families must tell the truth",
-        "body": "Families must upload their own real bill and must not give false information. A false case is closed and reported."
-      },
-      "p6": {
-        "title": "Demo notice",
-        "body": "This demo runs on sandbox money with made-up hospitals and bills. Nothing here is a real fundraiser."
-      }
-    }
+    "draft": "This notice has not been reviewed by a lawyer yet. TibaDirect is a prototype that runs on sandbox money.",
+    "updated": "Written for the hackathon prototype"
   },
   "donate": {
     "title": "Make a donation",

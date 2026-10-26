@@ -280,7 +280,7 @@ def test_an_admin_can_freeze_a_case_in_play(admin: Browser, db_session, status: 
     assert not case.is_publicly_visible
 
 
-def test_freezing_hides_the_page_and_stops_donations(admin: Browser, client, db_session) -> None:  # type: ignore[no-untyped-def]
+def test_freezing_pauses_the_page_and_stops_donations(admin: Browser, client, db_session) -> None:  # type: ignore[no-untyped-def]
     from app.services import case_service
 
     case = CaseFactory(status=CaseStatus.LIVE, target_kes_minor=8_500_000)
@@ -288,7 +288,11 @@ def test_freezing_hides_the_page_and_stops_donations(admin: Browser, client, db_
     assert client.get(f"/api/public/cases/{case.public_slug}").status_code == 200
     assert case_service.is_accepting_donations(case)
     admin.post(f"/api/admin/cases/{case.id}/freeze", {"reason": "Suspected forged invoice"})
-    assert client.get(f"/api/public/cases/{case.public_slug}").status_code == 404
+    page = client.get(f"/api/public/cases/{case.public_slug}")
+    assert page.status_code == 200  # the page says it is paused, with no story and no reason
+    assert page.get_json()["notice"] == "paused_for_review"
+    assert "forged" not in page.get_data(as_text=True)
+    assert client.get(f"/api/public/cases/{case.public_slug}/ledger").status_code == 404
     assert not case_service.is_accepting_donations(case)
 
 

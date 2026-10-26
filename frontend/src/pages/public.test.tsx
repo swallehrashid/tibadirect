@@ -179,6 +179,15 @@ describe("legal pages and not found", () => {
     expect(screen.getByText(/bado haijakaguliwa na mwanasheria/)).toBeInTheDocument();
   });
 
+  it("offers a feedback link in the footer that opens an email and carries only the page address", async () => {
+    mockApi(anonymous);
+    renderApp("/terms");
+    const link = await screen.findByRole("link", { name: "Give feedback" });
+    const href = link.getAttribute("href") ?? "";
+    expect(href.startsWith("mailto:feedback@")).toBe(true);
+    expect(decodeURIComponent(href)).toContain("/terms");
+  });
+
   it("shows a friendly page for an unknown address", async () => {
     mockApi(anonymous);
     renderApp("/no-such-page");

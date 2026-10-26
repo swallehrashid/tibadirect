@@ -1,10 +1,11 @@
-import { ChevronDown, LogOut, UserRound } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ChevronDown, LogOut, MessageSquare, UserRound } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/auth/AuthContext";
 import { homeFor } from "@/auth/roles";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
+import { feedbackHref } from "@/lib/feedback";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 /** Account menu for signed-in people: who they are, a link to their area, and sign out. */
@@ -12,6 +13,7 @@ export function UserMenu() {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   if (!user) return null;
   return (
     <DropdownMenu>
@@ -34,6 +36,11 @@ export function UserMenu() {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate(homeFor(user.role))}>{t("shell.myArea")}</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={feedbackHref(location.pathname, { subject: t("shell.feedbackSubject"), body: t("shell.feedbackBody") })}>
+            <MessageSquare className="size-4" aria-hidden="true" /> {t("shell.feedback")}
+          </a>
+        </DropdownMenuItem>
         <DropdownMenuItem
           // A guarded page sends the visitor home once the session ends; public pages stay where they are.
           onSelect={() => void signOut()}

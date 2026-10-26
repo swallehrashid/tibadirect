@@ -243,6 +243,36 @@ jobs:
             ${{ runner.temp }}/logs
           retention-days: 7
 
+  audit:
+    name: Dependency audit (report only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Findings are written to the job summary for a person to read; they do not fail the build,
+    # because a new advisory in a package we do not control should not block unrelated work.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Python packages (pip-audit)
+        run: |
+          pip install pip-audit
+          echo "### Python packages" >> "$GITHUB_STEP_SUMMARY"
+          pip-audit -r backend/requirements.txt --no-deps --disable-pip | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Web packages (npm audit)
+        working-directory: frontend
+        run: |
+          echo "### Web packages" >> "$GITHUB_STEP_SUMMARY"
+          npm audit --audit-level=high | tee -a "$GITHUB_STEP_SUMMARY"
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest

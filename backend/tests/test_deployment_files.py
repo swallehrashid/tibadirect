@@ -182,3 +182,12 @@ def test_ci_runs_the_browser_flows_on_the_local_stack() -> None:
         assert needed in steps, needed
     setup_node = [s for s in job["steps"] if s.get("uses", "").startswith("actions/setup-node")]
     assert setup_node[0]["with"]["node-version-file"] == ".nvmrc"
+
+
+def test_ci_audits_the_dependencies_without_failing_the_build() -> None:
+    workflow = yaml.safe_load((ROOT / ".github" / "workflows" / "ci.yml").read_text())
+    job = workflow["jobs"]["audit"]
+    assert job["continue-on-error"] is True
+    steps = "\n".join(str(step.get("run", "")) for step in job["steps"])
+    assert "pip-audit -r backend/requirements.txt" in steps
+    assert "npm audit --audit-level=high" in steps

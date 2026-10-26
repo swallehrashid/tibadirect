@@ -45,11 +45,13 @@ function StoppedCase({ item }: { item: PublicCase }) {
         </p>
       </header>
       <Alert tone="warning" data-testid="case-notice">
-        <AlertTitle>{paused ? t("casePage.paused.title") : t("casePage.ended.title")}</AlertTitle>
-        <AlertDescription>
-          {paused ? t("casePage.paused.body") : t("casePage.ended.body")}
-          {paused ? <span className="mt-2 block">{t("casePage.paused.refunds")}</span> : null}
-        </AlertDescription>
+        <div className="space-y-1">
+          <AlertTitle>{paused ? t("casePage.paused.title") : t("casePage.ended.title")}</AlertTitle>
+          <AlertDescription>
+            {paused ? t("casePage.paused.body") : t("casePage.ended.body")}
+            {paused ? <span className="mt-2 block">{t("casePage.paused.refunds")}</span> : null}
+          </AlertDescription>
+        </div>
       </Alert>
       <Button asChild variant="outline">
         <Link to="/cases">{t("landing.hero.browse")}</Link>

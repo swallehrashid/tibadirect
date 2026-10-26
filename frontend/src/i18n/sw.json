@@ -532,7 +532,16 @@
     "closedNote": "Kesi hii imefungwa. Ukurasa unabaki kama kumbukumbu ya wazi.",
     "notFound": {
       "title": "Hatukuweza kupata kesi hiyo",
-      "body": "Huenda ni ya faragha, imesimamishwa kwa ukaguzi, au kiungo si sahihi."
+      "body": "Huenda ni ya faragha, au kiungo si sahihi."
+    },
+    "paused": {
+      "title": "Imesimamishwa kwa ukaguzi",
+      "body": "Ukurasa huu umesimamishwa wakati timu yetu inauchunguza. Hauchukui michango mipya. Chochote kilichotolewa na ambacho hakijalipwa hospitalini kinarudishwa kwa waliokitoa.",
+      "refunds": "Kila mchangiaji ataarifiwa kwa barua pepe pesa zake zikirudishwa."
+    },
+    "ended": {
+      "title": "Uchangishaji huu umeisha",
+      "body": "Familia imefunga ukurasa huu. Hauchukui michango mipya. Chochote kilichotolewa na ambacho hakijalipwa hospitalini kinarudishwa kwa waliokitoa."
     }
   },
   "share": {

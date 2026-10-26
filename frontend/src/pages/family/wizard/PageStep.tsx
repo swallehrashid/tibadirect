@@ -64,6 +64,7 @@ export function PageStep({ draft, onNext, onBack }: StepProps) {
     hospital_name: draft.hospital.display_name,
     trust_level: "pending_confirmation" as const,
     status: "live" as const,
+    notice: null,
     story: story.trim() || null,
     photo_url: null,
     is_estimate: true,

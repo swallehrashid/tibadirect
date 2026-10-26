@@ -91,8 +91,9 @@ class PublicCaseDetail(MethodView):
     @blp.response(200, PublicCaseSchema)
     @blp.alt_response(404, description="No such public case")
     def get(self, slug: str) -> Case:
-        """One public case. A case that is not public is reported as not found."""
-        return case_service.get_public_case_or_404(db.session, slug)
+        """One public case. A case that is not public is reported as not found. A case that was
+        public and is now frozen or cancelled answers with a ``notice`` and no story."""
+        return case_service.get_public_page_or_404(db.session, slug)
 
 
 # Verifying walks the whole chain, so it is limited more tightly than reading a page.

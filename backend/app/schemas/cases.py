@@ -181,7 +181,16 @@ class PublicCaseSchema(ma.Schema):
     hospital_name = ma.fields.Function(lambda case: case.hospital.display_name)
     trust_level = ma.fields.Function(lambda case: case.trust_level.value)
     status = ma.fields.Function(lambda case: case.status.value)
-    story = ma.fields.String(allow_none=True)
+    notice = ma.fields.Function(
+        lambda case: case.public_notice,
+        metadata={
+            "description": "Set when the page has stopped: paused_for_review (frozen) or ended "
+            "(cancelled by the family). The story is then left out."
+        },
+    )
+    story = ma.fields.Function(
+        lambda case: None if case.public_notice else case.story, allow_none=True
+    )
     photo_url = ma.fields.Function(lambda case: None)  # photos arrive with the P1 photo feature
     is_estimate = ma.fields.Boolean()
     target_kes_minor = ma.fields.Integer(allow_none=True)

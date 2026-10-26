@@ -117,13 +117,17 @@ def test_only_the_owner_can_cancel(
     assert case.status == CaseStatus.LIVE
 
 
-def test_a_cancelled_case_disappears_from_the_public_and_takes_no_money(
+def test_a_cancelled_case_shows_only_a_notice_to_the_public_and_takes_no_money(
     browser_for: BrowserFor, browser: Browser, db_session, paypal
 ) -> None:
     case = settleable_case()
     browser_for(case.created_by).post(f"/api/cases/{case.id}/cancel", {"reason": "other"})
 
-    assert browser.get(f"/api/public/cases/{case.public_slug}").status_code == 404
+    page = browser.get(f"/api/public/cases/{case.public_slug}")
+    assert page.status_code == 200
+    assert page.get_json()["notice"] == "ended"
+    assert page.get_json()["story"] is None
+    assert browser.get(f"/api/public/cases/{case.public_slug}/ledger").status_code == 404
     orders = browser.post(
         "/api/donations/orders", {"case_slug": case.public_slug, "amount_usd": "10"}
     )

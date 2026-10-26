@@ -211,6 +211,29 @@ class Case(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
             and self.active_consent(ConsentScope.PUBLIC_PAGE) is not None
         )
 
+    @property
+    def public_notice(self) -> str | None:
+        """What a visitor is told in place of the page when a case that was public has stopped.
+
+        ``paused_for_review`` covers a freeze, including the cancellation that ends it, without
+        saying why: the reason stays with the admins. ``ended`` is a family's own cancellation.
+        """
+        if self.status == CaseStatus.FROZEN or (
+            self.status == CaseStatus.CANCELLED and self.close_reason == CloseReason.FRAUD
+        ):
+            return "paused_for_review"
+        if self.status == CaseStatus.CANCELLED:
+            return "ended"
+        return None
+
+    @property
+    def shows_public_notice(self) -> bool:
+        """A stopped case still answers on its public address, but only if its family agreed to a
+        public page. It then shows the notice and nothing else."""
+        return self.public_notice is not None and (
+            self.active_consent(ConsentScope.PUBLIC_PAGE) is not None
+        )
+
     def __repr__(self) -> str:
         return f"<Case id={self.id} status={self.status}>"
 

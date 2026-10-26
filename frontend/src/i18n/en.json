@@ -532,7 +532,16 @@
     "closedNote": "This case is closed. The page stays as a public record.",
     "notFound": {
       "title": "We could not find that case",
-      "body": "It may be private, paused for a check, or the link may be wrong."
+      "body": "It may be private, or the link may be wrong."
+    },
+    "paused": {
+      "title": "Paused for review",
+      "body": "This page is paused while our team looks at it. It takes no new donations. Anything that was given and not yet paid to the hospital is being refunded to the people who gave it.",
+      "refunds": "Each donor is told by email when their refund is sent."
+    },
+    "ended": {
+      "title": "This fundraiser has ended",
+      "body": "The family has closed this page. It takes no new donations. Anything that was given and not yet paid to the hospital is being refunded to the people who gave it."
     }
   },
   "share": {

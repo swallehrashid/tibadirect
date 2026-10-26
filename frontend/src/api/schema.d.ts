@@ -462,7 +462,10 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** One public case. A case that is not public is reported as not found. */
+        /**
+         * One public case. A case that is not public is reported as not found. A case that was
+         *     public and is now frozen or cancelled answers with a ``notice`` and no story.
+         */
         get: {
             parameters: {
                 query?: never;
@@ -3535,7 +3538,9 @@ export interface components {
             readonly hospital_name?: unknown;
             readonly trust_level?: unknown;
             readonly status?: unknown;
-            story?: string | null;
+            /** @description Set when the page has stopped: paused_for_review (frozen) or ended (cancelled by the family). The story is then left out. */
+            readonly notice?: unknown;
+            readonly story?: unknown;
             readonly photo_url?: unknown;
             is_estimate?: boolean;
             target_kes_minor?: number | null;

@@ -493,6 +493,18 @@ def get_public_case_or_404(session: Session, slug: str) -> Case:
     return case
 
 
+def get_public_page_or_404(session: Session, slug: str) -> Case:
+    """What the public case page may show: a public case, or one that was public and has been
+    paused or ended (it then carries a ``public_notice`` and none of its story). Anything else
+    does not exist. Donating and the ledger still use the strict lookup above."""
+    case = session.execute(
+        select(Case).where(Case.public_slug == slug.lower())
+    ).scalar_one_or_none()
+    if case is None or not (case.is_publicly_visible or case.shows_public_notice):
+        raise NotFound("Case not found.", code="case_not_found")
+    return case
+
+
 def public_totals(session: Session) -> dict[str, int]:
     """Landing-page totals over public cases only, so a private case never shows in a number."""
     visible = (

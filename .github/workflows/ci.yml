@@ -73,6 +73,16 @@ jobs:
       - name: Create the test database
         run: psql -h localhost -U tiba -d tibadirect -c "CREATE DATABASE tibadirect_test"
 
+      # This database is thrown away with the job, so it need not survive a crash. Not waiting for
+      # the disk on every commit and index build makes the test run several times faster.
+      - name: Make the throwaway database fast
+        run: >-
+          psql -h localhost -U tiba -d tibadirect
+          -c "ALTER SYSTEM SET fsync = off"
+          -c "ALTER SYSTEM SET synchronous_commit = off"
+          -c "ALTER SYSTEM SET full_page_writes = off"
+          -c "SELECT pg_reload_conf()"
+
       - name: Ruff lint
         run: ruff check .
 
@@ -100,8 +110,9 @@ jobs:
           flask --app wsgi ai evaluate --out "$RUNNER_TEMP/REPORT.md"
           head -20 "$RUNNER_TEMP/REPORT.md"
 
+      # One worker per CPU; each worker makes and uses its own database (tests/conftest.py).
       - name: Tests with coverage
-        run: pytest --cov=app --cov-fail-under=75
+        run: pytest -n auto --cov=app --cov-fail-under=75
 
       - name: Slow tests (dataset reproducibility)
         run: pytest -m slow

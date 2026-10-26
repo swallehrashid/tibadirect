@@ -34,8 +34,8 @@ seed: ## Load seed data
 reset-demo: ## Truncate all tables and re-seed
 	cd backend && $(BIN)/flask --app wsgi reset-demo
 
-test: ## Run the backend test suite
-	cd backend && $(BIN)/pytest
+test: ## Run the backend test suite, one worker per CPU (each worker has its own database)
+	cd backend && $(BIN)/pytest -n auto
 
 lint: ## Lint the backend
 	cd backend && $(BIN)/ruff check . && $(BIN)/ruff format --check .

@@ -116,7 +116,48 @@ def test_every_response_carries_the_security_headers(client: FlaskClient) -> Non
     assert "default-src 'self'" in policy
     assert "frame-ancestors 'none'" in policy
     assert "https://www.paypal.com" in policy
+    # The grid's icon font is a data: URI; fonts come only from our own files and from there.
+    assert "font-src 'self' data:" in policy
     assert "'unsafe-inline'" not in policy.split("script-src")[1].split(";")[0]
+
+
+def test_the_policy_lets_the_bill_viewer_load_files_from_storage_and_nothing_else_from_there() -> (
+    None
+):
+    from app.security.web import content_security_policy, storage_origins
+
+    local = {
+        "S3_ENDPOINT_URL": "http://minio:9000",
+        "S3_PUBLIC_ENDPOINT_URL": "http://localhost:9000",
+    }
+    # The browser reaches storage at the public address, so that is the origin the policy names.
+    assert storage_origins(local) == ["http://localhost:9000"]
+    policy = content_security_policy(local)
+    assert "http://localhost:9000" in policy["img-src"]
+    assert "http://localhost:9000" in policy["frame-src"]
+    for directive in ("script-src", "connect-src", "style-src", "default-src"):
+        assert "http://localhost:9000" not in str(policy[directive])
+    # Without a public address the endpoint itself is used; no path or query reaches the policy.
+    assert storage_origins(
+        {"S3_ENDPOINT_URL": "https://acct.r2.cloudflarestorage.com/bucket?x=1"}
+    ) == ["https://acct.r2.cloudflarestorage.com"]
+    # No endpoint means AWS S3, in its two usual spellings.
+    assert storage_origins({"S3_REGION": "eu-west-1"}) == [
+        "https://s3.amazonaws.com",
+        "https://s3.eu-west-1.amazonaws.com",
+    ]
+    assert storage_origins({"S3_ENDPOINT_URL": "not a url"}) == []
+
+
+def test_the_base_policy_is_not_changed_by_building_one_for_an_app() -> None:
+    from app.security.web import CONTENT_SECURITY_POLICY, content_security_policy
+
+    before = {
+        key: list(value) if isinstance(value, list) else value
+        for key, value in CONTENT_SECURITY_POLICY.items()
+    }
+    content_security_policy({"S3_ENDPOINT_URL": "http://minio:9000"})
+    assert before == CONTENT_SECURITY_POLICY
 
 
 def test_hsts_is_only_sent_in_production(client: FlaskClient) -> None:

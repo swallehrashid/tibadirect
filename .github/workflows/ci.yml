@@ -73,6 +73,16 @@ jobs:
       - name: Create the test database
         run: psql -h localhost -U tiba -d tibadirect -c "CREATE DATABASE tibadirect_test"
 
+      # This database is thrown away with the job, so it need not survive a crash. Not waiting for
+      # the disk on every commit and index build makes the test run several times faster.
+      - name: Make the throwaway database fast
+        run: >-
+          psql -h localhost -U tiba -d tibadirect
+          -c "ALTER SYSTEM SET fsync = off"
+          -c "ALTER SYSTEM SET synchronous_commit = off"
+          -c "ALTER SYSTEM SET full_page_writes = off"
+          -c "SELECT pg_reload_conf()"
+
       - name: Ruff lint
         run: ruff check .
 
@@ -100,11 +110,49 @@ jobs:
           flask --app wsgi ai evaluate --out "$RUNNER_TEMP/REPORT.md"
           head -20 "$RUNNER_TEMP/REPORT.md"
 
+      # One worker per CPU; each worker makes and uses its own database (tests/conftest.py).
       - name: Tests with coverage
-        run: pytest --cov=app --cov-fail-under=75
+        run: pytest -n auto --cov=app --cov-fail-under=75
 
       - name: Slow tests (dataset reproducibility)
         run: pytest -m slow
+
+  frontend:
+    name: Frontend (lint, types, tests, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: The generated API types match the committed OpenAPI document
+        run: |
+          npx openapi-typescript ../docs/api/openapi.json -o "$RUNNER_TEMP/schema.d.ts"
+          diff -q "$RUNNER_TEMP/schema.d.ts" src/api/schema.d.ts
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
 
   secrets:
     name: Secret scan

@@ -128,6 +128,9 @@ def test_a_bill_waiting_for_a_second_approval_moves_to_its_own_list(
     assert waiting["status"] == "awaiting_second_approval"
     assert waiting["confirmed_by"] == "Clerk One"
     assert waiting["amount_kes_minor"] == 8_500_000
+    # The supervisor needs to know which case this is to send the second code for it.
+    assert waiting["case_id"] == str(ward.case.id)
+    assert waiting["case_alias"] == ward.case.alias
 
 
 def test_case_detail_shows_what_the_hospital_needs_and_no_family_identity(
@@ -323,7 +326,9 @@ def test_the_family_hears_that_the_page_is_live(browser_for: BrowserFor, ward: W
     _decide(browser_for(ward.clerk.user), ward)
     live = [m for m in mail_service.outbox if m.template == "case_live"]
     assert [m.to for m in live] == ["mama@example.test"]
-    assert f"/cases/{ward.case.public_slug}" in live[0].text
+    # The public page is at /c/<slug>; /cases/<slug> would open the app's "not found" page.
+    assert f"/c/{ward.case.public_slug}" in live[0].text
+    assert "/cases/" not in live[0].text
     assert "Baby Zawadi" in live[0].text
 
 

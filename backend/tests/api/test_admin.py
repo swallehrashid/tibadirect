@@ -64,15 +64,17 @@ def _resolved_item(reason: str = "done") -> ReviewItem:
     )
 
 
+# A fixed ID, not uuid4(): parallel test workers must all collect the same test names.
+NO_SUCH_ID = "0b7f3c9e-5a4d-4e2b-9c61-7d8e2f1a3b45"
 ADMIN_ROUTES = [
     ("get", "/api/admin/stats"),
     ("get", "/api/admin/review-items"),
     ("get", "/api/admin/cases"),
     ("get", "/api/admin/audit-log"),
-    ("get", f"/api/admin/cases/{uuid.uuid4()}"),
-    ("post", f"/api/admin/cases/{uuid.uuid4()}/freeze"),
-    ("post", f"/api/admin/cases/{uuid.uuid4()}/settlements/run"),
-    ("post", f"/api/admin/review-items/{uuid.uuid4()}/resolve"),
+    ("get", f"/api/admin/cases/{NO_SUCH_ID}"),
+    ("post", f"/api/admin/cases/{NO_SUCH_ID}/freeze"),
+    ("post", f"/api/admin/cases/{NO_SUCH_ID}/settlements/run"),
+    ("post", f"/api/admin/review-items/{NO_SUCH_ID}/resolve"),
 ]
 
 

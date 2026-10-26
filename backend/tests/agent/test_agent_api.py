@@ -18,6 +18,8 @@ from tests.factories import UserFactory
 BrowserFor = Callable[..., Browser]
 ASK = "/api/admin/agent/ask"
 ACTIONS = "/api/admin/agent/actions"
+# A fixed ID, not uuid4(): parallel test workers must all collect the same test names.
+NO_SUCH_ID = "0b7f3c9e-5a4d-4e2b-9c61-7d8e2f1a3b45"
 
 
 @pytest.fixture
@@ -59,8 +61,8 @@ def refund_proposal(donation, amount: str = "10.00") -> tuple:  # type: ignore[n
     [
         ("post", ASK),
         ("get", ACTIONS),
-        ("post", f"{ACTIONS}/{uuid.uuid4()}/approve"),
-        ("post", f"{ACTIONS}/{uuid.uuid4()}/reject"),
+        ("post", f"{ACTIONS}/{NO_SUCH_ID}/approve"),
+        ("post", f"{ACTIONS}/{NO_SUCH_ID}/reject"),
     ],
 )
 def test_only_an_administrator_may_use_the_agent(  # type: ignore[no-untyped-def]
@@ -81,8 +83,8 @@ def test_only_an_administrator_may_use_the_agent(  # type: ignore[no-untyped-def
     [
         ("post", ASK),
         ("get", ACTIONS),
-        ("post", f"{ACTIONS}/{uuid.uuid4()}/approve"),
-        ("post", f"{ACTIONS}/{uuid.uuid4()}/reject"),
+        ("post", f"{ACTIONS}/{NO_SUCH_ID}/approve"),
+        ("post", f"{ACTIONS}/{NO_SUCH_ID}/reject"),
     ],
 )
 def test_with_the_flag_off_the_agent_does_not_exist(admin: Browser, method, path) -> None:  # type: ignore[no-untyped-def]

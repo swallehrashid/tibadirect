@@ -557,7 +557,7 @@ def go_live_if_ready(session: Session, case: Case) -> bool:
     notification_service.notify_family(
         case,
         "case_live",
-        url=f"{current_app.config['APP_BASE_URL'].rstrip('/')}/cases/{case.public_slug}",
+        url=f"{current_app.config['APP_BASE_URL'].rstrip('/')}/c/{case.public_slug}",
     )
     return True
 

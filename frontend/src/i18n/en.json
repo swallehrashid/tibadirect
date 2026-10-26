@@ -1,0 +1,1314 @@
+{
+  "app": {
+    "name": "TibaDirect",
+    "tagline": "Verified medical fundraising that pays the hospital, not a stranger's phone number."
+  },
+  "status": {
+    "checking": "Checking the service…",
+    "ok": "The service is running.",
+    "down": "The service is not reachable right now."
+  },
+  "common": {
+    "close": "Close",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "required": "Required",
+    "optional": "Optional",
+    "remove": "Remove",
+    "sandbox": "Sandbox",
+    "yes": "Yes",
+    "no": "No",
+    "tableOf": "{{name}} (table)"
+  },
+  "trust": {
+    "hospital_confirmed": {
+      "label": "Hospital-confirmed",
+      "explain": "The hospital's billing office confirmed this bill using a code sent to its official email."
+    },
+    "pending_confirmation": {
+      "label": "Pending confirmation",
+      "explain": "The family has shared a bill. We are waiting for the hospital to confirm it. Donations are not paid out yet."
+    },
+    "unverified": {
+      "label": "Unverified",
+      "explain": "This bill has not been checked by the hospital. Be careful and do not send money outside TibaDirect."
+    },
+    "about": "What this badge means"
+  },
+  "risk": {
+    "label": "Check result",
+    "low": "Low concern",
+    "medium": "Needs a closer look",
+    "high": "High concern"
+  },
+  "caseStatus": {
+    "draft": "Draft",
+    "pending_triage": "Checking the bill",
+    "in_review": "With our review team",
+    "pending_confirmation": "Waiting for the hospital",
+    "live": "Live",
+    "funded": "Fully funded",
+    "closed": "Closed",
+    "cancelled": "Cancelled",
+    "frozen": "Paused for a check"
+  },
+  "meter": {
+    "target": "Hospital bill",
+    "targetEstimate": "Estimated bill",
+    "noTarget": "The amount will show here once the hospital confirms the bill.",
+    "pledged": "Pledged by donors",
+    "settled": "Paid to the hospital",
+    "percent": "{{percent}}% pledged",
+    "summary": "{{pledged}} pledged and {{settled}} paid to the hospital, out of {{target}}.",
+    "summaryNone": "{{pledged}} pledged and {{settled}} paid to the hospital. The bill amount is not confirmed yet.",
+    "usdGoal": "About {{usd}} to give"
+  },
+  "stepper": {
+    "label": "Progress",
+    "stepOf": "Step {{current}} of {{total}}",
+    "done": "Done"
+  },
+  "consent": {
+    "agree": "I agree",
+    "required": "Required to continue",
+    "optional": "Optional",
+    "guardian": "You are giving this on behalf of the patient.",
+    "read": "Read the full wording",
+    "hide": "Hide the full wording",
+    "withdraw": "Withdraw"
+  },
+  "upload": {
+    "drop": "Drop the bill here, or choose a file",
+    "choose": "Choose a file",
+    "camera": "Take a photo",
+    "hint": "PDF, PNG or JPEG, up to 10 MB.",
+    "replace": "Choose a different file",
+    "preview": "Preview of the chosen bill",
+    "errors": {
+      "type": "Please choose a PDF, PNG or JPEG file.",
+      "size": "This file is larger than 10 MB.",
+      "empty": "This file is empty.",
+      "imageType": "Please choose a PNG or JPEG picture."
+    },
+    "dropImage": "Drop the screenshot here, or choose a picture",
+    "hintImage": "PNG or JPEG, up to 10 MB."
+  },
+  "otp": {
+    "label": "6-digit code",
+    "digit": "Digit {{n}} of 6",
+    "entered": "Code entered",
+    "incomplete": "{{count}} of 6 digits entered"
+  },
+  "money": {
+    "usdLabel": "Amount in US dollars",
+    "kesLabel": "Amount in Kenyan shillings",
+    "invalid": "Enter an amount like 25 or 25.50."
+  },
+  "error": {
+    "title": "Something went wrong",
+    "body": "Please try again. If it keeps happening, contact us and mention the reference below.",
+    "reference": "Reference: {{id}}",
+    "offline": "We could not reach the service. Check your connection and try again.",
+    "rateLimited": "Too many tries. Please wait {{seconds}} seconds and try again.",
+    "notFound": "We could not find that."
+  },
+  "empty": {
+    "title": "Nothing here yet"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "sw": "Kiswahili",
+    "switchTo": "Switch language"
+  },
+  "demo": {
+    "banner": "Demo: this uses PayPal sandbox money. No real money moves and no real patients are shown.",
+    "tag": "Sandbox / simulated",
+    "label": "Demo notice"
+  },
+  "nav": {
+    "cases": "Browse cases",
+    "howItWorks": "How it works",
+    "check": "Check an appeal",
+    "signIn": "Sign in",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "myCases": "My cases",
+    "startCampaign": "Start a campaign",
+    "queue": "Queue",
+    "settlements": "Settlements",
+    "overview": "Overview",
+    "review": "Review queue",
+    "audit": "Audit log",
+    "jobs": "Jobs",
+    "agent": "Treasurer agent"
+  },
+  "shell": {
+    "skip": "Skip to main content",
+    "home": "TibaDirect home",
+    "menu": "Menu",
+    "mainNav": "Main",
+    "footerNav": "Footer",
+    "accountMenu": "Account menu",
+    "myArea": "My dashboard",
+    "signOut": "Sign out",
+    "welcome": "Welcome, {{name}}",
+    "area": {
+      "family": "Family",
+      "hospital_staff": "Hospital",
+      "admin": "Admin"
+    }
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInIntro": "Enter your email and we will send you a 6-digit code.",
+    "email": "Email address",
+    "emailRequired": "Enter your email address.",
+    "emailInvalid": "Enter a valid email address.",
+    "sendCode": "Send me a code",
+    "noPassword": "There is no password to remember. If you are new, signing in creates your family account.",
+    "verifyTitle": "Enter your code",
+    "verifyIntro": "We sent a 6-digit code to {{email}}. It works once and lasts 10 minutes.",
+    "signIn": "Sign in",
+    "codeWrong": "That code is not right, or it has expired. Check your email and try again, or ask for a new code.",
+    "resend": "Send a new code",
+    "resendIn": "Send a new code in {{seconds}}s",
+    "resent": "We sent a new code.",
+    "otherEmail": "Use a different email",
+    "backHome": "Back to the home page",
+    "demoTitle": "Demo accounts",
+    "demoBody": "These are made-up accounts for the demo:"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or has moved."
+  },
+  "cases": {
+    "title": "Cases you can support",
+    "intro": "Every case here has a bill that the hospital itself has confirmed, or is waiting for the hospital to confirm. Pick one to see the details.",
+    "county": "Hospital county",
+    "allCounties": "All counties",
+    "count_one": "{{count}} case",
+    "count_other": "{{count}} cases",
+    "donors_one": "{{count}} donor",
+    "donors_other": "{{count}} donors",
+    "empty": {
+      "title": "No open cases right now",
+      "body": "New cases appear here once a hospital has confirmed the bill. Please check again soon."
+    },
+    "emptyCounty": {
+      "title": "No open cases in {{county}}",
+      "body": "Try another county, or look at all counties."
+    },
+    "pages": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{total}}"
+  },
+  "landing": {
+    "hero": {
+      "title": "Pay the hospital, not a stranger's phone number.",
+      "body": "Families share a hospital bill that the hospital itself confirms. Donors anywhere in the world give in US dollars through PayPal, and the money goes to the hospital in parts as it is needed.",
+      "browse": "Browse cases",
+      "start": "Start a campaign",
+      "motto": "We verify the bill, not the illness."
+    },
+    "promise": {
+      "title": "The money never touches a middleman",
+      "body": "Donations are paid out to the hospital, never to the family or to us. Every movement of money is written in a public ledger anyone can check."
+    },
+    "flow": {
+      "title": "How your money reaches the hospital",
+      "intro": "Four steps, from the family's bill to the hospital's account.",
+      "step": "Step {{n}}",
+      "more": "See the full money flow",
+      "share": {
+        "title": "The family shares the bill",
+        "body": "They upload the hospital bill. Medical details are removed before anything is checked."
+      },
+      "confirm": {
+        "title": "The hospital confirms it",
+        "body": "The hospital's billing office confirms the amount with a code sent to its official email."
+      },
+      "donate": {
+        "title": "You give with PayPal",
+        "body": "Choose an amount in US dollars. You also choose what happens to anything left over."
+      },
+      "pay": {
+        "title": "The hospital is paid",
+        "body": "Money is paid to the hospital in parts as it arrives. It is never paid to the family."
+      }
+    },
+    "live": {
+      "title": "Cases open now",
+      "previous": "Previous cases",
+      "next": "Next cases",
+      "all": "See all cases"
+    },
+    "check": {
+      "title": "Got a fundraising message on WhatsApp?",
+      "body": "Paste it or upload a screenshot and we will tell you what looks risky, and whether it matches a confirmed case. We do not keep what you paste.",
+      "cta": "Check an appeal"
+    },
+    "stats": {
+      "title": "So far",
+      "cases": "Public cases",
+      "hospitals": "Hospitals",
+      "donations": "Donations",
+      "settled": "Paid to hospitals",
+      "note": "These are demo figures from made-up cases and sandbox money."
+    }
+  },
+  "howItWorks": {
+    "title": "How TibaDirect works",
+    "intro": "Two things have to be true before you give: the bill is real, and the money reaches the hospital. We handle them separately, so you can check each one.",
+    "legsTitle": "The two parts of every case",
+    "motto": "We verify the bill, not the illness. The donor's money touches the hospital, never a middleman.",
+    "trust": {
+      "title": "Is the bill real?",
+      "intro": "The trust part. It happens before any money is accepted.",
+      "s1": {
+        "title": "The family shares the bill",
+        "body": "A family member signs in, chooses the hospital, agrees to what we may do with the bill, and uploads it. Medical details are removed before anything is stored or analysed."
+      },
+      "s2": {
+        "title": "A helper reads and checks it",
+        "body": "Software reads the amount and looks for edits, copies and scam patterns. It only explains what it finds. It never turns a family away: a person reviews anything that looks risky."
+      },
+      "s3": {
+        "title": "The hospital confirms it",
+        "body": "The hospital's billing office gets a one-time code at the official email address in the facility register, never an address printed on the bill. Large bills need two people to agree."
+      },
+      "s4": {
+        "title": "The page goes live",
+        "body": "The case page shows a hospital-confirmed badge, the amount and the family's story. It never shows a diagnosis."
+      }
+    },
+    "money": {
+      "title": "Does the money reach the hospital?",
+      "intro": "The money part. It follows the hospital's confirmed bill.",
+      "s1": {
+        "title": "You give in US dollars",
+        "body": "Pay with PayPal. The page shows the bill in Kenyan shillings, with a small buffer for exchange-rate changes and fees."
+      },
+      "s2": {
+        "title": "It is written in a public ledger",
+        "body": "Every movement is recorded in a chain of fingerprints that anyone can check. TibaDirect does not keep donations for itself."
+      },
+      "s3": {
+        "title": "The hospital is paid in parts",
+        "body": "As money arrives, the hospital is paid in tranches. While the bill is only an estimate, no more than 80% is paid until the final bill is confirmed."
+      },
+      "s4": {
+        "title": "The final bill closes the case",
+        "body": "When the final bill has been paid, the case closes and the page says so."
+      },
+      "s5": {
+        "title": "Anything left over follows your choice",
+        "body": "If there is money left, it goes where each donor chose when they gave. See below."
+      }
+    },
+    "excess": {
+      "title": "What happens to leftover money",
+      "intro": "When you give, you choose what should happen if more money arrives than the bill needs, or the treatment ends sooner than planned.",
+      "refund": {
+        "title": "Refund me",
+        "body": "Your share goes back to you through PayPal. Leftovers under $1 go to the solidarity pool instead, because the refund would cost more than it returns."
+      },
+      "pool": {
+        "title": "Solidarity pool",
+        "body": "Your share goes into a shared solidarity pool. The transfer is written in the public ledger like any other movement."
+      },
+      "follow": {
+        "title": "Keep for follow-up care",
+        "body": "Your share is held for up to 14 days for the same patient's next confirmed bill. If none comes, it is refunded."
+      },
+      "freeze": "If a case is frozen because something looks wrong, every donor is refunded, whatever they chose."
+    },
+    "real": {
+      "title": "What is real and what is simulated",
+      "realTitle": "Real",
+      "simTitle": "Simulated in this demo",
+      "r1": "The bill checks, the hospital confirmation steps and the review by a person.",
+      "r2": "The public ledger and its fingerprints, which you can verify on every case.",
+      "r3": "The rules for tranches, refunds and leftover money.",
+      "r4": "Sign-in by emailed code and the privacy rules for what is stored.",
+      "m1": "The money: payments run on PayPal's sandbox, so no real money moves.",
+      "m2": "Payments to the hospital go to a sandbox account. In production a licensed Kenyan settlement partner would pay the hospital's paybill or bank account.",
+      "m3": "The hospitals, families and bills are made up, and no real patient is shown.",
+      "m4": "Emails go to a test inbox, not to real addresses."
+    },
+    "faq": {
+      "title": "Questions",
+      "q1": {
+        "q": "Does TibaDirect hold my money?",
+        "a": "No. Payments go through PayPal and are paid out to the hospital in parts. We do not spend or keep donations, and the public ledger shows where each one went."
+      },
+      "q2": {
+        "q": "Who can see the patient's details?",
+        "a": "Donors see an alias, a region, the hospital and the amounts. The patient reference is only visible to the family and the hospital, and bill files are deleted 24 hours after the hospital confirms."
+      },
+      "q3": {
+        "q": "What if the final bill is lower than the estimate?",
+        "a": "The hospital is paid only the confirmed amount. Anything left over follows each donor's choice."
+      },
+      "q4": {
+        "q": "What if a case turns out to be fake?",
+        "a": "An administrator can freeze a case at any time. Every donor is then refunded."
+      },
+      "q5": {
+        "q": "Do I need an account to give?",
+        "a": "No. You only need PayPal. You can give anonymously or with a name of your choice."
+      }
+    }
+  },
+  "legal": {
+    "draft": "This is a short summary written for the demo. The full notice will be published after legal review.",
+    "privacy": {
+      "title": "Privacy",
+      "intro": "What we collect, why, and how long we keep it.",
+      "p1": {
+        "title": "We collect as little as we can",
+        "body": "Families give an email address, a patient reference and the bill. Donors give an email address for the receipt. We do not ask for anything else."
+      },
+      "p2": {
+        "title": "Medical details are removed early",
+        "body": "Diagnoses and similar details are removed from the bill text before it is stored or sent for analysis. Pages never show a diagnosis."
+      },
+      "p3": {
+        "title": "Your choices are separate",
+        "body": "Each use of the bill (hospital check, public page, analysis outside Kenya, receipts) has its own consent. You can withdraw a consent at any time from your dashboard."
+      },
+      "p4": {
+        "title": "Analysis outside Kenya needs your consent",
+        "body": "Only the redacted text of a bill can leave our servers, and only if you agreed. Without that consent a local fallback is used."
+      },
+      "p5": {
+        "title": "Files are deleted",
+        "body": "Bill files are deleted 24 hours after the hospital confirms them. Donor names appear on the public ledger only if the donor gave one and did not ask to be anonymous."
+      },
+      "p6": {
+        "title": "People decide",
+        "body": "Software never rejects a case. A person reviews anything flagged, and a family can ask for a review at any time."
+      }
+    },
+    "terms": {
+      "title": "Terms of use",
+      "intro": "The main rules for using TibaDirect.",
+      "p1": {
+        "title": "We do not hold or keep donations",
+        "body": "Donations are paid out to the confirmed hospital. TibaDirect does not pay families and does not keep donations for itself."
+      },
+      "p2": {
+        "title": "Money is paid in parts",
+        "body": "The hospital is paid in tranches as money arrives. While a bill is an estimate, no more than 80% is paid until the final bill is confirmed."
+      },
+      "p3": {
+        "title": "Leftover money follows the donor's choice",
+        "body": "If the final bill is lower or treatment ends early, leftover money is refunded, moved to the solidarity pool, or held briefly for follow-up care, as the donor chose."
+      },
+      "p4": {
+        "title": "Cases can be frozen",
+        "body": "If a case looks fraudulent we can freeze it. Every donor is then refunded, whatever they chose."
+      },
+      "p5": {
+        "title": "Families must tell the truth",
+        "body": "Families must upload their own real bill and must not give false information. A false case is closed and reported."
+      },
+      "p6": {
+        "title": "Demo notice",
+        "body": "This demo runs on sandbox money with made-up hospitals and bills. Nothing here is a real fundraiser."
+      }
+    }
+  },
+  "donate": {
+    "title": "Make a donation",
+    "intro": "Give in US dollars through PayPal. The hospital is paid, never the family.",
+    "amount": "Amount in US dollars",
+    "presets": "Quick amounts",
+    "estimate": "About {{kes}} at today's rate. The exact amount is set when you pay.",
+    "estimateWait": "The Kenyan shilling amount appears once today's rate loads.",
+    "range": "Enter an amount between $1 and $10,000.",
+    "name": "Name shown in the public ledger (optional)",
+    "anonymous": "Give anonymously",
+    "working": "Completing your donation…",
+    "payMock": "Donate {{amount}} with PayPal (simulated)",
+    "secure": "You pay in PayPal's own window. We never see your card or password.",
+    "feeNote": "PayPal takes a small fee from each payment, so a little less than your gift reaches the case. Your receipt shows the exact amount.",
+    "funded": {
+      "title": "This case is fully funded",
+      "body": "Thank you to everyone who gave. No more donations are needed for this bill."
+    },
+    "closed": {
+      "title": "This case is closed",
+      "body": "The bill has been paid and this page is kept as a public record."
+    },
+    "excess": {
+      "title": "If there is money left over",
+      "intro": "Sometimes more money arrives than the bill needs. Choose what should happen to your share.",
+      "refund": {
+        "label": "Refund me",
+        "body": "Your leftover share goes back to you through PayPal. Under $1 goes to the solidarity pool."
+      },
+      "solidarity_pool": {
+        "label": "Solidarity pool",
+        "body": "Your leftover share goes into a shared pool, written in the public ledger."
+      },
+      "follow_up_care": {
+        "label": "Keep for follow-up care",
+        "body": "Held for up to 14 days for this patient's next confirmed bill, then refunded."
+      }
+    },
+    "errors": {
+      "fullyFunded": "This case no longer needs more donations. You have not been charged.",
+      "notAccepting": "This case is not taking donations right now.",
+      "pending": "PayPal is still checking this payment. We will email your receipt when it clears.",
+      "declined": "PayPal did not complete this payment. You have not been charged. Please try another way to pay.",
+      "amount": "Enter an amount between $1 and $10,000.",
+      "paypalDown": "PayPal could not be reached. You have not been charged. Please try again shortly.",
+      "generic": "We could not complete your donation. You have not been charged. Please try again."
+    }
+  },
+  "ledger": {
+    "title": "Public ledger",
+    "intro": "Every movement of money for this case, oldest first. Each entry carries a fingerprint that depends on the one before it, so an entry cannot be changed or removed without breaking the chain.",
+    "empty": "No money has moved yet.",
+    "columns": {
+      "when": "When",
+      "what": "What happened",
+      "account": "Account",
+      "amount": "Amount",
+      "reference": "Reference",
+      "fingerprint": "Fingerprint"
+    },
+    "types": {
+      "donation_captured": "Donation received",
+      "paypal_fee": "PayPal fee",
+      "settlement_sent": "Paid to the hospital",
+      "refund_issued": "Refund to donor",
+      "pool_transfer": "Moved to the solidarity pool",
+      "reversal": "Payment reversed",
+      "adjustment": "Adjustment"
+    },
+    "accounts": {
+      "case_funds": "Case funds",
+      "paypal_fees": "PayPal fees",
+      "hospital_settled": "Paid to the hospital",
+      "donor_refunds": "Refunds to donors",
+      "solidarity_pool": "Solidarity pool"
+    },
+    "fromDonor": "{{what}} from {{name}}",
+    "verify": "Verify ledger",
+    "verifying": "Checking…",
+    "verifyHelp": "Recomputes every fingerprint for this case on our server.",
+    "valid": {
+      "title": "The ledger is intact",
+      "body": "We rechecked all {{count}} entries for this case and every fingerprint matches. The newest one starts with {{hash}}."
+    },
+    "invalid": {
+      "title": "The ledger check failed",
+      "body": "Something in the chain does not match. Please tell us so we can look into it, and be careful about giving until we have."
+    }
+  },
+  "tranches": {
+    "title": "Payments to the hospital",
+    "none": "Nothing has been paid to the hospital yet. A payment is made once enough has been pledged.",
+    "item": "Payment {{n}}: {{amount}}",
+    "simulated": "Payments to the hospital are simulated here: they go to the hospital's sandbox PayPal account. In production a licensed Kenyan partner pays the hospital's paybill or bank account."
+  },
+  "casePage": {
+    "title": "Case",
+    "back": "All cases",
+    "bill": "The hospital bill",
+    "story": "The family's story",
+    "noStory": "The family has not added a story yet.",
+    "noDiagnosis": "We verify the bill, not the illness. No diagnosis is shown on any case.",
+    "estimateNote": "This is an estimate. Until the final bill is confirmed, no more than 80% of it is paid to the hospital.",
+    "closedNote": "This case is closed. The page stays as a public record.",
+    "notFound": {
+      "title": "We could not find that case",
+      "body": "It may be private, paused for a check, or the link may be wrong."
+    }
+  },
+  "share": {
+    "title": "Share this case",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "copyFailed": "Could not copy the link",
+    "opensNewTab": "opens in a new tab",
+    "more": "Share",
+    "text": "Please help with {{alias}}'s hospital bill on TibaDirect:"
+  },
+  "receipt": {
+    "title": "Donation receipt",
+    "thanks": "Thank you",
+    "lead": "Your {{amount}} donation to {{alias}} is on its way to {{hospital}}.",
+    "amount": "You gave",
+    "fee": "PayPal fee",
+    "net": "Reaches the case",
+    "kes": "Worth about",
+    "kesNote": "The shilling amount uses the exchange rate at the time you paid. It is an estimate.",
+    "excess": "If money is left over",
+    "name": "Name in the ledger",
+    "date": "Paid",
+    "reference": "PayPal reference",
+    "fingerprint": "Ledger fingerprint",
+    "seeLedger": "See it in the public ledger",
+    "print": "Print receipt",
+    "keepLink": "Keep this link. It is your receipt and anyone with it can see it.",
+    "refunded": "This donation has been refunded in full.",
+    "partiallyRefunded": "{{amount}} of this donation has been refunded.",
+    "notFound": {
+      "title": "We could not find that receipt",
+      "body": "Check the link in your email, or the one you saved."
+    }
+  },
+  "timeline": {
+    "draft": "Draft started",
+    "pending_triage": "Bill checked",
+    "in_review": "Looked at by our team",
+    "pending_confirmation": "Waiting for the hospital",
+    "live": "Live on TibaDirect",
+    "funded": "Fully funded",
+    "closed": "Closed",
+    "cancelled": "Cancelled",
+    "frozen": "Paused for a check"
+  },
+  "family": {
+    "title": "My campaigns",
+    "empty": {
+      "title": "You have not started a campaign yet",
+      "body": "It takes about five minutes. You will need the hospital bill and the patient or admission number from it."
+    },
+    "continue": "Continue your campaign",
+    "open": "Open",
+    "raised": "{{pledged}} pledged of {{target}}",
+    "next": {
+      "draft": "Finish your campaign and send it for checking",
+      "pending_triage": "We are checking your bill. This usually takes a minute.",
+      "in_review": "A person on our team is looking at your case.",
+      "pending_confirmation": "Waiting for the hospital to confirm your bill.",
+      "live": "Live. Share your page so people can give.",
+      "liveSettling": "Live. Money has been pledged and is being paid to the hospital.",
+      "funded": "Fully funded. The hospital is being paid.",
+      "closed": "Closed. Thank you for sharing your story.",
+      "cancelled": "This campaign has ended.",
+      "frozen": "Paused while we check something. Donors are being refunded."
+    },
+    "frozenNote": "Your page is paused while we check something. Donors who gave are being refunded. If you think this is a mistake, ask for a review below.",
+    "share": {
+      "title": "Your public page",
+      "view": "View your page"
+    },
+    "timeline": {
+      "title": "Where your case is"
+    },
+    "money": {
+      "title": "Money so far",
+      "donors": "Donors",
+      "received": "Received after PayPal fees",
+      "refunded": "Refunded",
+      "note": "Money is paid to the hospital, never to you. You will see it move here as it is paid."
+    },
+    "triage": {
+      "title": "What our checks found",
+      "note": "These are things our checks noticed, not a verdict. A person always decides, and you can ask for a review.",
+      "route": {
+        "hospital_confirmation": "Sent to the hospital's billing office to confirm.",
+        "manual_review": "A person on our team is reviewing it."
+      },
+      "noReasons": "Nothing unusual was found.",
+      "notYet": "The checks have not finished yet.",
+      "notYetDraft": "The checks run after you send your campaign."
+    },
+    "review": {
+      "button": "Ask for a review",
+      "title": "Ask a person to look at your case",
+      "intro": "Tell us what you would like us to look at. Do not include medical details.",
+      "label": "Your message",
+      "hint": "{{count}} of at least 10 characters",
+      "send": "Send request",
+      "sent": "We have your request.",
+      "already": "You already asked for a review. We will look at it soon.",
+      "notNow": "A review can be asked for after a case is sent, and until it ends.",
+      "length": "Please write between 10 and 500 characters."
+    },
+    "confirmations": {
+      "title": "What the hospital said",
+      "status": {
+        "confirmed": "Confirmed",
+        "awaiting_second_approval": "Waiting for a second person at the hospital",
+        "queried": "The hospital has a question",
+        "rejected": "The hospital did not confirm"
+      },
+      "final": "Final bill",
+      "invoice": "Invoice {{number}}",
+      "note": "The hospital says:"
+    },
+    "finalBill": {
+      "title": "Upload the final bill",
+      "intro": "When treatment ends, upload the hospital's final bill. The hospital confirms it, we pay what is still due, and the case closes.",
+      "file": "Final bill",
+      "upload": "Send final bill",
+      "sent": "Your final bill is being checked and sent to the hospital."
+    },
+    "consents": {
+      "title": "Your consents",
+      "intro": "You can take back a consent at any time. Here is what each one changes.",
+      "none": "No active consents.",
+      "withdrawTitle": "Withdraw: {{name}}?",
+      "consequence": {
+        "hospital_verification": "The hospital check is already done for this bill, so withdrawing it will not undo that.",
+        "hospital_verification_unconfirmed": "The hospital has not confirmed your bill yet. If you withdraw this, your campaign ends.",
+        "public_page": "Your page is hidden straight away and people can no longer give.",
+        "ai_processing_abroad": "Automatic checks will use only the version that runs in Kenya from now on.",
+        "receipt_sharing": "We will stop sharing donation receipts with you."
+      }
+    },
+    "end": {
+      "title": "End this campaign",
+      "intro": "If treatment has been cancelled or is no longer needed, you can end the campaign. Donations stop straight away.",
+      "button": "End campaign",
+      "confirm": "End this campaign?",
+      "warning": "Donations stop at once. Money the case no longer needs goes back to donors or on, as each donor chose. This cannot be undone.",
+      "why": "Why is it ending?",
+      "reasons": {
+        "treatment_cancelled": "Treatment was cancelled",
+        "patient_deceased": "The patient has died",
+        "other": "Another reason"
+      },
+      "conflict": "This campaign cannot be ended from where it is.",
+      "ended": "Your campaign has ended.",
+      "deleteTitle": "Delete this draft",
+      "deleteIntro": "This draft was never sent. Deleting it removes it for good.",
+      "deleteButton": "Delete draft",
+      "deleteConfirm": "Delete this draft?",
+      "deleteWarning": "The draft and its uploaded bills will be removed.",
+      "deleted": "Draft deleted."
+    },
+    "dashboard": {
+      "title": "Campaign",
+      "notFound": {
+        "title": "We could not find that campaign",
+        "body": "It may belong to another account, or the link may be wrong."
+      }
+    }
+  },
+  "wizard": {
+    "title": "Start a campaign",
+    "subtitle": "Five short steps. Your progress is saved, so you can stop and come back.",
+    "steps": {
+      "hospital": "Hospital and patient",
+      "consent": "Consent",
+      "bill": "The bill",
+      "page": "Your page",
+      "review": "Review"
+    },
+    "hospital": {
+      "title": "Which hospital issued the bill?",
+      "intro": "Choose the hospital. We will ask its billing office to confirm the bill.",
+      "search": "Search hospitals",
+      "searchPlaceholder": "Hospital name or county",
+      "results_one": "{{count}} hospital shown",
+      "results_other": "{{count}} hospitals shown",
+      "none": "No hospital matches that. Try a different name or county.",
+      "label": "Hospital",
+      "locked": "The hospital cannot be changed once the draft is started. To pick another, delete this draft and start again.",
+      "alias": "Name for your page",
+      "aliasHint": "Use a first name or nickname, not the patient's full name, and no illness words.",
+      "aliasPreview": "On the page it will read: {{alias}} · {{region}}",
+      "region": "County or town",
+      "patientReference": "Patient or admission number from the bill",
+      "patientReferenceHint": "Only you and the hospital can see this. It is never shown on the public page.",
+      "minor": "The patient is a child",
+      "minorHint": "A parent or legal guardian must give consent for a child."
+    },
+    "errors": {
+      "hospital": "Choose a hospital from the list.",
+      "aliasLength": "Use between 2 and 40 characters.",
+      "aliasPersonal": "Do not put an email address or phone number in the name.",
+      "aliasMedical": "Please leave out illness words from the name.",
+      "region": "Enter a county or town, 2 to 40 letters.",
+      "patientReference": "Enter the admission or patient number from the bill (3 to 60 characters).",
+      "storyLength": "Use at most 600 characters.",
+      "storyPersonal": "Do not put an email address, phone number or long number in the story.",
+      "storyMedical": "Please leave out medical words. The hospital bill already shows the care given.",
+      "storyGeneric": "We could not save your story. Please try again."
+    },
+    "consent": {
+      "title": "What you agree to",
+      "intro": "Read each one. The first two are needed to send your campaign. The others are your choice.",
+      "guardianConfirm": "I am this child's parent or legal guardian.",
+      "locked": "You can take this back later from your campaign page.",
+      "requiredNote": "Tick the two required consents to continue.",
+      "outdated": "The wording changed. Please read it again and confirm.",
+      "guardianNeeded": "For a child, a parent or legal guardian must give consent."
+    },
+    "bill": {
+      "title": "Upload the hospital bill",
+      "intro": "A photo or PDF of the bill. We read the amount and remove medical details before anything is stored for checking.",
+      "synthetic": "For this demo, use a made-up bill only. Never upload a real patient's bill.",
+      "uploaded": "Bills uploaded",
+      "kind": "What kind of bill is it?",
+      "kinds": {
+        "invoice": {
+          "label": "An invoice",
+          "body": "The hospital is asking for payment for care already given."
+        },
+        "estimate": {
+          "label": "An estimate",
+          "body": "A quote for care that is planned but not given yet."
+        }
+      },
+      "file": "Bill file",
+      "upload": "Upload this bill",
+      "uploading": "Uploading…",
+      "uploadFailed": "We could not upload that file. Please try again.",
+      "needOne": "Upload at least one bill to continue.",
+      "received": "Received",
+      "removeNamed": "Remove {{kind}}"
+    },
+    "page": {
+      "title": "Your public page",
+      "intro": "This is what donors will read. Write about your family, not the illness.",
+      "story": "Your story (optional)",
+      "storyHelp": "No diagnosis, phone numbers or emails.",
+      "counter": "{{count}} of {{max}} characters",
+      "flagged": "Words to leave out:",
+      "checking": "Checking…",
+      "saved": "Saved. No medical words found.",
+      "photo": "Show a photo",
+      "photoOff": "Photos are switched off in this demo.",
+      "preview": "How your page will look in the list",
+      "previewNote": "The bill amount and the hospital badge appear after the hospital confirms."
+    },
+    "review": {
+      "title": "Check and send",
+      "intro": "Look this over. When you send it, we check the bill and then ask the hospital to confirm it.",
+      "pageName": "Page name",
+      "bills": "Bills",
+      "billCount_one": "{{count}} bill uploaded",
+      "billCount_other": "{{count}} bills uploaded",
+      "story": "Story",
+      "consents": "Consents",
+      "given": "given",
+      "notGiven": "not given",
+      "whatNext": "After you send: we check the bill (usually a minute), then the hospital's billing office confirms it with a code sent to its official email. You can follow each step on your campaign page.",
+      "missing": "Both required consents and at least one bill are needed before you can send.",
+      "submit": "Send for checking",
+      "sent": "Sent. We are checking your bill."
+    }
+  },
+  "hospital": {
+    "queue": {
+      "title": "Bills waiting for you",
+      "intro": "Bills families have sent to {{hospital}} to confirm. Open one to compare it with the original and decide.",
+      "waiting": "Waiting for your decision",
+      "emptyTitle": "Nothing is waiting",
+      "emptyBody": "New bills appear here as soon as a family sends one.",
+      "second": "Waiting for a second approval",
+      "secondIntro": "Large bills need a second person. A different billing supervisor approves them with a new code.",
+      "secondNone": "No bills are waiting for a second approval.",
+      "finalBill": "Final bill",
+      "submitted": "Sent {{when}}",
+      "bills_one": "{{count}} bill",
+      "bills_other": "{{count}} bills",
+      "review": "Review",
+      "invoice": "Invoice {{number}}",
+      "confirmedBy": "Confirmed by {{name}}",
+      "approve": "Approve",
+      "needsSupervisor": "A billing supervisor must approve"
+    },
+    "review": {
+      "title": "Review bill",
+      "notFound": {
+        "title": "We could not find that bill",
+        "body": "It may belong to another hospital, or the link may be wrong."
+      },
+      "patientReference": "Patient or admission number",
+      "region": "Family's county or town",
+      "privacy": "You see only the alias and the patient number on the bill, so you can match it to your records. The family's contact details are never shown.",
+      "nothingToDecide": "This bill is not waiting for a decision."
+    },
+    "bill": {
+      "title": "The original bill",
+      "which": "Which bill",
+      "kinds": {
+        "invoice": "Invoice",
+        "estimate": "Estimate",
+        "final_bill": "Final bill",
+        "photo": "Photo"
+      },
+      "none": "No bill was uploaded for this case.",
+      "imageAlt": "The uploaded hospital bill",
+      "pdfTitle": "The uploaded hospital bill (PDF)",
+      "open": "Open in a new tab",
+      "gone": "The original file has been deleted. Files are removed 24 hours after the hospital confirms a bill.",
+      "hint": "Check the amount, the invoice number and the patient number against your own records."
+    },
+    "extracted": {
+      "title": "What our software read",
+      "intro": "Use this to compare with the original. It can be wrong, so decide from your own records.",
+      "none": "The bill has not been checked yet.",
+      "facility": "Hospital on the bill",
+      "invoice": "Invoice number",
+      "date": "Date",
+      "type": "Type",
+      "total": "Total",
+      "balance": "Balance due",
+      "deposit": "Deposit paid",
+      "confidence": "How sure the reader was",
+      "lines": "Line items",
+      "item": "Item",
+      "qty": "Qty",
+      "lineAmount": "Amount",
+      "checks": "What the checks noticed"
+    },
+    "otp": {
+      "title": "One-time code",
+      "intro": "To protect the hospital, a code is sent only to the address in the facility register: {{address}}. Someone there reads it to you.",
+      "send": "Send a code to {{address}}",
+      "sent": "A code was sent to {{address}}. It works until {{time}}.",
+      "label": "6-digit code from that address",
+      "resend": "Send a new code",
+      "resendIn": "Send a new code in {{seconds}}s",
+      "tooMany": "Too many codes were sent for this bill. Please try again in an hour.",
+      "notSent": "The code could not be emailed. Please try again shortly.",
+      "notWaiting": "This bill is not waiting for that step.",
+      "needCode": "Send a code and enter it before you submit.",
+      "incomplete": "Enter all 6 digits of the code.",
+      "wrong": "That code is not right. Check it and try again.",
+      "expired": "That code has expired. Send a new one.",
+      "locked": "Too many wrong tries. Send a new code."
+    },
+    "decision": {
+      "title": "Your decision",
+      "intro": "Confirm the bill only if it is a real bill from your hospital. You can also ask the family a question or turn it down.",
+      "choose": "What do you decide?",
+      "options": {
+        "confirmed": {
+          "label": "Confirm the bill",
+          "body": "It is our bill. The family's page goes live for this amount.",
+          "submit": "Confirm the bill"
+        },
+        "queried": {
+          "label": "Ask the family a question",
+          "body": "Something does not match. The family sees your note and can fix it.",
+          "submit": "Send the question"
+        },
+        "rejected": {
+          "label": "This is not our bill",
+          "body": "We did not issue it. A person on our team will look at the case.",
+          "submit": "Reject the bill"
+        }
+      },
+      "amount": "Total amount to be paid (KES)",
+      "amountHelp": "Type the amount from your own records. It is not filled in for you.",
+      "matches": "This matches the amount our software read.",
+      "differs": "This is different from the {{total}} our software read. Check the original.",
+      "invoice": "Invoice number",
+      "deposit": "Deposit already paid (optional)",
+      "depositHelp": "If the family paid part of the bill already, enter that part so donors are not asked for it.",
+      "final": "This is the final bill",
+      "finalHelp": "Treatment is complete and this is the last bill.",
+      "finalNote": "This is a final bill for a case that is already live. The case closes once it has been paid.",
+      "twoPerson": "Bills of {{amount}} or more need a second approval. After you confirm, a different billing supervisor must approve with a new code before the page goes live.",
+      "noteQuery": "Your question for the family",
+      "noteReject": "Why is this not your bill?",
+      "noteHelp": "The family sees this. Do not include medical details.",
+      "recorded": "Decision recorded",
+      "result": {
+        "confirmed": "The bill is confirmed. The family's page is now live and the first payment will follow as money arrives.",
+        "queried": "Your question has gone to the family. They can correct the bill and send it again.",
+        "rejected": "The bill was not confirmed. A person on our team will look at the case."
+      },
+      "resultSecond": "Confirmed. This amount needs a second approval from a different billing supervisor before the page goes live.",
+      "notWaiting": "This bill is no longer waiting for a decision. The page has been refreshed.",
+      "errors": {
+        "amount": "Enter the total from the bill.",
+        "amountLarge": "That amount is too large. Check it.",
+        "invoice": "Enter the invoice number from the bill.",
+        "invoiceUsed": "That invoice number is already used on another case at this hospital.",
+        "deposit": "The deposit cannot be more than the bill.",
+        "note": "Write at least a few words for the family."
+      }
+    },
+    "second": {
+      "title": "Second approval needed",
+      "intro": "{{name}} confirmed {{amount}} (invoice {{invoice}}). Because it is a large bill, a different billing supervisor must approve it.",
+      "approve": "Approve the bill",
+      "approved": "Approved",
+      "approvedBody": "Both approvals are in. The family's page is now live.",
+      "samePerson": "A different billing supervisor must give the second approval. You confirmed this bill.",
+      "needSupervisor": "Only a billing supervisor can give the second approval."
+    },
+    "history": {
+      "title": "Earlier decisions",
+      "invoiceStatus": "PayPal invoice: {{status}}",
+      "by": "{{name}} · {{when}}",
+      "second": "second approval by {{name}}",
+      "note": "Note:"
+    },
+    "settlements": {
+      "title": "Payments received",
+      "intro": "Each payment TibaDirect has made to your hospital, newest first.",
+      "requested": "Requested",
+      "case": "Case",
+      "tranche": "Payment no.",
+      "amount": "Amount",
+      "status": "Status",
+      "statuses": {
+        "pending": "Pending",
+        "processing": "Being paid",
+        "succeeded": "Paid",
+        "failed": "Failed"
+      },
+      "reference": "Reference",
+      "completed": "Completed",
+      "emptyTitle": "No payments yet",
+      "emptyBody": "Payments appear here once a confirmed case has enough money pledged."
+    }
+  },
+  "admin": {
+    "overview": {
+      "title": "Overview",
+      "waiting": "Waiting for a person",
+      "openReviews": "Cases to review",
+      "openReviewsHint": "Flagged by the checks or asked for by a family",
+      "secondApprovals": "Bills awaiting a second approval",
+      "secondApprovalsHint": "At the hospitals",
+      "failedJobs": "Failed background jobs",
+      "ledgerEntries": "Ledger entries",
+      "money": "Money",
+      "donations": "Donations",
+      "captured": "Received (USD)",
+      "capturedHint": "After PayPal fees",
+      "refunded": "Refunded (USD)",
+      "settledUsd": "Paid out (USD)",
+      "pledged": "Pledged (KES)",
+      "settledKes": "Paid to hospitals (KES)",
+      "cases_one": "{{count}} case",
+      "cases_other": "{{count}} cases",
+      "queuesDown": "The job queues cannot be reached.",
+      "ledger": {
+        "title": "Ledger check",
+        "intro": "Recomputes every fingerprint in the whole ledger, across all cases, and says where it breaks if it does.",
+        "verify": "Check the whole ledger",
+        "ok": "The ledger is intact",
+        "okBody": "All {{count}} entries were rechecked and every fingerprint matches.",
+        "broken": "The ledger is broken",
+        "brokenBody": "The chain fails at entry {{seq}}. Stop paying out and find out why."
+      },
+      "queueLine": "Jobs waiting in the queues — {{queues}}"
+    },
+    "cases": {
+      "title": "All cases",
+      "alias": "Alias",
+      "status": "Status",
+      "hospital": "Hospital",
+      "owner": "Owner",
+      "target": "Target",
+      "pledged": "Pledged",
+      "settled": "Paid out",
+      "search": "Search by alias, link name, hospital or owner email",
+      "allStatuses": "All statuses",
+      "searchButton": "Search",
+      "none": "No cases match.",
+      "count_one": "{{count}} case",
+      "count_other": "{{count}} cases",
+      "hint": "Open a case to see everything about it. Opening a case is written to the audit log.",
+      "open": "Open"
+    },
+    "review": {
+      "title": "Review queue",
+      "intro": "Cases the checks flagged, or that a family asked us to look at. Nothing is rejected automatically: a person decides, and must say why.",
+      "filter": "Show",
+      "tabs": {
+        "open": "Open",
+        "resolved": "Resolved",
+        "all": "All"
+      },
+      "emptyTitle": "Nothing here",
+      "emptyBody": "No review items match.",
+      "columns": {
+        "created": "Raised",
+        "case": "Case",
+        "source": "Raised by",
+        "reason": "Reason",
+        "status": "Status"
+      },
+      "sources": {
+        "ai_flag": "The checks",
+        "family_request": "The family",
+        "insider_anomaly": "Insider check",
+        "admin": "An admin"
+      },
+      "status": {
+        "open": "Open",
+        "resolved": "Resolved"
+      },
+      "resolve": "Resolve",
+      "view": "View",
+      "hint": "Use the button on a row, or click the row, to open it.",
+      "resolveTitle": "Resolve this item",
+      "detailsTitle": "Review item",
+      "openCase": "Open the case",
+      "decision": "Your decision",
+      "note": "Why? (required)",
+      "noteHelp": "{{count}} of at least 10 characters",
+      "noteLength": "Write between 10 and 500 characters.",
+      "conflict": "This item was already resolved, or the case cannot take that decision.",
+      "submit": "Record decision",
+      "resolved": "Decision recorded",
+      "resolutions": {
+        "approved_for_confirmation": {
+          "label": "Send to the hospital",
+          "body": "Satisfied. The bill goes to the hospital's billing office to confirm."
+        },
+        "kept_unverified": {
+          "label": "Keep unverified",
+          "body": "The case stays unverified until something changes."
+        },
+        "case_cancelled": {
+          "label": "Cancel the case",
+          "body": "The campaign ends and donors are refunded as they chose."
+        },
+        "no_action": {
+          "label": "No action needed",
+          "body": "Close the item without changing the case."
+        }
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "intro": "Every sign-in, decision and movement of money, newest first. Entries cannot be changed.",
+      "targetType": "Target type",
+      "targetIdFull": "Target ID (the full ID)",
+      "idInvalid": "That is not a full ID.",
+      "filter": "Filter",
+      "clear": "Clear filter",
+      "emptyTitle": "No entries",
+      "emptyBody": "Nothing matches this filter.",
+      "hint": "Open a row to see the details of that entry.",
+      "count_one": "{{count}} entry",
+      "count_other": "{{count}} entries",
+      "requestId": "Request ID",
+      "view": "Details",
+      "columns": {
+        "when": "When",
+        "actor": "Who",
+        "action": "Action",
+        "target": "Target",
+        "targetId": "ID",
+        "details": "Details"
+      }
+    },
+    "jobs": {
+      "title": "Background jobs",
+      "intro": "Bill checks, payments and emails run in the background. A failed job can be put back on its queue.",
+      "schedulerOk": "The scheduler is running",
+      "schedulerDown": "The scheduler has stopped",
+      "heartbeat": "last signal {{when}}",
+      "queues": "Queues",
+      "queue": "Queue",
+      "columns": {
+        "queued": "Waiting",
+        "started": "Running",
+        "scheduled": "Scheduled",
+        "failed": "Failed"
+      },
+      "failed": "Failed jobs",
+      "noneTitle": "No failed jobs",
+      "noneBody": "Everything that ran has finished.",
+      "jobMeta": "{{queue}} queue · failed {{when}} · {{retries}} retries left",
+      "retry": "Retry",
+      "retried": "The job is back on its queue.",
+      "notFailed": "That job has not failed, so it cannot be retried."
+    },
+    "case": {
+      "title": "Case",
+      "notFound": "We could not find that case",
+      "hospital": "Hospital",
+      "owner": "Family account",
+      "minor": "Patient is a child",
+      "slug": "Page address",
+      "created": "Started",
+      "live": "Went live",
+      "closed": "Closed",
+      "freezeReason": "Paused because: {{reason}} ({{when}})",
+      "audited": "Opening this page is written to the audit log.",
+      "documents": "Bills",
+      "noDocuments": "No bills uploaded.",
+      "kind": "Kind",
+      "size": "Size",
+      "pages": "Pages",
+      "checks": "Automatic checks",
+      "noChecks": "The checks have not run yet.",
+      "score": "Risk score {{score}}",
+      "usedModel": "language model used",
+      "localOnly": "local checks only",
+      "noSignals": "No signals were raised.",
+      "donations_one": "{{count}} donation",
+      "donations_other": "{{count}} donations",
+      "noDonations": "No donations yet.",
+      "paid": "Paid",
+      "amount": "Amount",
+      "donor": "Donor",
+      "anonymous": "Anonymous",
+      "refundedColumn": "Refunded",
+      "settlements": "Payments to the hospital",
+      "noSettlements": "Nothing paid yet.",
+      "adapter": "Method",
+      "refunds": "Refunds",
+      "noRefunds": "No refunds.",
+      "reason": "Reason",
+      "by": "By",
+      "scope": "Consent",
+      "version": "Wording",
+      "granted": "Given",
+      "withdrawn": "Withdrawn",
+      "reviews": "Review items",
+      "noReviews": "No review items.",
+      "trail_one": "Audit trail ({{count}} entry)",
+      "trail_other": "Audit trail ({{count}} entries)",
+      "freeze": {
+        "button": "Freeze case",
+        "title": "Freeze {{alias}}?",
+        "warning": "The page stops being public and stops taking money at once. Payments not yet sent are cancelled and every donor is refunded in full, whatever they chose. The case is then cancelled for fraud. This cannot be undone.",
+        "reason": "Why? (required)",
+        "help": "{{count}} of at least 10 characters (at most 300). The family may see a general reason.",
+        "confirm": "Freeze and refund",
+        "done": "The case is frozen and refunds have started.",
+        "conflict": "This case cannot be frozen from where it is."
+      },
+      "settle": {
+        "button": "Check for a payment now",
+        "created": "Payment {{n}} of {{amount}} was created.",
+        "reasons": {
+          "case_not_settleable": "The case is not in a state where it can be paid.",
+          "no_confirmation": "The hospital has not confirmed a bill yet.",
+          "hospital_inactive": "The hospital is not active.",
+          "hospital_not_ready": "The hospital cannot receive payments yet.",
+          "cap_reached": "The most that can be paid before the final bill has been reached.",
+          "nothing_available": "There is no money available to pay out.",
+          "below_threshold": "Not enough has been pledged yet for the next payment."
+        }
+      }
+    },
+    "agent": {
+      "title": "Treasurer agent",
+      "intro": "Ask about the money. It reads the books and can suggest a refund, a payment or a freeze, but it cannot do any of them: you approve or reject each suggestion.",
+      "offTitle": "The treasurer agent is not switched on",
+      "offBody": "An administrator can turn it on in the settings.",
+      "question": "Your question",
+      "placeholder": "For example: which donations on this case are still unrefunded?",
+      "aboutCase": "About a case (optional)",
+      "noCase": "No particular case",
+      "safety": "The agent sees amounts, statuses and IDs only, never donor names, emails or bill text.",
+      "ask": "Ask",
+      "thinking": "Looking at the books…",
+      "answer": "Answer",
+      "stoppedEarly": "The agent ran out of steps before it finished. Try a narrower question.",
+      "trace_one": "What it looked at ({{count}} step)",
+      "trace_other": "What it looked at ({{count}} steps)",
+      "ok": "ok",
+      "failed": "failed",
+      "proposed": "It suggests",
+      "actions": "Suggestions",
+      "waiting": "Waiting for you",
+      "noActions": "No suggestions",
+      "noActionsBody": "When the agent proposes something it appears here.",
+      "errors": {
+        "noModel": "No language model is set up in this environment, so the agent cannot answer.",
+        "unreachable": "The language model could not be reached. Try again shortly.",
+        "tooMany": "Too many questions this hour. Please wait.",
+        "off": "The agent is switched off."
+      },
+      "action": {
+        "types": {
+          "refund": "Refund",
+          "payout": "Payout",
+          "freeze": "Freeze"
+        },
+        "statuses": {
+          "proposed": "Waiting for you",
+          "approved": "Approved",
+          "executed": "Done",
+          "rejected": "Rejected",
+          "failed": "Could not be done"
+        },
+        "approve": "Approve",
+        "reject": "Reject",
+        "approveTitle": "Carry this out now?",
+        "approveBody": {
+          "refund": "The donor is refunded through PayPal straight away.",
+          "payout": "A payment to the hospital is made straight away.",
+          "freeze": "The case is frozen and every donor is refunded."
+        },
+        "rejectTitle": "Turn this suggestion down",
+        "rejectBody": "Say why, so it is on record.",
+        "decidedBy": "Decided by {{name}}",
+        "conflict": "This suggestion was already decided.",
+        "failedToast": "It could not be carried out. See the reason on the card.",
+        "doneToast": "Done.",
+        "rejectedToast": "Suggestion rejected."
+      }
+    },
+    "actions": "Actions"
+  },
+  "checker": {
+    "title": "Check an appeal",
+    "intro": "Got a message asking for money for a hospital bill? Paste it here, or upload a screenshot, and we will tell you what looks risky.",
+    "privacy": "We do not keep what you paste or upload. Only a fingerprint of it is kept, to count how many times the same message goes around.",
+    "how": "How to give us the message",
+    "tabs": {
+      "text": "Paste the message",
+      "image": "Upload a screenshot"
+    },
+    "textLabel": "The message, exactly as you received it",
+    "textHelp": "Paste at least {{count}} characters.",
+    "textCount": "{{count}} of {{max}} characters",
+    "imageLabel": "Screenshot of the message",
+    "imageHelp": "We read the words from the picture. If we cannot read enough, paste the message instead.",
+    "check": "Check this appeal",
+    "checking": "Checking…",
+    "again": "Check another message",
+    "score": "How worrying this message looks",
+    "scoreText": "Score {{score}} out of 100",
+    "reasons": "Why",
+    "explanation": "In more detail",
+    "tip": "Staying safe",
+    "notProof": "This is a guide, not proof. A message that looks fine can still be a scam, and a confirmed case is the only way to be sure the money reaches the hospital.",
+    "offTitle": "The appeal checker is switched off",
+    "offBody": "It is not available in this environment.",
+    "band": {
+      "low": {
+        "title": "Nothing worrying found",
+        "body": "We did not find the usual signs of a scam. Still, only give through a page where the hospital has confirmed the bill."
+      },
+      "medium": {
+        "title": "Be careful with this one",
+        "body": "Some things about this message are often seen in scams. Check it with the hospital before you give."
+      },
+      "high": {
+        "title": "This looks like a scam",
+        "body": "It has several of the signs that fake appeals use. Do not send money, and do not share it."
+      }
+    },
+    "match": {
+      "title": "This matches a confirmed case",
+      "body": "The appeal looks like {{alias}}'s case at {{hospital}}, which the hospital has confirmed.",
+      "link": "Open the confirmed case"
+    },
+    "errors": {
+      "off": "The appeal checker is not available right now.",
+      "unreadable": "We could not read enough text in that picture. Paste the message instead.",
+      "invalid": "Please paste a message of at least 20 characters."
+    }
+  }
+}

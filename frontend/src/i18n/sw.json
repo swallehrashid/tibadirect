@@ -1,0 +1,1314 @@
+{
+  "app": {
+    "name": "TibaDirect",
+    "tagline": "Uchangishaji wa matibabu uliothibitishwa, unaolipa hospitali moja kwa moja."
+  },
+  "status": {
+    "checking": "Inakagua huduma…",
+    "ok": "Huduma inafanya kazi.",
+    "down": "Huduma haipatikani kwa sasa."
+  },
+  "common": {
+    "close": "Funga",
+    "retry": "Jaribu tena",
+    "loading": "Inapakia…",
+    "back": "Rudi",
+    "next": "Endelea",
+    "submit": "Tuma",
+    "cancel": "Ghairi",
+    "save": "Hifadhi",
+    "required": "Lazima",
+    "optional": "Si lazima",
+    "remove": "Ondoa",
+    "sandbox": "Majaribio",
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "tableOf": "{{name}} (jedwali)"
+  },
+  "trust": {
+    "hospital_confirmed": {
+      "label": "Imethibitishwa na hospitali",
+      "explain": "Ofisi ya malipo ya hospitali imethibitisha bili hii kwa msimbo uliotumwa kwa barua pepe rasmi ya hospitali."
+    },
+    "pending_confirmation": {
+      "label": "Inasubiri uthibitisho",
+      "explain": "Familia imeshiriki bili. Tunasubiri hospitali iithibitishe. Michango bado haijalipwa."
+    },
+    "unverified": {
+      "label": "Haijathibitishwa",
+      "explain": "Bili hii haijakaguliwa na hospitali. Kuwa mwangalifu na usitume pesa nje ya TibaDirect."
+    },
+    "about": "Alama hii inamaanisha nini"
+  },
+  "risk": {
+    "label": "Matokeo ya ukaguzi",
+    "low": "Wasiwasi mdogo",
+    "medium": "Inahitaji uangalizi zaidi",
+    "high": "Wasiwasi mkubwa"
+  },
+  "caseStatus": {
+    "draft": "Rasimu",
+    "pending_triage": "Bili inakaguliwa",
+    "in_review": "Iko kwa timu yetu ya ukaguzi",
+    "pending_confirmation": "Inasubiri hospitali",
+    "live": "Hai",
+    "funded": "Imekamilika kuchangiwa",
+    "closed": "Imefungwa",
+    "cancelled": "Imeghairiwa",
+    "frozen": "Imesimamishwa kwa ukaguzi"
+  },
+  "meter": {
+    "target": "Bili ya hospitali",
+    "targetEstimate": "Makadirio ya bili",
+    "noTarget": "Kiasi kitaonekana hapa hospitali itakapothibitisha bili.",
+    "pledged": "Iliyoahidiwa na wachangiaji",
+    "settled": "Iliyolipwa hospitalini",
+    "percent": "{{percent}}% imeahidiwa",
+    "summary": "{{pledged}} zimeahidiwa na {{settled}} zimelipwa hospitalini, kati ya {{target}}.",
+    "summaryNone": "{{pledged}} zimeahidiwa na {{settled}} zimelipwa hospitalini. Kiasi cha bili bado hakijathibitishwa.",
+    "usdGoal": "Takriban {{usd}} za kuchangia"
+  },
+  "stepper": {
+    "label": "Maendeleo",
+    "stepOf": "Hatua ya {{current}} kati ya {{total}}",
+    "done": "Imekamilika"
+  },
+  "consent": {
+    "agree": "Nakubali",
+    "required": "Lazima ili kuendelea",
+    "optional": "Si lazima",
+    "guardian": "Unatoa ridhaa hii kwa niaba ya mgonjwa.",
+    "read": "Soma maelezo kamili",
+    "hide": "Ficha maelezo kamili",
+    "withdraw": "Ondoa ridhaa"
+  },
+  "upload": {
+    "drop": "Weka bili hapa, au chagua faili",
+    "choose": "Chagua faili",
+    "camera": "Piga picha",
+    "hint": "PDF, PNG au JPEG, hadi MB 10.",
+    "replace": "Chagua faili nyingine",
+    "preview": "Muonekano wa bili uliyochagua",
+    "errors": {
+      "type": "Tafadhali chagua faili ya PDF, PNG au JPEG.",
+      "size": "Faili hii ni kubwa kuliko MB 10.",
+      "empty": "Faili hii ni tupu.",
+      "imageType": "Tafadhali chagua picha ya PNG au JPEG."
+    },
+    "dropImage": "Weka picha ya skrini hapa, au chagua picha",
+    "hintImage": "PNG au JPEG, hadi MB 10."
+  },
+  "otp": {
+    "label": "Msimbo wa tarakimu 6",
+    "digit": "Tarakimu ya {{n}} kati ya 6",
+    "entered": "Msimbo umeingizwa",
+    "incomplete": "Tarakimu {{count}} kati ya 6 zimeingizwa"
+  },
+  "money": {
+    "usdLabel": "Kiasi kwa dola za Marekani",
+    "kesLabel": "Kiasi kwa shilingi za Kenya",
+    "invalid": "Weka kiasi kama 25 au 25.50."
+  },
+  "error": {
+    "title": "Kuna tatizo",
+    "body": "Tafadhali jaribu tena. Likiendelea, wasiliana nasi na utaje namba ya rejea hapa chini.",
+    "reference": "Rejea: {{id}}",
+    "offline": "Hatukuweza kufikia huduma. Angalia mtandao wako kisha ujaribu tena.",
+    "rateLimited": "Umejaribu mara nyingi. Tafadhali subiri sekunde {{seconds}} kisha ujaribu tena.",
+    "notFound": "Hatukuweza kupata hicho."
+  },
+  "empty": {
+    "title": "Hakuna kitu hapa bado"
+  },
+  "language": {
+    "label": "Lugha",
+    "en": "English",
+    "sw": "Kiswahili",
+    "switchTo": "Badilisha lugha"
+  },
+  "demo": {
+    "banner": "Onyesho: hii inatumia pesa za majaribio za PayPal. Hakuna pesa halisi zinazohamishwa wala wagonjwa halisi wanaoonyeshwa.",
+    "tag": "Majaribio / kuigiza",
+    "label": "Tangazo la onyesho"
+  },
+  "nav": {
+    "cases": "Angalia kesi",
+    "howItWorks": "Jinsi inavyofanya kazi",
+    "check": "Kagua ombi la msaada",
+    "signIn": "Ingia",
+    "privacy": "Faragha",
+    "terms": "Masharti",
+    "myCases": "Kesi zangu",
+    "startCampaign": "Anzisha mchango",
+    "queue": "Foleni",
+    "settlements": "Malipo",
+    "overview": "Muhtasari",
+    "review": "Foleni ya ukaguzi",
+    "audit": "Kumbukumbu za ukaguzi",
+    "jobs": "Kazi",
+    "agent": "Msaidizi wa mhazini"
+  },
+  "shell": {
+    "skip": "Ruka hadi maudhui makuu",
+    "home": "Ukurasa wa mwanzo wa TibaDirect",
+    "menu": "Menyu",
+    "mainNav": "Kuu",
+    "footerNav": "Chini ya ukurasa",
+    "accountMenu": "Menyu ya akaunti",
+    "myArea": "Dashibodi yangu",
+    "signOut": "Toka",
+    "welcome": "Karibu, {{name}}",
+    "area": {
+      "family": "Familia",
+      "hospital_staff": "Hospitali",
+      "admin": "Msimamizi"
+    }
+  },
+  "auth": {
+    "signInTitle": "Ingia",
+    "signInIntro": "Weka barua pepe yako nasi tutakutumia msimbo wa tarakimu 6.",
+    "email": "Anwani ya barua pepe",
+    "emailRequired": "Weka anwani yako ya barua pepe.",
+    "emailInvalid": "Weka anwani sahihi ya barua pepe.",
+    "sendCode": "Nitumie msimbo",
+    "noPassword": "Hakuna nenosiri la kukumbuka. Ikiwa wewe ni mgeni, kuingia kunafungua akaunti yako ya familia.",
+    "verifyTitle": "Weka msimbo wako",
+    "verifyIntro": "Tumetuma msimbo wa tarakimu 6 kwa {{email}}. Unatumika mara moja na unadumu dakika 10.",
+    "signIn": "Ingia",
+    "codeWrong": "Msimbo huo si sahihi, au muda wake umeisha. Angalia barua pepe yako kisha ujaribu tena, au omba msimbo mpya.",
+    "resend": "Tuma msimbo mpya",
+    "resendIn": "Tuma msimbo mpya baada ya sekunde {{seconds}}",
+    "resent": "Tumetuma msimbo mpya.",
+    "otherEmail": "Tumia barua pepe nyingine",
+    "backHome": "Rudi ukurasa wa mwanzo",
+    "demoTitle": "Akaunti za onyesho",
+    "demoBody": "Hizi ni akaunti za kubuni za onyesho:"
+  },
+  "notFound": {
+    "title": "Ukurasa haujapatikana",
+    "body": "Ukurasa unaoutafuta haupo au umehamishwa."
+  },
+  "cases": {
+    "title": "Kesi unazoweza kusaidia",
+    "intro": "Kila kesi hapa ina bili ambayo hospitali yenyewe imethibitisha, au inasubiri hospitali kuithibitisha. Chagua moja uone maelezo.",
+    "county": "Kaunti ya hospitali",
+    "allCounties": "Kaunti zote",
+    "count_one": "Kesi {{count}}",
+    "count_other": "Kesi {{count}}",
+    "donors_one": "Mchangiaji {{count}}",
+    "donors_other": "Wachangiaji {{count}}",
+    "empty": {
+      "title": "Hakuna kesi wazi sasa hivi",
+      "body": "Kesi mpya huonekana hapa hospitali ikishathibitisha bili. Tafadhali angalia tena baadaye."
+    },
+    "emptyCounty": {
+      "title": "Hakuna kesi wazi katika {{county}}",
+      "body": "Jaribu kaunti nyingine, au tazama kaunti zote."
+    },
+    "pages": "Kurasa",
+    "previous": "Iliyotangulia",
+    "next": "Inayofuata",
+    "pageOf": "Ukurasa wa {{page}} kati ya {{total}}"
+  },
+  "landing": {
+    "hero": {
+      "title": "Lipa hospitali, si simu ya mtu usiyemjua.",
+      "body": "Familia zinashiriki bili ya hospitali ambayo hospitali yenyewe inathibitisha. Wachangiaji popote duniani wanatoa kwa dola za Marekani kupitia PayPal, na pesa hulipwa hospitalini kwa awamu kadiri zinavyohitajika.",
+      "browse": "Angalia kesi",
+      "start": "Anzisha mchango",
+      "motto": "Tunathibitisha bili, si ugonjwa."
+    },
+    "promise": {
+      "title": "Pesa hazipiti kwa mtu wa kati",
+      "body": "Michango hulipwa hospitalini, kamwe si kwa familia wala kwetu. Kila uhamishaji wa pesa unaandikwa kwenye leja ya wazi ambayo yeyote anaweza kuikagua."
+    },
+    "flow": {
+      "title": "Jinsi pesa zako zinavyofika hospitalini",
+      "intro": "Hatua nne, kutoka bili ya familia hadi akaunti ya hospitali.",
+      "step": "Hatua ya {{n}}",
+      "more": "Tazama mtiririko kamili wa pesa",
+      "share": {
+        "title": "Familia inashiriki bili",
+        "body": "Wanapakia bili ya hospitali. Maelezo ya kitabibu huondolewa kabla ya ukaguzi wowote."
+      },
+      "confirm": {
+        "title": "Hospitali inaithibitisha",
+        "body": "Ofisi ya malipo ya hospitali inathibitisha kiasi kwa msimbo unaotumwa kwa barua pepe yake rasmi."
+      },
+      "donate": {
+        "title": "Unatoa kwa PayPal",
+        "body": "Chagua kiasi kwa dola za Marekani. Pia unachagua kitakachotokea kwa pesa zitakazobaki."
+      },
+      "pay": {
+        "title": "Hospitali inalipwa",
+        "body": "Pesa hulipwa hospitalini kwa awamu kadiri zinavyofika. Kamwe hazilipwi kwa familia."
+      }
+    },
+    "live": {
+      "title": "Kesi zilizo wazi sasa",
+      "previous": "Kesi zilizotangulia",
+      "next": "Kesi zinazofuata",
+      "all": "Tazama kesi zote"
+    },
+    "check": {
+      "title": "Umepata ujumbe wa kuchangisha kwenye WhatsApp?",
+      "body": "Bandika ujumbe au pakia picha ya skrini nasi tutakuambia kinachoonekana hatari, na kama unalingana na kesi iliyothibitishwa. Hatuhifadhi unachobandika.",
+      "cta": "Kagua ombi la msaada"
+    },
+    "stats": {
+      "title": "Hadi sasa",
+      "cases": "Kesi za umma",
+      "hospitals": "Hospitali",
+      "donations": "Michango",
+      "settled": "Iliyolipwa hospitalini",
+      "note": "Hizi ni takwimu za onyesho kutoka kesi za kubuni na pesa za majaribio."
+    }
+  },
+  "howItWorks": {
+    "title": "Jinsi TibaDirect inavyofanya kazi",
+    "intro": "Mambo mawili lazima yawe kweli kabla ya kutoa: bili ni halisi, na pesa zinafika hospitalini. Tunayashughulikia kando, ili uweze kukagua kila moja.",
+    "legsTitle": "Sehemu mbili za kila kesi",
+    "motto": "Tunathibitisha bili, si ugonjwa. Pesa ya mchangiaji hufika hospitalini, kamwe si kwa mtu wa kati.",
+    "trust": {
+      "title": "Je, bili ni halisi?",
+      "intro": "Sehemu ya uaminifu. Hufanyika kabla pesa yoyote kukubaliwa.",
+      "s1": {
+        "title": "Familia inashiriki bili",
+        "body": "Mwanafamilia anaingia, anachagua hospitali, anakubali tunachoweza kufanya na bili, na kuipakia. Maelezo ya kitabibu huondolewa kabla ya kuhifadhi au kuchambua chochote."
+      },
+      "s2": {
+        "title": "Msaidizi anasoma na kukagua",
+        "body": "Programu inasoma kiasi na kutafuta mabadiliko, nakala na mbinu za utapeli. Inaeleza tu inachokipata. Kamwe haikatai familia: mtu hukagua chochote kinachoonekana hatari."
+      },
+      "s3": {
+        "title": "Hospitali inaithibitisha",
+        "body": "Ofisi ya malipo ya hospitali hupokea msimbo wa mara moja kwenye barua pepe rasmi iliyo kwenye daftari la vituo vya afya, kamwe si anwani iliyochapishwa kwenye bili. Bili kubwa zinahitaji watu wawili kukubali."
+      },
+      "s4": {
+        "title": "Ukurasa unaanza kutumika",
+        "body": "Ukurasa wa kesi unaonyesha alama ya kuthibitishwa na hospitali, kiasi na hadithi ya familia. Kamwe haonyeshi utambuzi wa ugonjwa."
+      }
+    },
+    "money": {
+      "title": "Je, pesa zinafika hospitalini?",
+      "intro": "Sehemu ya pesa. Inafuata bili iliyothibitishwa na hospitali.",
+      "s1": {
+        "title": "Unatoa kwa dola za Marekani",
+        "body": "Lipa kwa PayPal. Ukurasa unaonyesha bili kwa shilingi za Kenya, pamoja na ziada ndogo kwa mabadiliko ya viwango vya kubadilisha fedha na ada."
+      },
+      "s2": {
+        "title": "Inaandikwa kwenye leja ya wazi",
+        "body": "Kila uhamishaji unarekodiwa kwenye mnyororo wa alama za kidijitali ambazo yeyote anaweza kuzikagua. TibaDirect haihifadhi michango kwa manufaa yake."
+      },
+      "s3": {
+        "title": "Hospitali inalipwa kwa awamu",
+        "body": "Pesa zinapofika, hospitali hulipwa kwa awamu. Bili ikiwa makadirio tu, si zaidi ya 80% hulipwa hadi bili ya mwisho ithibitishwe."
+      },
+      "s4": {
+        "title": "Bili ya mwisho inafunga kesi",
+        "body": "Bili ya mwisho ikishalipwa, kesi inafungwa na ukurasa unasema hivyo."
+      },
+      "s5": {
+        "title": "Kinachobaki kinafuata chaguo lako",
+        "body": "Ikiwa pesa zimebaki, zinaenda kule kila mchangiaji alikochagua alipotoa. Tazama hapa chini."
+      }
+    },
+    "excess": {
+      "title": "Pesa zinazobaki hufanywaje",
+      "intro": "Unapotoa, unachagua kitakachotokea ikiwa pesa nyingi kuliko bili zinahitajika zitafika, au matibabu yakiisha mapema kuliko ilivyopangwa.",
+      "refund": {
+        "title": "Nirudishie",
+        "body": "Sehemu yako inarudishwa kwako kupitia PayPal. Salio chini ya $1 huenda kwenye mfuko wa mshikamano, kwa sababu kurudisha kungegharimu zaidi ya kinachorudishwa."
+      },
+      "pool": {
+        "title": "Mfuko wa mshikamano",
+        "body": "Sehemu yako inaenda kwenye mfuko wa pamoja wa mshikamano. Uhamishaji unaandikwa kwenye leja ya wazi kama mwingine wowote."
+      },
+      "follow": {
+        "title": "Weka kwa matibabu ya kufuatilia",
+        "body": "Sehemu yako inashikiliwa hadi siku 14 kwa ajili ya bili inayofuata iliyothibitishwa ya mgonjwa yule yule. Isipokuja, inarudishwa."
+      },
+      "freeze": "Kesi ikisimamishwa kwa sababu kuna kitu kinaonekana si sawa, kila mchangiaji hurudishiwa pesa, bila kujali alichochagua."
+    },
+    "real": {
+      "title": "Kipi ni halisi na kipi ni cha kuigiza",
+      "realTitle": "Halisi",
+      "simTitle": "Vinaigizwa kwenye onyesho hili",
+      "r1": "Ukaguzi wa bili, hatua za uthibitisho wa hospitali na ukaguzi wa mtu.",
+      "r2": "Leja ya wazi na alama zake za kidijitali, unazoweza kuzithibitisha kwenye kila kesi.",
+      "r3": "Kanuni za awamu za malipo, marejesho na pesa zinazobaki.",
+      "r4": "Kuingia kwa msimbo wa barua pepe na kanuni za faragha kuhusu kinachohifadhiwa.",
+      "m1": "Pesa: malipo yanaendeshwa kwenye mazingira ya majaribio ya PayPal, kwa hiyo hakuna pesa halisi zinazohamishwa.",
+      "m2": "Malipo kwa hospitali yanaenda kwenye akaunti ya majaribio. Kwa matumizi halisi, mshirika wa malipo mwenye leseni nchini Kenya angelipa paybill au akaunti ya benki ya hospitali.",
+      "m3": "Hospitali, familia na bili ni za kubuni, na hakuna mgonjwa halisi anayeonyeshwa.",
+      "m4": "Barua pepe zinaenda kwenye kisanduku cha majaribio, si kwa anwani halisi."
+    },
+    "faq": {
+      "title": "Maswali",
+      "q1": {
+        "q": "Je, TibaDirect inashikilia pesa zangu?",
+        "a": "Hapana. Malipo yanapita PayPal na kulipwa hospitalini kwa awamu. Hatutumii wala kuhifadhi michango, na leja ya wazi inaonyesha kila mchango ulikoenda."
+      },
+      "q2": {
+        "q": "Nani anaweza kuona maelezo ya mgonjwa?",
+        "a": "Wachangiaji wanaona jina la utambulisho, eneo, hospitali na kiasi. Rejea ya mgonjwa inaonekana kwa familia na hospitali pekee, na faili za bili hufutwa saa 24 baada ya hospitali kuthibitisha."
+      },
+      "q3": {
+        "q": "Je, bili ya mwisho ikiwa ndogo kuliko makadirio?",
+        "a": "Hospitali inalipwa kiasi kilichothibitishwa tu. Kinachobaki kinafuata chaguo la kila mchangiaji."
+      },
+      "q4": {
+        "q": "Je, kesi ikionekana ni ya uongo?",
+        "a": "Msimamizi anaweza kusimamisha kesi wakati wowote. Kila mchangiaji hurudishiwa pesa."
+      },
+      "q5": {
+        "q": "Je, nahitaji akaunti ili kutoa?",
+        "a": "Hapana. Unahitaji PayPal tu. Unaweza kutoa bila kujitambulisha au kwa jina utakalochagua."
+      }
+    }
+  },
+  "legal": {
+    "draft": "Hii ni muhtasari mfupi ulioandikwa kwa ajili ya onyesho. Notisi kamili itachapishwa baada ya ukaguzi wa kisheria.",
+    "privacy": {
+      "title": "Faragha",
+      "intro": "Tunachokusanya, kwa nini, na tunakihifadhi kwa muda gani.",
+      "p1": {
+        "title": "Tunakusanya kidogo iwezekanavyo",
+        "body": "Familia hutoa barua pepe, rejea ya mgonjwa na bili. Wachangiaji hutoa barua pepe kwa ajili ya risiti. Hatuombi kitu kingine."
+      },
+      "p2": {
+        "title": "Maelezo ya kitabibu huondolewa mapema",
+        "body": "Utambuzi wa ugonjwa na maelezo kama hayo huondolewa kwenye maandishi ya bili kabla ya kuhifadhiwa au kutumwa kuchambuliwa. Kurasa kamwe hazionyeshi utambuzi."
+      },
+      "p3": {
+        "title": "Chaguo zako ni tofauti",
+        "body": "Kila matumizi ya bili (ukaguzi wa hospitali, ukurasa wa umma, uchambuzi nje ya Kenya, risiti) lina ridhaa yake. Unaweza kuondoa ridhaa wakati wowote kutoka dashibodi yako."
+      },
+      "p4": {
+        "title": "Uchambuzi nje ya Kenya unahitaji ridhaa yako",
+        "body": "Maandishi ya bili yaliyoondolewa maelezo pekee ndiyo yanaweza kutoka kwenye seva zetu, na ni ikiwa ulikubali tu. Bila ridhaa hiyo, mfumo wa ndani hutumika."
+      },
+      "p5": {
+        "title": "Faili hufutwa",
+        "body": "Faili za bili hufutwa saa 24 baada ya hospitali kuzithibitisha. Majina ya wachangiaji huonekana kwenye leja ya wazi tu ikiwa mchangiaji alitoa jina na hakuomba kutotambulika."
+      },
+      "p6": {
+        "title": "Watu ndio wanaoamua",
+        "body": "Programu kamwe haikatai kesi. Mtu hukagua chochote kilichoalamishwa, na familia inaweza kuomba ukaguzi wakati wowote."
+      }
+    },
+    "terms": {
+      "title": "Masharti ya matumizi",
+      "intro": "Kanuni kuu za kutumia TibaDirect.",
+      "p1": {
+        "title": "Hatushikilii wala kuhifadhi michango",
+        "body": "Michango hulipwa kwa hospitali iliyothibitishwa. TibaDirect hailipi familia na haihifadhi michango kwa manufaa yake."
+      },
+      "p2": {
+        "title": "Pesa hulipwa kwa awamu",
+        "body": "Hospitali hulipwa kwa awamu pesa zinapofika. Bili ikiwa makadirio, si zaidi ya 80% hulipwa hadi bili ya mwisho ithibitishwe."
+      },
+      "p3": {
+        "title": "Pesa zinazobaki zinafuata chaguo la mchangiaji",
+        "body": "Bili ya mwisho ikiwa ndogo au matibabu yakiisha mapema, pesa zinazobaki hurudishwa, kuhamishiwa mfuko wa mshikamano, au kushikiliwa kwa muda mfupi kwa matibabu ya kufuatilia, kama mchangiaji alivyochagua."
+      },
+      "p4": {
+        "title": "Kesi zinaweza kusimamishwa",
+        "body": "Kesi ikionekana ya udanganyifu tunaweza kuisimamisha. Kila mchangiaji hurudishiwa pesa, bila kujali alichochagua."
+      },
+      "p5": {
+        "title": "Familia lazima zisimulie ukweli",
+        "body": "Familia lazima zipakie bili yao halisi na zisitoe taarifa za uongo. Kesi ya uongo hufungwa na kuripotiwa."
+      },
+      "p6": {
+        "title": "Tangazo la onyesho",
+        "body": "Onyesho hili linatumia pesa za majaribio na hospitali na bili za kubuni. Hakuna kinachoonekana hapa ni mchango halisi."
+      }
+    }
+  },
+  "donate": {
+    "title": "Toa mchango",
+    "intro": "Toa kwa dola za Marekani kupitia PayPal. Hospitali ndiyo inayolipwa, si familia.",
+    "amount": "Kiasi kwa dola za Marekani",
+    "presets": "Viasi vya haraka",
+    "estimate": "Takriban {{kes}} kwa kiwango cha leo. Kiasi kamili kinawekwa unapolipa.",
+    "estimateWait": "Kiasi cha shilingi kitaonekana kiwango cha leo kikipakiwa.",
+    "range": "Weka kiasi kati ya $1 na $10,000.",
+    "name": "Jina litakaloonekana kwenye leja ya wazi (si lazima)",
+    "anonymous": "Toa bila kujitambulisha",
+    "working": "Inakamilisha mchango wako…",
+    "payMock": "Changia {{amount}} kwa PayPal (kuigiza)",
+    "secure": "Unalipa kwenye dirisha la PayPal lenyewe. Hatuoni kadi wala nenosiri lako.",
+    "feeNote": "PayPal huchukua ada ndogo kwa kila malipo, kwa hiyo kiasi kidogo kuliko mchango wako hufika kwenye kesi. Risiti yako inaonyesha kiasi kamili.",
+    "funded": {
+      "title": "Kesi hii imekamilika kuchangiwa",
+      "body": "Asante kwa wote waliotoa. Hakuna michango zaidi inayohitajika kwa bili hii."
+    },
+    "closed": {
+      "title": "Kesi hii imefungwa",
+      "body": "Bili imelipwa na ukurasa huu unahifadhiwa kama kumbukumbu ya wazi."
+    },
+    "excess": {
+      "title": "Pesa zikibaki",
+      "intro": "Wakati mwingine pesa nyingi kuliko bili zinahitaji hufika. Chagua kitakachotokea kwa sehemu yako.",
+      "refund": {
+        "label": "Nirudishie",
+        "body": "Sehemu yako inayobaki inarudi kwako kupitia PayPal. Chini ya $1 huenda kwenye mfuko wa mshikamano."
+      },
+      "solidarity_pool": {
+        "label": "Mfuko wa mshikamano",
+        "body": "Sehemu yako inayobaki inaenda kwenye mfuko wa pamoja, na inaandikwa kwenye leja ya wazi."
+      },
+      "follow_up_care": {
+        "label": "Weka kwa matibabu ya kufuatilia",
+        "body": "Inashikiliwa hadi siku 14 kwa bili inayofuata iliyothibitishwa ya mgonjwa huyu, kisha inarudishwa."
+      }
+    },
+    "errors": {
+      "fullyFunded": "Kesi hii haihitaji tena michango zaidi. Hujakatwa pesa.",
+      "notAccepting": "Kesi hii haipokei michango kwa sasa.",
+      "pending": "PayPal bado inakagua malipo haya. Tutakutumia risiti kwa barua pepe yakikamilika.",
+      "declined": "PayPal haikukamilisha malipo haya. Hujakatwa pesa. Tafadhali jaribu njia nyingine ya kulipa.",
+      "amount": "Weka kiasi kati ya $1 na $10,000.",
+      "paypalDown": "PayPal haikufikiwa. Hujakatwa pesa. Tafadhali jaribu tena baadaye kidogo.",
+      "generic": "Hatukuweza kukamilisha mchango wako. Hujakatwa pesa. Tafadhali jaribu tena."
+    }
+  },
+  "ledger": {
+    "title": "Leja ya wazi",
+    "intro": "Kila uhamishaji wa pesa wa kesi hii, wa zamani kwanza. Kila rekodi ina alama ya kidijitali inayotegemea ile iliyotangulia, kwa hiyo rekodi haiwezi kubadilishwa au kuondolewa bila kuvunja mnyororo.",
+    "empty": "Hakuna pesa zilizohamishwa bado.",
+    "columns": {
+      "when": "Lini",
+      "what": "Kilichotokea",
+      "account": "Akaunti",
+      "amount": "Kiasi",
+      "reference": "Rejea",
+      "fingerprint": "Alama ya kidijitali"
+    },
+    "types": {
+      "donation_captured": "Mchango umepokelewa",
+      "paypal_fee": "Ada ya PayPal",
+      "settlement_sent": "Imelipwa hospitalini",
+      "refund_issued": "Marejesho kwa mchangiaji",
+      "pool_transfer": "Imehamishiwa mfuko wa mshikamano",
+      "reversal": "Malipo yamerudishwa",
+      "adjustment": "Marekebisho"
+    },
+    "accounts": {
+      "case_funds": "Pesa za kesi",
+      "paypal_fees": "Ada za PayPal",
+      "hospital_settled": "Iliyolipwa hospitalini",
+      "donor_refunds": "Marejesho kwa wachangiaji",
+      "solidarity_pool": "Mfuko wa mshikamano"
+    },
+    "fromDonor": "{{what}} kutoka kwa {{name}}",
+    "verify": "Thibitisha leja",
+    "verifying": "Inakagua…",
+    "verifyHelp": "Inakokotoa upya kila alama ya kidijitali ya kesi hii kwenye seva yetu.",
+    "valid": {
+      "title": "Leja iko salama",
+      "body": "Tumekagua tena rekodi zote {{count}} za kesi hii na kila alama ya kidijitali inalingana. Ya hivi karibuni inaanza na {{hash}}."
+    },
+    "invalid": {
+      "title": "Ukaguzi wa leja umeshindwa",
+      "body": "Kuna kitu kwenye mnyororo kisicholingana. Tafadhali tuambie ili tuchunguze, na uwe mwangalifu kuhusu kutoa hadi tutakapomaliza."
+    }
+  },
+  "tranches": {
+    "title": "Malipo kwa hospitali",
+    "none": "Hakuna kilicholipwa hospitalini bado. Malipo hufanywa pesa za kutosha zikishaahidiwa.",
+    "item": "Malipo ya {{n}}: {{amount}}",
+    "simulated": "Malipo kwa hospitali yanaigizwa hapa: yanaenda kwenye akaunti ya majaribio ya PayPal ya hospitali. Kwa matumizi halisi, mshirika mwenye leseni nchini Kenya angelipa paybill au akaunti ya benki ya hospitali."
+  },
+  "casePage": {
+    "title": "Kesi",
+    "back": "Kesi zote",
+    "bill": "Bili ya hospitali",
+    "story": "Hadithi ya familia",
+    "noStory": "Familia haijaongeza hadithi bado.",
+    "noDiagnosis": "Tunathibitisha bili, si ugonjwa. Hakuna utambuzi wa ugonjwa unaoonyeshwa kwenye kesi yoyote.",
+    "estimateNote": "Hili ni makadirio. Hadi bili ya mwisho ithibitishwe, si zaidi ya 80% hulipwa hospitalini.",
+    "closedNote": "Kesi hii imefungwa. Ukurasa unabaki kama kumbukumbu ya wazi.",
+    "notFound": {
+      "title": "Hatukuweza kupata kesi hiyo",
+      "body": "Huenda ni ya faragha, imesimamishwa kwa ukaguzi, au kiungo si sahihi."
+    }
+  },
+  "share": {
+    "title": "Shiriki kesi hii",
+    "copy": "Nakili kiungo",
+    "copied": "Kiungo kimenakiliwa",
+    "copyFailed": "Hatukuweza kunakili kiungo",
+    "opensNewTab": "inafunguka kwenye kichupo kipya",
+    "more": "Shiriki",
+    "text": "Tafadhali saidia bili ya hospitali ya {{alias}} kwenye TibaDirect:"
+  },
+  "receipt": {
+    "title": "Risiti ya mchango",
+    "thanks": "Asante",
+    "lead": "Mchango wako wa {{amount}} kwa {{alias}} unaelekea {{hospital}}.",
+    "amount": "Ulitoa",
+    "fee": "Ada ya PayPal",
+    "net": "Kinachofika kwenye kesi",
+    "kes": "Thamani takriban",
+    "kesNote": "Kiasi cha shilingi kinatumia kiwango cha kubadilisha fedha wakati ulipolipa. Ni makadirio.",
+    "excess": "Pesa zikibaki",
+    "name": "Jina kwenye leja",
+    "date": "Ulilipa",
+    "reference": "Rejea ya PayPal",
+    "fingerprint": "Alama ya kidijitali ya leja",
+    "seeLedger": "Ione kwenye leja ya wazi",
+    "print": "Chapisha risiti",
+    "keepLink": "Hifadhi kiungo hiki. Ni risiti yako na yeyote mwenye kiungo anaweza kuiona.",
+    "refunded": "Mchango huu umerudishwa wote.",
+    "partiallyRefunded": "{{amount}} za mchango huu zimerudishwa.",
+    "notFound": {
+      "title": "Hatukuweza kupata risiti hiyo",
+      "body": "Angalia kiungo kwenye barua pepe yako, au ulichohifadhi."
+    }
+  },
+  "timeline": {
+    "draft": "Rasimu imeanzishwa",
+    "pending_triage": "Bili imekaguliwa",
+    "in_review": "Imeangaliwa na timu yetu",
+    "pending_confirmation": "Inasubiri hospitali",
+    "live": "Hai kwenye TibaDirect",
+    "funded": "Imekamilika kuchangiwa",
+    "closed": "Imefungwa",
+    "cancelled": "Imeghairiwa",
+    "frozen": "Imesimamishwa kwa ukaguzi"
+  },
+  "family": {
+    "title": "Michango yangu",
+    "empty": {
+      "title": "Bado hujaanzisha mchango",
+      "body": "Inachukua takriban dakika tano. Utahitaji bili ya hospitali na namba ya mgonjwa au ya kulazwa iliyo kwenye bili."
+    },
+    "continue": "Endelea na mchango wako",
+    "open": "Fungua",
+    "raised": "{{pledged}} zimeahidiwa kati ya {{target}}",
+    "next": {
+      "draft": "Maliza mchango wako na uutume ukaguliwe",
+      "pending_triage": "Tunakagua bili yako. Kwa kawaida huchukua dakika moja.",
+      "in_review": "Mtu kwenye timu yetu anaangalia kesi yako.",
+      "pending_confirmation": "Inasubiri hospitali kuthibitisha bili yako.",
+      "live": "Hai. Shiriki ukurasa wako ili watu wachangie.",
+      "liveSettling": "Hai. Pesa zimeahidiwa na zinalipwa hospitalini.",
+      "funded": "Imekamilika kuchangiwa. Hospitali inalipwa.",
+      "closed": "Imefungwa. Asante kwa kushiriki hadithi yako.",
+      "cancelled": "Mchango huu umeisha.",
+      "frozen": "Imesimamishwa tunapokagua kitu. Wachangiaji wanarudishiwa pesa."
+    },
+    "frozenNote": "Ukurasa wako umesimamishwa tunapokagua kitu. Wachangiaji waliotoa wanarudishiwa pesa. Ukiona ni kosa, omba ukaguzi hapa chini.",
+    "share": {
+      "title": "Ukurasa wako wa umma",
+      "view": "Tazama ukurasa wako"
+    },
+    "timeline": {
+      "title": "Kesi yako iko wapi"
+    },
+    "money": {
+      "title": "Pesa hadi sasa",
+      "donors": "Wachangiaji",
+      "received": "Zilizopokelewa baada ya ada za PayPal",
+      "refunded": "Zilizorudishwa",
+      "note": "Pesa hulipwa hospitalini, kamwe si kwako. Utaziona zikisogea hapa zinapolipwa."
+    },
+    "triage": {
+      "title": "Ukaguzi wetu ulipata nini",
+      "note": "Haya ni mambo ambayo ukaguzi wetu uliona, si hukumu. Mtu daima ndiye anayeamua, na unaweza kuomba ukaguzi.",
+      "route": {
+        "hospital_confirmation": "Imetumwa kwa ofisi ya malipo ya hospitali ili kuthibitisha.",
+        "manual_review": "Mtu kwenye timu yetu anaikagua."
+      },
+      "noReasons": "Hakuna kisicho cha kawaida kilichopatikana.",
+      "notYet": "Ukaguzi bado haujakamilika.",
+      "notYetDraft": "Ukaguzi huendeshwa baada ya kutuma mchango wako."
+    },
+    "review": {
+      "button": "Omba ukaguzi",
+      "title": "Omba mtu aangalie kesi yako",
+      "intro": "Tuambie unachotaka tuangalie. Usiweke maelezo ya kitabibu.",
+      "label": "Ujumbe wako",
+      "hint": "Herufi {{count}} kati ya angalau 10",
+      "send": "Tuma ombi",
+      "sent": "Tumepokea ombi lako.",
+      "already": "Tayari uliomba ukaguzi. Tutaliangalia hivi karibuni.",
+      "notNow": "Ukaguzi unaweza kuombwa baada ya kesi kutumwa, na hadi inapoisha.",
+      "length": "Tafadhali andika herufi kati ya 10 na 500."
+    },
+    "confirmations": {
+      "title": "Hospitali ilisema nini",
+      "status": {
+        "confirmed": "Imethibitishwa",
+        "awaiting_second_approval": "Inasubiri mtu wa pili hospitalini",
+        "queried": "Hospitali ina swali",
+        "rejected": "Hospitali haikuthibitisha"
+      },
+      "final": "Bili ya mwisho",
+      "invoice": "Ankara {{number}}",
+      "note": "Hospitali inasema:"
+    },
+    "finalBill": {
+      "title": "Pakia bili ya mwisho",
+      "intro": "Matibabu yakiisha, pakia bili ya mwisho ya hospitali. Hospitali inaithibitisha, tunalipa kinachobaki, na kesi inafungwa.",
+      "file": "Bili ya mwisho",
+      "upload": "Tuma bili ya mwisho",
+      "sent": "Bili yako ya mwisho inakaguliwa na kutumwa hospitalini."
+    },
+    "consents": {
+      "title": "Ridhaa zako",
+      "intro": "Unaweza kuondoa ridhaa wakati wowote. Hiki ndicho kila moja inachobadilisha.",
+      "none": "Hakuna ridhaa zinazotumika.",
+      "withdrawTitle": "Kuondoa: {{name}}?",
+      "consequence": {
+        "hospital_verification": "Ukaguzi wa hospitali tayari umefanyika kwa bili hii, kwa hiyo kuuondoa hakutaurudisha nyuma.",
+        "hospital_verification_unconfirmed": "Hospitali bado haijathibitisha bili yako. Ukiondoa hii, mchango wako unaisha.",
+        "public_page": "Ukurasa wako unafichwa mara moja na watu hawawezi tena kuchangia.",
+        "ai_processing_abroad": "Kuanzia sasa ukaguzi wa kiotomatiki utatumia mfumo unaoendeshwa Kenya pekee.",
+        "receipt_sharing": "Tutaacha kushiriki risiti za michango nawe."
+      }
+    },
+    "end": {
+      "title": "Maliza mchango huu",
+      "intro": "Ikiwa matibabu yameghairiwa au hayahitajiki tena, unaweza kumaliza mchango. Michango inasimama mara moja.",
+      "button": "Maliza mchango",
+      "confirm": "Kumaliza mchango huu?",
+      "warning": "Michango inasimama mara moja. Pesa ambazo kesi haizihitaji tena zinarudishwa kwa wachangiaji au kuendelea, kama kila mchangiaji alivyochagua. Hili haliwezi kutenduliwa.",
+      "why": "Kwa nini unaisha?",
+      "reasons": {
+        "treatment_cancelled": "Matibabu yameghairiwa",
+        "patient_deceased": "Mgonjwa amefariki",
+        "other": "Sababu nyingine"
+      },
+      "conflict": "Mchango huu hauwezi kumalizwa ulipo sasa.",
+      "ended": "Mchango wako umeisha.",
+      "deleteTitle": "Futa rasimu hii",
+      "deleteIntro": "Rasimu hii haikutumwa kamwe. Kuifuta kunaiondoa moja kwa moja.",
+      "deleteButton": "Futa rasimu",
+      "deleteConfirm": "Kufuta rasimu hii?",
+      "deleteWarning": "Rasimu na bili zilizopakiwa zitaondolewa.",
+      "deleted": "Rasimu imefutwa."
+    },
+    "dashboard": {
+      "title": "Mchango",
+      "notFound": {
+        "title": "Hatukuweza kupata mchango huo",
+        "body": "Huenda ni wa akaunti nyingine, au kiungo si sahihi."
+      }
+    }
+  },
+  "wizard": {
+    "title": "Anzisha mchango",
+    "subtitle": "Hatua tano fupi. Maendeleo yako yanahifadhiwa, kwa hiyo unaweza kusimama na kurudi.",
+    "steps": {
+      "hospital": "Hospitali na mgonjwa",
+      "consent": "Ridhaa",
+      "bill": "Bili",
+      "page": "Ukurasa wako",
+      "review": "Kagua"
+    },
+    "hospital": {
+      "title": "Bili imetolewa na hospitali gani?",
+      "intro": "Chagua hospitali. Tutaomba ofisi yake ya malipo ithibitishe bili.",
+      "search": "Tafuta hospitali",
+      "searchPlaceholder": "Jina la hospitali au kaunti",
+      "results_one": "Hospitali {{count}} imeonyeshwa",
+      "results_other": "Hospitali {{count}} zimeonyeshwa",
+      "none": "Hakuna hospitali inayolingana. Jaribu jina au kaunti nyingine.",
+      "label": "Hospitali",
+      "locked": "Hospitali haiwezi kubadilishwa rasimu ikishaanzishwa. Ili kuchagua nyingine, futa rasimu hii kisha uanze upya.",
+      "alias": "Jina la ukurasa wako",
+      "aliasHint": "Tumia jina la kwanza au jina la utani, si jina kamili la mgonjwa, na bila maneno ya ugonjwa.",
+      "aliasPreview": "Kwenye ukurasa litasomeka: {{alias}} · {{region}}",
+      "region": "Kaunti au mji",
+      "patientReference": "Namba ya mgonjwa au ya kulazwa kutoka kwenye bili",
+      "patientReferenceHint": "Wewe na hospitali pekee mnaweza kuiona. Haionyeshwi kamwe kwenye ukurasa wa umma.",
+      "minor": "Mgonjwa ni mtoto",
+      "minorHint": "Mzazi au mlezi wa kisheria lazima atoe ridhaa kwa mtoto."
+    },
+    "errors": {
+      "hospital": "Chagua hospitali kutoka kwenye orodha.",
+      "aliasLength": "Tumia herufi kati ya 2 na 40.",
+      "aliasPersonal": "Usiweke barua pepe au namba ya simu kwenye jina.",
+      "aliasMedical": "Tafadhali acha maneno ya ugonjwa kwenye jina.",
+      "region": "Weka kaunti au mji, herufi 2 hadi 40.",
+      "patientReference": "Weka namba ya kulazwa au ya mgonjwa kutoka kwenye bili (herufi 3 hadi 60).",
+      "storyLength": "Tumia herufi 600 au chini.",
+      "storyPersonal": "Usiweke barua pepe, namba ya simu au namba ndefu kwenye hadithi.",
+      "storyMedical": "Tafadhali acha maneno ya kitabibu. Bili ya hospitali tayari inaonyesha huduma iliyotolewa.",
+      "storyGeneric": "Hatukuweza kuhifadhi hadithi yako. Tafadhali jaribu tena."
+    },
+    "consent": {
+      "title": "Unachokubali",
+      "intro": "Soma kila moja. Mbili za kwanza zinahitajika ili kutuma mchango wako. Nyingine ni chaguo lako.",
+      "guardianConfirm": "Mimi ni mzazi au mlezi wa kisheria wa mtoto huyu.",
+      "locked": "Unaweza kuiondoa baadaye kutoka ukurasa wa mchango wako.",
+      "requiredNote": "Weka alama kwenye ridhaa mbili zinazohitajika ili kuendelea.",
+      "outdated": "Maneno yamebadilika. Tafadhali yasome tena kisha uthibitishe.",
+      "guardianNeeded": "Kwa mtoto, mzazi au mlezi wa kisheria lazima atoe ridhaa."
+    },
+    "bill": {
+      "title": "Pakia bili ya hospitali",
+      "intro": "Picha au PDF ya bili. Tunasoma kiasi na kuondoa maelezo ya kitabibu kabla ya kuhifadhi chochote kwa ukaguzi.",
+      "synthetic": "Kwa onyesho hili, tumia bili ya kubuni tu. Usipakie kamwe bili ya mgonjwa halisi.",
+      "uploaded": "Bili zilizopakiwa",
+      "kind": "Hii ni bili ya aina gani?",
+      "kinds": {
+        "invoice": {
+          "label": "Ankara",
+          "body": "Hospitali inaomba malipo ya huduma iliyokwisha tolewa."
+        },
+        "estimate": {
+          "label": "Makadirio",
+          "body": "Bei ya huduma iliyopangwa lakini haijatolewa bado."
+        }
+      },
+      "file": "Faili ya bili",
+      "upload": "Pakia bili hii",
+      "uploading": "Inapakia…",
+      "uploadFailed": "Hatukuweza kupakia faili hiyo. Tafadhali jaribu tena.",
+      "needOne": "Pakia angalau bili moja ili kuendelea.",
+      "received": "Imepokelewa",
+      "removeNamed": "Ondoa {{kind}}"
+    },
+    "page": {
+      "title": "Ukurasa wako wa umma",
+      "intro": "Hiki ndicho wachangiaji watakachosoma. Andika kuhusu familia yako, si ugonjwa.",
+      "story": "Hadithi yako (si lazima)",
+      "storyHelp": "Bila utambuzi wa ugonjwa, namba za simu au barua pepe.",
+      "counter": "Herufi {{count}} kati ya {{max}}",
+      "flagged": "Maneno ya kuacha:",
+      "checking": "Inakagua…",
+      "saved": "Imehifadhiwa. Hakuna maneno ya kitabibu yaliyopatikana.",
+      "photo": "Onyesha picha",
+      "photoOff": "Picha zimezimwa kwenye onyesho hili.",
+      "preview": "Jinsi ukurasa wako utakavyoonekana kwenye orodha",
+      "previewNote": "Kiasi cha bili na alama ya hospitali huonekana baada ya hospitali kuthibitisha."
+    },
+    "review": {
+      "title": "Kagua kisha utume",
+      "intro": "Pitia haya. Ukiituma, tunakagua bili kisha tunaomba hospitali iithibitishe.",
+      "pageName": "Jina la ukurasa",
+      "bills": "Bili",
+      "billCount_one": "Bili {{count}} imepakiwa",
+      "billCount_other": "Bili {{count}} zimepakiwa",
+      "story": "Hadithi",
+      "consents": "Ridhaa",
+      "given": "imetolewa",
+      "notGiven": "haijatolewa",
+      "whatNext": "Baada ya kutuma: tunakagua bili (kwa kawaida dakika moja), kisha ofisi ya malipo ya hospitali inaithibitisha kwa msimbo unaotumwa kwa barua pepe yake rasmi. Unaweza kufuatilia kila hatua kwenye ukurasa wa mchango wako.",
+      "missing": "Ridhaa mbili zinazohitajika na angalau bili moja vinahitajika kabla ya kutuma.",
+      "submit": "Tuma ikaguliwe",
+      "sent": "Imetumwa. Tunakagua bili yako."
+    }
+  },
+  "hospital": {
+    "queue": {
+      "title": "Bili zinazokusubiri",
+      "intro": "Bili ambazo familia zimetuma kwa {{hospital}} ili kuthibitisha. Fungua moja uilinganishe na asili kisha uamue.",
+      "waiting": "Zinasubiri uamuzi wako",
+      "emptyTitle": "Hakuna kinachosubiri",
+      "emptyBody": "Bili mpya huonekana hapa familia inapotuma.",
+      "second": "Zinasubiri idhini ya pili",
+      "secondIntro": "Bili kubwa zinahitaji mtu wa pili. Msimamizi mwingine wa malipo huziidhinisha kwa msimbo mpya.",
+      "secondNone": "Hakuna bili zinazosubiri idhini ya pili.",
+      "finalBill": "Bili ya mwisho",
+      "submitted": "Imetumwa {{when}}",
+      "bills_one": "Bili {{count}}",
+      "bills_other": "Bili {{count}}",
+      "review": "Kagua",
+      "invoice": "Ankara {{number}}",
+      "confirmedBy": "Imethibitishwa na {{name}}",
+      "approve": "Idhinisha",
+      "needsSupervisor": "Msimamizi wa malipo lazima aidhinishe"
+    },
+    "review": {
+      "title": "Kagua bili",
+      "notFound": {
+        "title": "Hatukuweza kupata bili hiyo",
+        "body": "Huenda ni ya hospitali nyingine, au kiungo si sahihi."
+      },
+      "patientReference": "Namba ya mgonjwa au ya kulazwa",
+      "region": "Kaunti au mji wa familia",
+      "privacy": "Unaona jina la utambulisho na namba ya mgonjwa kwenye bili pekee, ili uilinganishe na kumbukumbu zako. Mawasiliano ya familia hayaonyeshwi kamwe.",
+      "nothingToDecide": "Bili hii haisubiri uamuzi."
+    },
+    "bill": {
+      "title": "Bili ya asili",
+      "which": "Bili ipi",
+      "kinds": {
+        "invoice": "Ankara",
+        "estimate": "Makadirio",
+        "final_bill": "Bili ya mwisho",
+        "photo": "Picha"
+      },
+      "none": "Hakuna bili iliyopakiwa kwa kesi hii.",
+      "imageAlt": "Bili ya hospitali iliyopakiwa",
+      "pdfTitle": "Bili ya hospitali iliyopakiwa (PDF)",
+      "open": "Fungua kwenye kichupo kipya",
+      "gone": "Faili ya asili imefutwa. Faili huondolewa saa 24 baada ya hospitali kuthibitisha bili.",
+      "hint": "Linganisha kiasi, namba ya ankara na namba ya mgonjwa na kumbukumbu zako mwenyewe."
+    },
+    "extracted": {
+      "title": "Programu yetu ilisoma nini",
+      "intro": "Tumia hii kulinganisha na asili. Inaweza kukosea, kwa hiyo amua kwa kumbukumbu zako mwenyewe.",
+      "none": "Bili bado haijakaguliwa.",
+      "facility": "Hospitali kwenye bili",
+      "invoice": "Namba ya ankara",
+      "date": "Tarehe",
+      "type": "Aina",
+      "total": "Jumla",
+      "balance": "Salio",
+      "deposit": "Amana iliyolipwa",
+      "confidence": "Msomaji alikuwa na uhakika kiasi gani",
+      "lines": "Vipengee",
+      "item": "Kipengee",
+      "qty": "Idadi",
+      "lineAmount": "Kiasi",
+      "checks": "Ukaguzi uliona nini"
+    },
+    "otp": {
+      "title": "Msimbo wa mara moja",
+      "intro": "Ili kulinda hospitali, msimbo hutumwa tu kwenye anwani iliyo kwenye daftari la vituo vya afya: {{address}}. Mtu aliye huko atakusomea.",
+      "send": "Tuma msimbo kwa {{address}}",
+      "sent": "Msimbo umetumwa kwa {{address}}. Unafanya kazi hadi {{time}}.",
+      "label": "Msimbo wa tarakimu 6 kutoka anwani hiyo",
+      "resend": "Tuma msimbo mpya",
+      "resendIn": "Tuma msimbo mpya baada ya sekunde {{seconds}}",
+      "tooMany": "Misimbo mingi sana imetumwa kwa bili hii. Tafadhali jaribu tena baada ya saa moja.",
+      "notSent": "Msimbo haukuweza kutumwa kwa barua pepe. Tafadhali jaribu tena baadaye kidogo.",
+      "notWaiting": "Bili hii haisubiri hatua hiyo.",
+      "needCode": "Tuma msimbo na uuweke kabla ya kuwasilisha.",
+      "incomplete": "Weka tarakimu zote 6 za msimbo.",
+      "wrong": "Msimbo huo si sahihi. Uangalie kisha ujaribu tena.",
+      "expired": "Muda wa msimbo huo umeisha. Tuma mpya.",
+      "locked": "Umekosea mara nyingi. Tuma msimbo mpya."
+    },
+    "decision": {
+      "title": "Uamuzi wako",
+      "intro": "Thibitisha bili tu ikiwa ni bili halisi kutoka hospitali yako. Unaweza pia kuiuliza familia swali au kuikataa.",
+      "choose": "Unaamua nini?",
+      "options": {
+        "confirmed": {
+          "label": "Thibitisha bili",
+          "body": "Ni bili yetu. Ukurasa wa familia unaanza kutumika kwa kiasi hiki.",
+          "submit": "Thibitisha bili"
+        },
+        "queried": {
+          "label": "Uliza familia swali",
+          "body": "Kuna kitu kisicholingana. Familia inaona ujumbe wako na inaweza kurekebisha.",
+          "submit": "Tuma swali"
+        },
+        "rejected": {
+          "label": "Hii si bili yetu",
+          "body": "Hatukuitoa sisi. Mtu kwenye timu yetu ataangalia kesi.",
+          "submit": "Kataa bili"
+        }
+      },
+      "amount": "Jumla ya kulipwa (KES)",
+      "amountHelp": "Andika kiasi kutoka kwenye kumbukumbu zako. Hakijajazwa kwa niaba yako.",
+      "matches": "Hii inalingana na kiasi kilichosomwa na programu yetu.",
+      "differs": "Hii ni tofauti na {{total}} iliyosomwa na programu yetu. Angalia asili.",
+      "invoice": "Namba ya ankara",
+      "deposit": "Amana iliyokwisha lipwa (si lazima)",
+      "depositHelp": "Familia ikiwa imelipa sehemu ya bili tayari, weka sehemu hiyo ili wachangiaji wasiombwe.",
+      "final": "Hii ni bili ya mwisho",
+      "finalHelp": "Matibabu yamekamilika na hii ndiyo bili ya mwisho.",
+      "finalNote": "Hii ni bili ya mwisho kwa kesi iliyo hai tayari. Kesi inafungwa ikishalipwa.",
+      "twoPerson": "Bili za {{amount}} au zaidi zinahitaji idhini ya pili. Baada ya kuthibitisha, msimamizi mwingine wa malipo lazima aidhinishe kwa msimbo mpya kabla ukurasa kuanza kutumika.",
+      "noteQuery": "Swali lako kwa familia",
+      "noteReject": "Kwa nini hii si bili yenu?",
+      "noteHelp": "Familia inaona hili. Usiweke maelezo ya kitabibu.",
+      "recorded": "Uamuzi umerekodiwa",
+      "result": {
+        "confirmed": "Bili imethibitishwa. Ukurasa wa familia sasa uko hai na malipo ya kwanza yatafuata pesa zinapofika.",
+        "queried": "Swali lako limeenda kwa familia. Wanaweza kurekebisha bili na kuituma tena.",
+        "rejected": "Bili haikuthibitishwa. Mtu kwenye timu yetu ataangalia kesi."
+      },
+      "resultSecond": "Imethibitishwa. Kiasi hiki kinahitaji idhini ya pili kutoka kwa msimamizi mwingine wa malipo kabla ukurasa kuanza kutumika.",
+      "notWaiting": "Bili hii haisubiri tena uamuzi. Ukurasa umesasishwa.",
+      "errors": {
+        "amount": "Weka jumla kutoka kwenye bili.",
+        "amountLarge": "Kiasi hicho ni kikubwa mno. Kiangalie.",
+        "invoice": "Weka namba ya ankara kutoka kwenye bili.",
+        "invoiceUsed": "Namba hiyo ya ankara tayari imetumika kwenye kesi nyingine katika hospitali hii.",
+        "deposit": "Amana haiwezi kuwa kubwa kuliko bili.",
+        "note": "Andika angalau maneno machache kwa familia."
+      }
+    },
+    "second": {
+      "title": "Idhini ya pili inahitajika",
+      "intro": "{{name}} amethibitisha {{amount}} (ankara {{invoice}}). Kwa kuwa ni bili kubwa, msimamizi mwingine wa malipo lazima aiidhinishe.",
+      "approve": "Idhinisha bili",
+      "approved": "Imeidhinishwa",
+      "approvedBody": "Idhini zote mbili zimepatikana. Ukurasa wa familia sasa uko hai.",
+      "samePerson": "Msimamizi mwingine wa malipo lazima atoe idhini ya pili. Wewe ndiye uliyethibitisha bili hii.",
+      "needSupervisor": "Msimamizi wa malipo pekee ndiye anayeweza kutoa idhini ya pili."
+    },
+    "history": {
+      "title": "Maamuzi ya awali",
+      "invoiceStatus": "Ankara ya PayPal: {{status}}",
+      "by": "{{name}} · {{when}}",
+      "second": "idhini ya pili na {{name}}",
+      "note": "Ujumbe:"
+    },
+    "settlements": {
+      "title": "Malipo yaliyopokelewa",
+      "intro": "Kila malipo ambayo TibaDirect imefanya kwa hospitali yako, ya hivi karibuni kwanza.",
+      "requested": "Yaliyoombwa",
+      "case": "Kesi",
+      "tranche": "Malipo namba",
+      "amount": "Kiasi",
+      "status": "Hali",
+      "statuses": {
+        "pending": "Yanasubiri",
+        "processing": "Yanalipwa",
+        "succeeded": "Yamelipwa",
+        "failed": "Yameshindwa"
+      },
+      "reference": "Rejea",
+      "completed": "Yamekamilika",
+      "emptyTitle": "Hakuna malipo bado",
+      "emptyBody": "Malipo yanaonekana hapa kesi iliyothibitishwa ikishapata pesa za kutosha zilizoahidiwa."
+    }
+  },
+  "admin": {
+    "overview": {
+      "title": "Muhtasari",
+      "waiting": "Vinavyosubiri mtu",
+      "openReviews": "Kesi za kukagua",
+      "openReviewsHint": "Zimealamishwa na ukaguzi au familia imeomba",
+      "secondApprovals": "Bili zinazosubiri idhini ya pili",
+      "secondApprovalsHint": "Hospitalini",
+      "failedJobs": "Kazi za nyuma zilizoshindwa",
+      "ledgerEntries": "Rekodi za leja",
+      "money": "Pesa",
+      "donations": "Michango",
+      "captured": "Zilizopokelewa (USD)",
+      "capturedHint": "Baada ya ada za PayPal",
+      "refunded": "Zilizorudishwa (USD)",
+      "settledUsd": "Zilizolipwa (USD)",
+      "pledged": "Zilizoahidiwa (KES)",
+      "settledKes": "Zilizolipwa hospitalini (KES)",
+      "cases_one": "Kesi {{count}}",
+      "cases_other": "Kesi {{count}}",
+      "queuesDown": "Foleni za kazi hazifikiki.",
+      "ledger": {
+        "title": "Ukaguzi wa leja",
+        "intro": "Inakokotoa upya kila alama ya kidijitali kwenye leja nzima, kwa kesi zote, na inasema inapovunjika.",
+        "verify": "Kagua leja nzima",
+        "ok": "Leja iko salama",
+        "okBody": "Rekodi zote {{count}} zimekaguliwa tena na kila alama ya kidijitali inalingana.",
+        "broken": "Leja imevunjika",
+        "brokenBody": "Mnyororo unashindwa kwenye rekodi {{seq}}. Acha kulipa kisha ujue sababu."
+      },
+      "queueLine": "Kazi zinazosubiri kwenye foleni — {{queues}}"
+    },
+    "cases": {
+      "title": "Kesi zote",
+      "alias": "Jina",
+      "status": "Hali",
+      "hospital": "Hospitali",
+      "owner": "Mmiliki",
+      "target": "Lengo",
+      "pledged": "Iliyoahidiwa",
+      "settled": "Iliyolipwa",
+      "search": "Tafuta kwa jina, jina la kiungo, hospitali au barua pepe ya mmiliki",
+      "allStatuses": "Hali zote",
+      "searchButton": "Tafuta",
+      "none": "Hakuna kesi zinazolingana.",
+      "count_one": "Kesi {{count}}",
+      "count_other": "Kesi {{count}}",
+      "hint": "Fungua kesi uone kila kitu kuhusu hiyo. Kufungua kesi kunaandikwa kwenye kumbukumbu za ukaguzi.",
+      "open": "Fungua"
+    },
+    "review": {
+      "title": "Foleni ya ukaguzi",
+      "intro": "Kesi ambazo ukaguzi uliziwekea alama, au familia iliomba tuziangalie. Hakuna kinachokataliwa kiotomatiki: mtu anaamua, na lazima aseme kwa nini.",
+      "filter": "Onyesha",
+      "tabs": {
+        "open": "Wazi",
+        "resolved": "Zilizoshughulikiwa",
+        "all": "Zote"
+      },
+      "emptyTitle": "Hakuna kitu hapa",
+      "emptyBody": "Hakuna vipengee vya ukaguzi vinavyolingana.",
+      "columns": {
+        "created": "Ilianzishwa",
+        "case": "Kesi",
+        "source": "Ilianzishwa na",
+        "reason": "Sababu",
+        "status": "Hali"
+      },
+      "sources": {
+        "ai_flag": "Ukaguzi",
+        "family_request": "Familia",
+        "insider_anomaly": "Ukaguzi wa ndani",
+        "admin": "Msimamizi"
+      },
+      "status": {
+        "open": "Wazi",
+        "resolved": "Imeshughulikiwa"
+      },
+      "resolve": "Shughulikia",
+      "view": "Tazama",
+      "hint": "Tumia kitufe kwenye safu, au bonyeza safu, ili kuifungua.",
+      "resolveTitle": "Shughulikia kipengee hiki",
+      "detailsTitle": "Kipengee cha ukaguzi",
+      "openCase": "Fungua kesi",
+      "decision": "Uamuzi wako",
+      "note": "Kwa nini? (lazima)",
+      "noteHelp": "Herufi {{count}} kati ya angalau 10",
+      "noteLength": "Andika herufi kati ya 10 na 500.",
+      "conflict": "Kipengee hiki tayari kimeshughulikiwa, au kesi haiwezi kupokea uamuzi huo.",
+      "submit": "Rekodi uamuzi",
+      "resolved": "Uamuzi umerekodiwa",
+      "resolutions": {
+        "approved_for_confirmation": {
+          "label": "Tuma hospitalini",
+          "body": "Nimeridhika. Bili inaenda kwa ofisi ya malipo ya hospitali kuthibitisha."
+        },
+        "kept_unverified": {
+          "label": "Weka bila uthibitisho",
+          "body": "Kesi inabaki bila uthibitisho hadi kitu kibadilike."
+        },
+        "case_cancelled": {
+          "label": "Ghairi kesi",
+          "body": "Mchango unaisha na wachangiaji wanarudishiwa kama walivyochagua."
+        },
+        "no_action": {
+          "label": "Hakuna hatua inayohitajika",
+          "body": "Funga kipengee bila kubadilisha kesi."
+        }
+      }
+    },
+    "audit": {
+      "title": "Kumbukumbu za ukaguzi",
+      "intro": "Kila kuingia, uamuzi na uhamishaji wa pesa, wa hivi karibuni kwanza. Rekodi haziwezi kubadilishwa.",
+      "targetType": "Aina ya lengo",
+      "targetIdFull": "Kitambulisho cha lengo (kamili)",
+      "idInvalid": "Hicho si kitambulisho kamili.",
+      "filter": "Chuja",
+      "clear": "Futa kichujio",
+      "emptyTitle": "Hakuna rekodi",
+      "emptyBody": "Hakuna kinacholingana na kichujio hiki.",
+      "hint": "Fungua safu uone maelezo ya rekodi hiyo.",
+      "count_one": "Rekodi {{count}}",
+      "count_other": "Rekodi {{count}}",
+      "requestId": "Kitambulisho cha ombi",
+      "view": "Maelezo",
+      "columns": {
+        "when": "Lini",
+        "actor": "Nani",
+        "action": "Hatua",
+        "target": "Lengo",
+        "targetId": "Kitambulisho",
+        "details": "Maelezo"
+      }
+    },
+    "jobs": {
+      "title": "Kazi za nyuma",
+      "intro": "Ukaguzi wa bili, malipo na barua pepe hufanyika nyuma. Kazi iliyoshindwa inaweza kurudishwa kwenye foleni yake.",
+      "schedulerOk": "Mpangaji wa kazi unafanya kazi",
+      "schedulerDown": "Mpangaji wa kazi umesimama",
+      "heartbeat": "ishara ya mwisho {{when}}",
+      "queues": "Foleni",
+      "queue": "Foleni",
+      "columns": {
+        "queued": "Zinasubiri",
+        "started": "Zinaendelea",
+        "scheduled": "Zilizopangwa",
+        "failed": "Zilizoshindwa"
+      },
+      "failed": "Kazi zilizoshindwa",
+      "noneTitle": "Hakuna kazi zilizoshindwa",
+      "noneBody": "Kila kilichoendeshwa kimekamilika.",
+      "jobMeta": "Foleni ya {{queue}} · imeshindwa {{when}} · majaribio {{retries}} yamebaki",
+      "retry": "Jaribu tena",
+      "retried": "Kazi imerudi kwenye foleni yake.",
+      "notFailed": "Kazi hiyo haijashindwa, kwa hiyo haiwezi kujaribiwa tena."
+    },
+    "case": {
+      "title": "Kesi",
+      "notFound": "Hatukuweza kupata kesi hiyo",
+      "hospital": "Hospitali",
+      "owner": "Akaunti ya familia",
+      "minor": "Mgonjwa ni mtoto",
+      "slug": "Anwani ya ukurasa",
+      "created": "Ilianza",
+      "live": "Ilianza kutumika",
+      "closed": "Ilifungwa",
+      "freezeReason": "Imesimamishwa kwa sababu: {{reason}} ({{when}})",
+      "audited": "Kufungua ukurasa huu kunaandikwa kwenye kumbukumbu za ukaguzi.",
+      "documents": "Bili",
+      "noDocuments": "Hakuna bili zilizopakiwa.",
+      "kind": "Aina",
+      "size": "Ukubwa",
+      "pages": "Kurasa",
+      "checks": "Ukaguzi wa kiotomatiki",
+      "noChecks": "Ukaguzi bado haujaendeshwa.",
+      "score": "Alama ya hatari {{score}}",
+      "usedModel": "modeli ya lugha ilitumika",
+      "localOnly": "ukaguzi wa ndani pekee",
+      "noSignals": "Hakuna ishara zilizotolewa.",
+      "donations_one": "Mchango {{count}}",
+      "donations_other": "Michango {{count}}",
+      "noDonations": "Hakuna michango bado.",
+      "paid": "Ilipwa",
+      "amount": "Kiasi",
+      "donor": "Mchangiaji",
+      "anonymous": "Bila jina",
+      "refundedColumn": "Iliyorudishwa",
+      "settlements": "Malipo kwa hospitali",
+      "noSettlements": "Hakuna kilicholipwa bado.",
+      "adapter": "Njia",
+      "refunds": "Marejesho",
+      "noRefunds": "Hakuna marejesho.",
+      "reason": "Sababu",
+      "by": "Na",
+      "scope": "Ridhaa",
+      "version": "Maneno",
+      "granted": "Imetolewa",
+      "withdrawn": "Imeondolewa",
+      "reviews": "Vipengee vya ukaguzi",
+      "noReviews": "Hakuna vipengee vya ukaguzi.",
+      "trail_one": "Kumbukumbu za ukaguzi (rekodi {{count}})",
+      "trail_other": "Kumbukumbu za ukaguzi (rekodi {{count}})",
+      "freeze": {
+        "button": "Simamisha kesi",
+        "title": "Kusimamisha {{alias}}?",
+        "warning": "Ukurasa unaacha kuwa wa umma na kuacha kupokea pesa mara moja. Malipo ambayo hayajatumwa yanaghairiwa na kila mchangiaji anarudishiwa pesa zote, bila kujali alichochagua. Kesi kisha inaghairiwa kwa udanganyifu. Hili haliwezi kutenduliwa.",
+        "reason": "Kwa nini? (lazima)",
+        "help": "Herufi {{count}} kati ya angalau 10 (zisizozidi 300). Familia inaweza kuona sababu ya jumla.",
+        "confirm": "Simamisha na rudisha pesa",
+        "done": "Kesi imesimamishwa na marejesho yameanza.",
+        "conflict": "Kesi hii haiwezi kusimamishwa ilipo sasa."
+      },
+      "settle": {
+        "button": "Angalia kama kuna malipo sasa",
+        "created": "Malipo ya {{n}} ya {{amount}} yameundwa.",
+        "reasons": {
+          "case_not_settleable": "Kesi haiko katika hali ya kulipwa.",
+          "no_confirmation": "Hospitali bado haijathibitisha bili.",
+          "hospital_inactive": "Hospitali haifanyi kazi.",
+          "hospital_not_ready": "Hospitali bado haiwezi kupokea malipo.",
+          "cap_reached": "Kiwango cha juu kinachoweza kulipwa kabla ya bili ya mwisho kimefikiwa.",
+          "nothing_available": "Hakuna pesa za kulipa.",
+          "below_threshold": "Hakuna pesa za kutosha zilizoahidiwa kwa malipo yanayofuata."
+        }
+      }
+    },
+    "agent": {
+      "title": "Msaidizi wa mhazini",
+      "intro": "Uliza kuhusu pesa. Husoma vitabu na anaweza kupendekeza marejesho, malipo au kusimamisha kesi, lakini hawezi kufanya lolote kati ya hayo: wewe unaidhinisha au kukataa kila pendekezo.",
+      "offTitle": "Msaidizi wa mhazini hajawashwa",
+      "offBody": "Msimamizi anaweza kumwasha kwenye mipangilio.",
+      "question": "Swali lako",
+      "placeholder": "Kwa mfano: ni michango ipi kwenye kesi hii ambayo bado haijarudishwa?",
+      "aboutCase": "Kuhusu kesi (si lazima)",
+      "noCase": "Hakuna kesi maalum",
+      "safety": "Msaidizi anaona kiasi, hali na vitambulisho pekee, kamwe si majina ya wachangiaji, barua pepe wala maandishi ya bili.",
+      "ask": "Uliza",
+      "thinking": "Anaangalia vitabu…",
+      "answer": "Jibu",
+      "stoppedEarly": "Msaidizi alikosa hatua kabla ya kumaliza. Jaribu swali finyu zaidi.",
+      "trace_one": "Alichoangalia (hatua {{count}})",
+      "trace_other": "Alichoangalia (hatua {{count}})",
+      "ok": "sawa",
+      "failed": "imeshindwa",
+      "proposed": "Anapendekeza",
+      "actions": "Mapendekezo",
+      "waiting": "Yanakusubiri",
+      "noActions": "Hakuna mapendekezo",
+      "noActionsBody": "Msaidizi akipendekeza kitu kitaonekana hapa.",
+      "errors": {
+        "noModel": "Hakuna modeli ya lugha iliyowekwa kwenye mazingira haya, kwa hiyo msaidizi hawezi kujibu.",
+        "unreachable": "Modeli ya lugha haikufikiwa. Jaribu tena baadaye kidogo.",
+        "tooMany": "Maswali mengi sana saa hii. Tafadhali subiri.",
+        "off": "Msaidizi amezimwa."
+      },
+      "action": {
+        "types": {
+          "refund": "Marejesho",
+          "payout": "Malipo",
+          "freeze": "Kusimamisha"
+        },
+        "statuses": {
+          "proposed": "Yanakusubiri",
+          "approved": "Imeidhinishwa",
+          "executed": "Imefanyika",
+          "rejected": "Imekataliwa",
+          "failed": "Haikuweza kufanyika"
+        },
+        "approve": "Idhinisha",
+        "reject": "Kataa",
+        "approveTitle": "Kufanya hili sasa?",
+        "approveBody": {
+          "refund": "Mchangiaji anarudishiwa pesa kupitia PayPal mara moja.",
+          "payout": "Malipo kwa hospitali yanafanywa mara moja.",
+          "freeze": "Kesi inasimamishwa na kila mchangiaji anarudishiwa pesa."
+        },
+        "rejectTitle": "Kataa pendekezo hili",
+        "rejectBody": "Sema kwa nini, ili iwe kwenye kumbukumbu.",
+        "decidedBy": "Imeamuliwa na {{name}}",
+        "conflict": "Pendekezo hili tayari limeamuliwa.",
+        "failedToast": "Haikuweza kufanyika. Angalia sababu kwenye kadi.",
+        "doneToast": "Imefanyika.",
+        "rejectedToast": "Pendekezo limekataliwa."
+      }
+    },
+    "actions": "Hatua"
+  },
+  "checker": {
+    "title": "Kagua ombi la msaada",
+    "intro": "Umepata ujumbe unaoomba pesa kwa bili ya hospitali? Bandika hapa, au pakia picha ya skrini, nasi tutakuambia kinachoonekana hatari.",
+    "privacy": "Hatuhifadhi unachobandika au kupakia. Alama ya kidijitali yake tu ndiyo huhifadhiwa, ili kuhesabu mara ambazo ujumbe ule ule unasambaa.",
+    "how": "Jinsi ya kutupa ujumbe",
+    "tabs": {
+      "text": "Bandika ujumbe",
+      "image": "Pakia picha ya skrini"
+    },
+    "textLabel": "Ujumbe, kama ulivyoupokea",
+    "textHelp": "Bandika angalau herufi {{count}}.",
+    "textCount": "Herufi {{count}} kati ya {{max}}",
+    "imageLabel": "Picha ya skrini ya ujumbe",
+    "imageHelp": "Tunasoma maneno kutoka kwenye picha. Tusipoweza kusoma ya kutosha, bandika ujumbe badala yake.",
+    "check": "Kagua ombi hili",
+    "checking": "Inakagua…",
+    "again": "Kagua ujumbe mwingine",
+    "score": "Ujumbe huu unavyotia wasiwasi",
+    "scoreText": "Alama {{score}} kati ya 100",
+    "reasons": "Kwa nini",
+    "explanation": "Kwa undani zaidi",
+    "tip": "Kujilinda",
+    "notProof": "Huu ni mwongozo, si ushahidi. Ujumbe unaoonekana sawa bado unaweza kuwa utapeli, na kesi iliyothibitishwa ndiyo njia pekee ya kuwa na uhakika pesa zinafika hospitalini.",
+    "offTitle": "Kikagua maombi kimezimwa",
+    "offBody": "Hakipatikani kwenye mazingira haya.",
+    "band": {
+      "low": {
+        "title": "Hakuna kinachotia wasiwasi",
+        "body": "Hatukuona dalili za kawaida za utapeli. Hata hivyo, changia tu kupitia ukurasa ambapo hospitali imethibitisha bili."
+      },
+      "medium": {
+        "title": "Kuwa mwangalifu na huu",
+        "body": "Baadhi ya mambo kuhusu ujumbe huu huonekana mara nyingi kwenye utapeli. Uliza hospitali kabla ya kutoa."
+      },
+      "high": {
+        "title": "Huu unaonekana kuwa utapeli",
+        "body": "Una dalili kadhaa zinazotumiwa na maombi ya uongo. Usitume pesa, na usiusambaze."
+      }
+    },
+    "match": {
+      "title": "Huu unalingana na kesi iliyothibitishwa",
+      "body": "Ombi hili linafanana na kesi ya {{alias}} katika {{hospital}}, ambayo hospitali imethibitisha.",
+      "link": "Fungua kesi iliyothibitishwa"
+    },
+    "errors": {
+      "off": "Kikagua maombi hakipatikani sasa hivi.",
+      "unreadable": "Hatukuweza kusoma maandishi ya kutosha kwenye picha hiyo. Bandika ujumbe badala yake.",
+      "invalid": "Tafadhali bandika ujumbe wa angalau herufi 20."
+    }
+  }
+}

@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import Select, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.errors import Conflict, NotFound, ValidationFailed
 from app.models.case import Case, ReviewItem
@@ -90,17 +90,14 @@ def request_review(session: Session, case: Case, user: User, message: str) -> Re
 
 def queue(status: ReviewStatus | None = None) -> Select[tuple[ReviewItem]]:
     """Review items: open ones first, oldest first (longest wait on top); resolved newest first."""
-    statement = select(ReviewItem)
+    statement = select(ReviewItem).options(selectinload(ReviewItem.case))
     if status is not None:
         statement = statement.where(ReviewItem.status == status)
-    open_first = ReviewItem.status == ReviewStatus.OPEN
-    return statement.order_by(
-        open_first.desc(),
-        ReviewItem.created_at.asc()
-        if status != ReviewStatus.RESOLVED
-        else ReviewItem.created_at.desc(),
-        ReviewItem.id,
-    )
+    if status == ReviewStatus.RESOLVED:
+        return statement.order_by(ReviewItem.created_at.desc(), ReviewItem.id)
+    # ``open`` comes before ``resolved`` in the status type, so this puts open items first and
+    # lets the (status, created_at) index serve the sort.
+    return statement.order_by(ReviewItem.status.asc(), ReviewItem.created_at.asc(), ReviewItem.id)
 
 
 def get_or_404(session: Session, item_id: uuid.UUID) -> ReviewItem:

@@ -3,12 +3,12 @@
 
 # Stage 1: the web app. `npm ci` installs exactly what package-lock.json says; the build type-checks first.
 # Only this stage needs Node: the final image carries the built files and no JavaScript toolchain.
-FROM node:20-alpine AS frontend
+FROM node:24-alpine AS frontend
 WORKDIR /web
 # A slow or dropped connection should be retried, not fail the whole image build.
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false \
     NPM_CONFIG_FETCH_RETRIES=6 NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=10000 NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 NPM_CONFIG_FETCH_TIMEOUT=180000
-COPY frontend/package.json frontend/package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
 RUN npm ci
 COPY frontend/ ./
 RUN npm run build

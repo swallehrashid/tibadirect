@@ -90,7 +90,7 @@ def test_the_dockerfile_builds_a_non_root_image_that_migrates_then_serves() -> N
     assert "gunicorn wsgi:app --workers 2 --threads 4" in text
     assert "--bind 0.0.0.0:${PORT}" in text
     # The web app is built from the lockfile in its own stage; only the built files are copied in.
-    assert "FROM node:20-alpine AS frontend" in text
+    assert re.search(r"^FROM node:\d+-alpine AS frontend$", text, re.MULTILINE)
     assert re.search(r"^RUN npm ci$", text, re.MULTILINE)
     assert re.search(r"^RUN npm run build$", text, re.MULTILINE)
     assert "COPY --from=frontend /web/dist/ frontend/dist/" in text
@@ -98,6 +98,30 @@ def test_the_dockerfile_builds_a_non_root_image_that_migrates_then_serves() -> N
     assert "node" not in runtime.lower().replace(
         "nodes", ""
     )  # no JavaScript toolchain in the final image
+
+
+def test_every_build_of_the_web_app_uses_the_node_version_in_nvmrc() -> None:
+    # CI once tested on an older Node than the one on developers' machines, and the test runner's
+    # dependencies refused to start there. One version, read from .nvmrc, keeps them together.
+    major = (ROOT / ".nvmrc").read_text().strip()
+    assert major.isdigit()
+    dockerfile = (ROOT / "Dockerfile").read_text()
+    assert f"FROM node:{major}-alpine AS frontend" in dockerfile
+    assert "frontend/.npmrc" in dockerfile  # so the image install checks engines too
+
+    workflow = yaml.safe_load((ROOT / ".github" / "workflows" / "ci.yml").read_text())
+    setup_node = [
+        step
+        for step in workflow["jobs"]["frontend"]["steps"]
+        if step.get("uses", "").startswith("actions/setup-node")
+    ]
+    assert setup_node
+    assert setup_node[0]["with"] == {**setup_node[0]["with"], "node-version-file": ".nvmrc"}
+    assert "node-version" not in setup_node[0]["with"]
+
+    # npm refuses to install on a Node that any dependency does not support, so a mismatch
+    # fails at install with a clear message instead of deep inside the test run.
+    assert "engine-strict=true" in (ROOT / "frontend" / ".npmrc").read_text().splitlines()
 
 
 def test_the_build_context_excludes_secrets_and_tests_but_keeps_the_consent_wording() -> None:

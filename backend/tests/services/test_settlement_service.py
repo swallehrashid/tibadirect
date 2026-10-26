@@ -782,6 +782,7 @@ def test_a_tranche_the_provider_calls_paid_after_we_failed_it_opens_a_review_onl
 
 
 def test_open_tranches_are_polled_at_a_growing_interval() -> None:
+    assert settlement_service.poll_interval(timedelta(seconds=5)) == timedelta(seconds=10)
     assert settlement_service.poll_interval(timedelta(minutes=3)) == timedelta(minutes=2)
     assert settlement_service.poll_interval(timedelta(minutes=30)) == timedelta(minutes=10)
     assert settlement_service.poll_interval(timedelta(hours=5)) == timedelta(minutes=30)

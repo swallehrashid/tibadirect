@@ -46,8 +46,10 @@ PERIODIC_JOBS: list[PeriodicJob] = [
     PeriodicJob(
         "sweep_webhook_events", "app.jobs.tasks.sweep_webhook_events", jobs.QUEUE_PAYMENTS, 120
     ),
+    # Only tranches that are on their way are asked about, and each is asked at its own pace
+    # (settlement_service.poll_interval), so running this at every tick costs one small query.
     PeriodicJob(
-        "poll_payout_status", "app.jobs.tasks.poll_payout_status", jobs.QUEUE_PAYMENTS, 120
+        "poll_payout_status", "app.jobs.tasks.poll_payout_status", jobs.QUEUE_PAYMENTS, TICK_SECONDS
     ),
     PeriodicJob("sweep_settlements", "app.jobs.tasks.sweep_settlements", jobs.QUEUE_PAYMENTS, 900),
     PeriodicJob("sweep_invoices", "app.jobs.tasks.sweep_invoices", jobs.QUEUE_PAYMENTS, 900),

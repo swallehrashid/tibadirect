@@ -580,7 +580,11 @@ def _enqueue(func: str, argument: str) -> None:
 
 
 def poll_interval(age: timedelta) -> timedelta:
-    """How long to wait between asking the provider: 2 minutes at first, then less often."""
+    """How long to wait between asking the provider. A payout usually finishes within seconds,
+    so the first minute is checked every 10 seconds (people are watching a screen); after that
+    every 2 minutes, then less and less often."""
+    if age < timedelta(minutes=1):
+        return timedelta(seconds=10)
     if age < timedelta(minutes=10):
         return timedelta(minutes=2)
     if age < timedelta(hours=2):

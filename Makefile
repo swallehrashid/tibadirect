@@ -61,5 +61,5 @@ synthetic: ## Generate the synthetic dataset
 eval: ## Run the AI evaluation harness
 	cd backend && $(BIN)/flask --app wsgi ai evaluate
 
-e2e: ## Run the end-to-end tests
-	cd frontend && npm run e2e
+e2e: ## Run the browser flows (the stack must be running: make up, migrate, seed, API, worker, scheduler, web)
+	cd frontend && npm run e2e:flows

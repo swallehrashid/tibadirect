@@ -1,9 +1,11 @@
 import type { Page } from "@playwright/test";
+import { clearRateLimits } from "./stack";
 
 const MAILPIT = process.env.E2E_MAILPIT_URL ?? "http://localhost:8025";
 
 /** Signs in through the real email-code screens, reading the code from Mailpit (the local mail catcher). */
 export async function signIn(page: Page, email: string): Promise<void> {
+  clearRateLimits();
   await fetch(`${MAILPIT}/api/v1/messages`, { method: "DELETE" });
   await page.goto("/login");
   // Selectors that do not depend on the language the page is in.

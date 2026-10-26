@@ -17,6 +17,7 @@
     "gen:api": "openapi-typescript http://localhost:5000/api/openapi.json -o src/api/schema.d.ts",
     "gen:api:file": "openapi-typescript ../docs/api/openapi.json -o src/api/schema.d.ts",
     "e2e": "playwright test",
+    "e2e:flows": "playwright test e2e/flows",
     "e2e:a11y": "playwright test e2e/accessibility.spec.ts",
     "i18n:review": "node scripts/swahili-review.mjs"
   },

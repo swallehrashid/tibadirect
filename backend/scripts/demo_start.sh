@@ -4,8 +4,13 @@
 set -e
 
 flask --app wsgi db upgrade
-flask --app wsgi storage bootstrap
-flask --app wsgi seed
+# Bucket settings are best effort; a token limited to objects may not be allowed to change them.
+flask --app wsgi storage bootstrap || echo "storage bootstrap failed; continuing"
+if [ "${DEMO_RESET_ON_START:-false}" = "true" ]; then
+  flask --app wsgi reset-demo --yes
+else
+  flask --app wsgi seed
+fi
 
 # Free plans have no background workers, so the scheduler and the worker run beside the web app.
 python -m app.jobs.scheduler &

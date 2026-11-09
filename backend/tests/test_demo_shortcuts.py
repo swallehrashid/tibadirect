@@ -108,13 +108,19 @@ def test_the_demo_blueprint_only_names_settings_the_app_reads_and_keeps_secrets_
     read_by_config |= set(re.findall(r'os\.environ\.get\(\s*"([A-Z0-9_]+)"', source))
     [web, redis] = blueprint["services"]
     env = {v["key"]: v for v in web["envVars"]}
-    assert set(env) <= read_by_config
+    assert set(env) - {"DEMO_RESET_ON_START"} <= read_by_config  # that one is read by the script
     assert (web["plan"], redis["plan"], blueprint["databases"][0]["plan"]) == ("free",) * 3
-    assert env["STORAGE_BACKEND"]["value"] == "database"
-    for name in ("PAYPAL_CLIENT_SECRET", "PAYPAL_CLIENT_ID"):
+    assert env["STORAGE_BACKEND"]["value"] == "s3"
+    for name in (
+        "PAYPAL_CLIENT_SECRET",
+        "PAYPAL_CLIENT_ID",
+        "S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY",
+        "SMTP_PASSWORD",
+    ):
         assert env[name] == {"key": name, "sync": False}
     # Render keeps the quotes of an inline `sh -c "..."`, so the steps live in a script
     assert web["dockerCommand"] == "sh scripts/demo_start.sh"
     script = (root / "backend" / "scripts" / "demo_start.sh").read_text()
-    for command in ("db upgrade", "seed", "app.jobs.scheduler", "app.jobs.worker", "gunicorn"):
+    for command in ("db upgrade", "seed", "reset-demo", "app.jobs.scheduler", "gunicorn"):
         assert command in script

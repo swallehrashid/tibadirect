@@ -1,7 +1,7 @@
 # Free demo Blueprint: everything on Render's free plans. One web service also runs the worker and
 # the scheduler (free plans have no background workers). Bills go to a private Cloudflare R2 bucket
-# and sign-in codes are emailed through Gmail; they also show on screen (DEMO_SHOW_LOGIN_CODE) so
-# judges can use the made-up demo accounts. The demo world is seeded on the first start. Not for
+# and sign-in codes show on screen (DEMO_SHOW_LOGIN_CODE), so judges can use the made-up demo
+# accounts. The demo world is seeded on the first start. Not for
 # real patients: render.yaml is the production setup.
 services:
   - type: web
@@ -21,8 +21,11 @@ services:
         value: "true"
       - key: DEMO_SHOW_LOGIN_CODE
         value: "true"
+      # Render's free plan blocks outgoing SMTP ports (25, 465, 587), so Gmail cannot be reached
+      # from here: mail stays off and codes show on screen. The SMTP settings below are ready
+      # for a paid plan or a relay on another port.
       - key: MAIL_BACKEND
-        value: smtp
+        value: "off"
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT

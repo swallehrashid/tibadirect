@@ -4,10 +4,13 @@ import uuid
 from datetime import UTC, datetime
 
 from flask.views import MethodView
+from sqlalchemy.orm import selectinload
 
 from app.api.base import TibaBlueprint
 from app.extensions import db
+from app.models.case import Case
 from app.models.enums import UserRole
+from app.models.money import Donation
 from app.pagination import PaginationArgsSchema, page_of, paginate
 from app.schemas.admin import (
     AdminCaseListItemSchema,
@@ -149,7 +152,9 @@ class AdminCaseDetail(MethodView):
     @blp.response(200, AdminCaseSchema)
     def get(self, case_id: uuid.UUID) -> object:
         """Everything about one case. Opening it is written to the audit log."""
-        case = get_case_for_admin_or_404(case_id)
+        case = get_case_for_admin_or_404(
+            case_id, options=(selectinload(Case.donations).selectinload(Donation.refunds),)
+        )
         audit_service.record("admin.case_viewed", case, actor=current_account())
         db.session.commit()
         return case

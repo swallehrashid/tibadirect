@@ -154,6 +154,125 @@ jobs:
       - name: Build
         run: npm run build
 
+  e2e:
+    name: End-to-end (browser flows on the local stack)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    needs: [backend, frontend]
+
+    # The same stack a developer runs locally: Postgres, Redis, storage and a mail catcher from
+    # docker-compose.yml, the API, a worker and the scheduler as processes, and the web app's dev server.
+    # PayPal is the built-in simulation, so the donation button needs no keys and no network.
+    env:
+      APP_ENV: development
+      DATA_ENCRYPTION_KEY: ZGV2LW9ubHkta2V5LWRvLW5vdC11c2UtaW4tcHJvZCE=
+      DATABASE_URL: postgresql+psycopg://tiba:tiba@localhost:5432/tibadirect
+      REDIS_URL: redis://localhost:6379/0
+      PAYPAL_MODE: mock
+      LLM_API_KEY: ""
+      DEMO_BANNER: "true"
+      E2E_BASE_URL: http://localhost:5173
+      E2E_BROWSER_CHANNEL: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr poppler-utils
+
+      - name: Install Python dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Start the infrastructure
+        run: |
+          docker compose up -d --wait postgres redis minio mailpit
+          docker compose run --rm minio-init
+
+      - name: Create the tables and the demo data
+        working-directory: backend
+        run: |
+          flask --app wsgi db upgrade
+          flask --app wsgi seed
+
+      - name: Start the API, the worker and the scheduler
+        working-directory: backend
+        run: |
+          mkdir -p "$RUNNER_TEMP/logs"
+          nohup flask --app wsgi run --port 5000 > "$RUNNER_TEMP/logs/api.log" 2>&1 &
+          nohup python -m app.jobs.worker > "$RUNNER_TEMP/logs/worker.log" 2>&1 &
+          nohup python -m app.jobs.scheduler > "$RUNNER_TEMP/logs/scheduler.log" 2>&1 &
+          for attempt in $(seq 1 30); do curl -fs localhost:5000/api/health && break; sleep 2; done
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install the web app and a browser
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Start the web app
+        working-directory: frontend
+        run: |
+          nohup npm run dev > "$RUNNER_TEMP/logs/web.log" 2>&1 &
+          for attempt in $(seq 1 30); do curl -fs localhost:5173 > /dev/null && break; sleep 2; done
+
+      # The long walkthrough (e2e/mvp-flow.spec.ts) stays a manual run; it is the Phase 4 review's tour.
+      - name: Browser flows, accessibility and phone-size checks
+        working-directory: frontend
+        run: npx playwright test e2e/flows e2e/accessibility.spec.ts e2e/responsive.spec.ts
+
+      - name: Keep the reports and logs when something failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-failure
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+            ${{ runner.temp }}/logs
+          retention-days: 7
+
+  audit:
+    name: Dependency audit (report only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Findings are written to the job summary for a person to read; they do not fail the build,
+    # because a new advisory in a package we do not control should not block unrelated work.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Python packages (pip-audit)
+        run: |
+          pip install pip-audit
+          echo "### Python packages" >> "$GITHUB_STEP_SUMMARY"
+          pip-audit -r backend/requirements.txt --no-deps --disable-pip | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Web packages (npm audit)
+        working-directory: frontend
+        run: |
+          echo "### Web packages" >> "$GITHUB_STEP_SUMMARY"
+          npm audit --audit-level=high | tee -a "$GITHUB_STEP_SUMMARY"
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest

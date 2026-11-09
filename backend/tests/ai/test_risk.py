@@ -71,7 +71,7 @@ def test_a_medium_score_without_a_forcing_signal_still_goes_to_the_hospital() ->
 
 
 @pytest.mark.parametrize("code", sorted(FORCES_MANUAL_REVIEW))
-def test_a_duplicate_or_a_patient_in_another_open_case_forces_review_at_any_score(
+def test_a_duplicate_a_patient_in_another_open_case_or_an_instruction_to_the_software_forces_review(
     code: str,
 ) -> None:
     assessed = risk.assess(make(code))
@@ -85,6 +85,7 @@ def test_exactly_those_signals_force_review() -> None:
         "duplicate_near",
         "duplicate_fingerprint",
         "patient_active_elsewhere",
+        "instruction_like_text",
     } == FORCES_MANUAL_REVIEW
 
 

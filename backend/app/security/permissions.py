@@ -135,9 +135,10 @@ def _hospital_may_see(case: Case) -> bool:
     return False
 
 
-def get_case_for_admin_or_404(case_id: uuid.UUID) -> Case:
-    """Any case. Only routes limited to admins may call this."""
-    case = db.session.get(Case, case_id)
+def get_case_for_admin_or_404(case_id: uuid.UUID, *, options: tuple[Any, ...] = ()) -> Case:
+    """Any case. Only routes limited to admins may call this. ``options`` are loader options for
+    a page that will read related rows, so they come in a few queries instead of one per row."""
+    case = db.session.get(Case, case_id, options=list(options), populate_existing=bool(options))
     if case is None:
         raise _case_not_found()
     return case

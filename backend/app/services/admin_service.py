@@ -3,7 +3,7 @@
 from typing import Any
 
 from sqlalchemy import Select, func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, contains_eager
 
 from app.models.case import Case, ReviewItem
 from app.models.enums import (
@@ -35,6 +35,8 @@ def cases(status: CaseStatus | None = None, query: str | None = None) -> Select[
         select(Case)
         .join(Hospital, Case.hospital_id == Hospital.id)
         .join(User, Case.created_by_id == User.id)
+        # The joins above already read the hospital and the owner; reuse them for the page's rows.
+        .options(contains_eager(Case.hospital), contains_eager(Case.created_by))
     )
     if status is not None:
         statement = statement.where(Case.status == status)

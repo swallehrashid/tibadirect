@@ -64,7 +64,11 @@ class AuditLog(db.Model, UUIDPrimaryKeyMixin, CreatedAtMixin):
     """Who did what to which record. ``details`` holds no personal data or document text."""
 
     __tablename__ = "audit_log"
-    __table_args__ = (Index("ix_audit_log_target", "target_type", "target_id"),)
+    __table_args__ = (
+        Index("ix_audit_log_target", "target_type", "target_id"),
+        # The admin's audit log lists the newest entries first, over a table that only grows.
+        Index("ix_audit_log_created_at", "created_at"),
+    )
 
     actor_type: Mapped[ActorType] = mapped_column(pg_enum(ActorType))
     actor_user_id: Mapped[uuid.UUID | None] = mapped_column(

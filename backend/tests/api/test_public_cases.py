@@ -26,6 +26,7 @@ PUBLIC_KEYS = {
     "hospital_name",
     "trust_level",
     "status",
+    "notice",
     "story",
     "photo_url",
     "is_estimate",
@@ -44,9 +45,11 @@ PUBLIC_KEYS = {
 
 
 def _case(status: CaseStatus, *, consent: bool = True, **fields):  # type: ignore[no-untyped-def]
+    fields.setdefault(
+        "close_reason", CloseReason.FULLY_SETTLED if status == CaseStatus.CLOSED else None
+    )
     case = CaseFactory(
         status=status,
-        close_reason=CloseReason.FULLY_SETTLED if status == CaseStatus.CLOSED else None,
         freeze_reason="under review" if status == CaseStatus.FROZEN else None,
         **fields,
     )
@@ -72,8 +75,8 @@ def _slugs(response) -> list[str]:  # type: ignore[no-untyped-def]
         (CaseStatus.LIVE, True, True),
         (CaseStatus.FUNDED, True, True),
         (CaseStatus.CLOSED, False, True),
-        (CaseStatus.CANCELLED, False, False),
-        (CaseStatus.FROZEN, False, False),
+        (CaseStatus.CANCELLED, False, True),
+        (CaseStatus.FROZEN, False, True),
     ],
 )
 def test_a_case_is_public_only_in_the_right_status_with_the_consent(
@@ -89,6 +92,53 @@ def test_a_case_is_public_only_in_the_right_status_with_the_consent(
         200 if has_page else 404
     )
     assert client.get(f"/api/public/cases/{without.public_slug}").status_code == 404
+
+
+# --- A page that has stopped says so, and says nothing else ---------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("status", "close_reason", "notice"),
+    [
+        (CaseStatus.FROZEN, None, "paused_for_review"),
+        (CaseStatus.CANCELLED, CloseReason.FRAUD, "paused_for_review"),
+        (CaseStatus.CANCELLED, CloseReason.TREATMENT_CANCELLED, "ended"),
+        (CaseStatus.CANCELLED, CloseReason.PATIENT_DECEASED, "ended"),
+    ],
+)
+def test_a_frozen_or_cancelled_page_answers_with_a_notice_and_no_story(
+    client, db_session, status: CaseStatus, close_reason: CloseReason | None, notice: str
+) -> None:  # type: ignore[no-untyped-def]
+    case = _case(status, story="A private family story", close_reason=close_reason)
+    response = client.get(f"/api/public/cases/{case.public_slug}")
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["notice"] == notice
+    assert body["status"] == status.value
+    assert body["story"] is None
+    assert set(body) == PUBLIC_KEYS
+    assert "A private family story" not in response.get_data(as_text=True)
+
+
+def test_a_live_page_has_no_notice(client, db_session) -> None:  # type: ignore[no-untyped-def]
+    case = _case(CaseStatus.LIVE, story="Hello")
+    body = client.get(f"/api/public/cases/{case.public_slug}").get_json()
+    assert body["notice"] is None
+    assert body["story"] == "Hello"
+
+
+def test_a_stopped_page_without_the_public_consent_still_looks_like_it_never_existed(  # type: ignore[no-untyped-def]
+    client, db_session
+) -> None:
+    for status in (CaseStatus.FROZEN, CaseStatus.CANCELLED):
+        case = _case(status, consent=False)
+        assert client.get(f"/api/public/cases/{case.public_slug}").status_code == 404
+
+
+def test_a_stopped_case_cannot_be_donated_to_or_read_as_a_ledger(client, db_session) -> None:  # type: ignore[no-untyped-def]
+    case = _case(CaseStatus.FROZEN)
+    assert client.get(f"/api/public/cases/{case.public_slug}/ledger").status_code == 404
+    assert client.get(f"/api/public/cases/{case.public_slug}/ledger/verify").status_code == 404
 
 
 def test_withdrawing_the_public_page_consent_hides_it_at_once(client, db_session) -> None:  # type: ignore[no-untyped-def]

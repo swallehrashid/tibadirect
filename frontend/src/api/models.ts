@@ -29,6 +29,9 @@ export type PublicCase = Model<
     hospital_name: string;
     trust_level: TrustLevel;
     status: CaseStatus;
+    /** Set when a page that was public has stopped; the story is then left out. */
+    notice: "paused_for_review" | "ended" | null;
+    story: string | null;
     photo_url: string | null;
     /** Amounts as decimal strings, "1250.00"; null when the hospital has not confirmed a bill yet. */
     target_kes: string | null;

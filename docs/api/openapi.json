@@ -383,7 +383,7 @@
             "$ref": "#/components/responses/DEFAULT_ERROR"
           }
         },
-        "summary": "One public case. A case that is not public is reported as not found.",
+        "summary": "One public case. A case that is not public is reported as not found. A case that was\npublic and is now frozen or cancelled answers with a ``notice`` and no story.",
         "tags": [
           "public"
         ]
@@ -3758,8 +3758,12 @@
           "status": {
             "readOnly": true
           },
+          "notice": {
+            "readOnly": true,
+            "description": "Set when the page has stopped: paused_for_review (frozen) or ended (cancelled by the family). The story is then left out."
+          },
           "story": {
-            "type": "string",
+            "readOnly": true,
             "nullable": true
           },
           "photo_url": {

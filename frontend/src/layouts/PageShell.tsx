@@ -1,5 +1,5 @@
 import { Menu } from "lucide-react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { usePublicConfig } from "@/api";
 import { useAuth } from "@/auth/AuthContext";
@@ -9,6 +9,7 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { feedbackHref } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 import { SkipLink } from "./SkipLink";
 import { UserMenu } from "./UserMenu";
@@ -25,6 +26,7 @@ function useLinks() {
 
 /** Layout for public pages: header, the page, and a footer with the legal links. */
 export function PageShell() {
+  const location = useLocation();
   const { t } = useTranslation();
   const { user, status } = useAuth();
   const { data: config } = usePublicConfig();
@@ -104,6 +106,9 @@ export function PageShell() {
             <Link to="/terms" className="rounded-sm py-2 text-tiba-100 underline-offset-4 hover:text-white hover:underline">
               {t("nav.terms")}
             </Link>
+            <a href={feedbackHref(location.pathname, { subject: t("shell.feedbackSubject"), body: t("shell.feedbackBody") })} className="rounded-sm py-2 text-tiba-100 underline-offset-4 hover:text-white hover:underline">
+              {t("shell.feedback")}
+            </a>
           </nav>
         </div>
       </footer>

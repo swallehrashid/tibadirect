@@ -2,7 +2,7 @@ import { ArrowLeft, Building2, MapPin } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { isApiError, usePublicCase, usePublicConfig, usePublicLedger } from "@/api";
+import { isApiError, usePublicCase, usePublicConfig, usePublicLedger, type PublicCase } from "@/api";
 import { BillMeter } from "@/components/BillMeter";
 import { DonatePanel } from "@/components/DonatePanel";
 import { EmptyState } from "@/components/EmptyState";
@@ -11,7 +11,7 @@ import { ShareButtons } from "@/components/ShareButtons";
 import { TrancheTimeline } from "@/components/TrancheTimeline";
 import { TrustBadge } from "@/components/TrustBadge";
 import { VerifyLedger } from "@/components/VerifyLedger";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +21,44 @@ import { usePageTitle } from "@/lib/usePageTitle";
 
 // AG Grid is large, so it loads after the rest of the page is already usable.
 const LedgerGrid = lazy(() => import("@/components/LedgerGrid"));
+
+/** A page that was public and has stopped: who it was for and why there is nothing to give to, and no story. */
+function StoppedCase({ item }: { item: PublicCase }) {
+  const { t } = useTranslation();
+  const paused = item.notice === "paused_for_review";
+  return (
+    <div className="container max-w-2xl space-y-6 py-10">
+      <Link to="/cases" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline">
+        <ArrowLeft className="size-4" aria-hidden="true" /> {t("casePage.back")}
+      </Link>
+      <header className="space-y-2">
+        <h1 className="font-heading text-3xl font-extrabold md:text-4xl">{item.alias}</h1>
+        <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <MapPin className="size-4" aria-hidden="true" />
+            {item.region}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Building2 className="size-4" aria-hidden="true" />
+            {item.hospital_name}
+          </span>
+        </p>
+      </header>
+      <Alert tone="warning" data-testid="case-notice">
+        <div className="space-y-1">
+          <AlertTitle>{paused ? t("casePage.paused.title") : t("casePage.ended.title")}</AlertTitle>
+          <AlertDescription>
+            {paused ? t("casePage.paused.body") : t("casePage.ended.body")}
+            {paused ? <span className="mt-2 block">{t("casePage.paused.refunds")}</span> : null}
+          </AlertDescription>
+        </div>
+      </Alert>
+      <Button asChild variant="outline">
+        <Link to="/cases">{t("landing.hero.browse")}</Link>
+      </Button>
+    </div>
+  );
+}
 
 export function CasePage() {
   const { slug = "" } = useParams();
@@ -63,6 +101,7 @@ export function CasePage() {
   }
 
   const item = caseQuery.data;
+  if (item.notice) return <StoppedCase item={item} />;
   const simulated = config?.paypal_mode !== "live";
   const tranches = tranchesFrom(ledger.data?.items ?? []);
 

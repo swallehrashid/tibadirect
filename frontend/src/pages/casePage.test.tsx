@@ -70,6 +70,26 @@ describe("case page", () => {
     expect(screen.queryByRole("button", { name: /Donate/ })).not.toBeInTheDocument();
   });
 
+  it("says a frozen case is paused for review, with no story, no donation form and no ledger", async () => {
+    mockApi(live({ status: "frozen", notice: "paused_for_review", story: null }));
+    renderApp("/c/demolive2345");
+    expect(await screen.findByRole("heading", { level: 1, name: "Baraka" })).toBeInTheDocument();
+    const notice = screen.getByTestId("case-notice");
+    expect(within(notice).getByText("Paused for review")).toBeInTheDocument();
+    expect(within(notice).getByText(/being refunded to the people who gave it/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Donate/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Public ledger" })).not.toBeInTheDocument();
+    expect(screen.queryByText("We could not find that case")).not.toBeInTheDocument();
+  });
+
+  it("says a case its family cancelled has ended, without calling it a review", async () => {
+    mockApi(live({ status: "cancelled", notice: "ended", story: null }));
+    renderApp("/c/demolive2345");
+    expect(await screen.findByText("This fundraiser has ended")).toBeInTheDocument();
+    expect(screen.queryByText("Paused for review")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Donate/ })).not.toBeInTheDocument();
+  });
+
   it("closes the donation form for a fully funded case", async () => {
     mockApi(live({ status: "funded" }));
     renderApp("/c/demolive2345");

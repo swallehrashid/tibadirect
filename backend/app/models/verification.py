@@ -11,6 +11,7 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Index,
     SmallInteger,
     String,
     false,
@@ -97,6 +98,8 @@ class Confirmation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
         CheckConstraint(
             "status <> 'confirmed' OR finalized_at IS NOT NULL", name="confirmed_has_finalized_at"
         ),
+        # The hospital's queue of bills waiting for a second approval.
+        Index("ix_confirmations_hospital_status", "hospital_id", "status"),
     )
 
     case_id: Mapped[uuid.UUID] = mapped_column(
@@ -104,7 +107,7 @@ class Confirmation(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     hospital_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("hospitals.id", ondelete="RESTRICT"))
     document_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("case_documents.id", ondelete="RESTRICT")
+        ForeignKey("case_documents.id", ondelete="RESTRICT"), index=True
     )
     confirmation_request_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("confirmation_requests.id", ondelete="RESTRICT"), unique=True

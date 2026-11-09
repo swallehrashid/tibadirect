@@ -37,9 +37,17 @@ WEIGHTS: dict[str, int] = {
     "instruction_like_text": 15,
 }
 
-# Signals that send a bill to a person whatever the total score is (7.6).
+# Signals that send a bill to a person whatever the total score is (7.6). A bill that talks to the
+# software is the other kind: no genuine bill does, so someone is trying something, and a person
+# should look even though the extraction ignored the instruction and the weight alone is low.
 FORCES_MANUAL_REVIEW = frozenset(
-    {"duplicate_exact", "duplicate_near", "duplicate_fingerprint", "patient_active_elsewhere"}
+    {
+        "duplicate_exact",
+        "duplicate_near",
+        "duplicate_fingerprint",
+        "patient_active_elsewhere",
+        "instruction_like_text",
+    }
 )
 
 

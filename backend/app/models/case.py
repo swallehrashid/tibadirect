@@ -98,6 +98,7 @@ class Case(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
             "status <> 'frozen' OR freeze_reason IS NOT NULL", name="frozen_has_reason"
         ),
         Index("ix_cases_hospital_status", "hospital_id", "status"),
+        Index("ix_cases_created_at", "created_at"),
         Index(
             "ix_cases_active_patient_ref",
             "patient_ref_hmac",
@@ -211,6 +212,29 @@ class Case(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
             and self.active_consent(ConsentScope.PUBLIC_PAGE) is not None
         )
 
+    @property
+    def public_notice(self) -> str | None:
+        """What a visitor is told in place of the page when a case that was public has stopped.
+
+        ``paused_for_review`` covers a freeze, including the cancellation that ends it, without
+        saying why: the reason stays with the admins. ``ended`` is a family's own cancellation.
+        """
+        if self.status == CaseStatus.FROZEN or (
+            self.status == CaseStatus.CANCELLED and self.close_reason == CloseReason.FRAUD
+        ):
+            return "paused_for_review"
+        if self.status == CaseStatus.CANCELLED:
+            return "ended"
+        return None
+
+    @property
+    def shows_public_notice(self) -> bool:
+        """A stopped case still answers on its public address, but only if its family agreed to a
+        public page. It then shows the notice and nothing else."""
+        return self.public_notice is not None and (
+            self.active_consent(ConsentScope.PUBLIC_PAGE) is not None
+        )
+
     def __repr__(self) -> str:
         return f"<Case id={self.id} status={self.status}>"
 
@@ -221,6 +245,12 @@ class CaseDocument(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "case_documents"
     __table_args__ = (
         CheckConstraint(f"size_bytes BETWEEN 1 AND {MAX_UPLOAD_BYTES}", name="size_range"),
+        # The hourly sweep that deletes originals looks only at the ones still held.
+        Index(
+            "ix_case_documents_raw_held",
+            "case_id",
+            postgresql_where=text("storage_key IS NOT NULL AND raw_deleted_at IS NULL"),
+        ),
     )
 
     case_id: Mapped[uuid.UUID] = mapped_column(
@@ -323,6 +353,7 @@ class ReviewItem(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
             "AND resolved_at IS NOT NULL AND length(btrim(coalesce(resolution_note, ''))) > 0)",
             name="resolved_has_decision",
         ),
+        Index("ix_review_items_status_created_at", "status", "created_at"),
     )
 
     case_id: Mapped[uuid.UUID] = mapped_column(

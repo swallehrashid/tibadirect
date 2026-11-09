@@ -5,6 +5,7 @@ import uuid
 from flask import request
 from flask.views import MethodView
 from sqlalchemy import and_, exists, or_, select
+from sqlalchemy.orm import selectinload
 
 from app.api.base import TibaBlueprint
 from app.errors import NotFound
@@ -71,6 +72,7 @@ class Queue(MethodView):
         cases = db.session.execute(
             select(Case)
             .where(Case.hospital_id == staff.hospital_id, or_(*decidable))
+            .options(selectinload(Case.triage_results), selectinload(Case.documents))
             .order_by(Case.submitted_at, Case.id)
         ).scalars()
         waiting_second = list(

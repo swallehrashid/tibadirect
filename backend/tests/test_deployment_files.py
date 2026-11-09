@@ -162,3 +162,32 @@ def test_invoicing_settings_reach_both_services_and_the_agent_stays_off_by_defau
         assert keys["HOSPITAL_PAYPAL_CREDENTIALS"]["sync"] is False
     web_keys = {v["key"]: v for v in web["envVars"] if "key" in v}
     assert web_keys["AGENT_ENABLED"]["value"] == "false"
+
+
+def test_ci_runs_the_browser_flows_on_the_local_stack() -> None:
+    """The end-to-end specs need the whole stack, so CI starts it: infrastructure from compose, the
+    API, the worker and the scheduler, the web app, then the flows with PayPal simulated."""
+    workflow = yaml.safe_load((ROOT / ".github" / "workflows" / "ci.yml").read_text())
+    job = workflow["jobs"]["e2e"]
+    assert job["env"]["PAYPAL_MODE"] == "mock"
+    steps = "\n".join(str(step.get("run", "")) for step in job["steps"])
+    for needed in (
+        "docker compose up -d --wait postgres redis minio mailpit",
+        "flask --app wsgi seed",
+        "app.jobs.worker",
+        "app.jobs.scheduler",
+        "npm run dev",
+        "playwright test e2e/flows",
+    ):
+        assert needed in steps, needed
+    setup_node = [s for s in job["steps"] if s.get("uses", "").startswith("actions/setup-node")]
+    assert setup_node[0]["with"]["node-version-file"] == ".nvmrc"
+
+
+def test_ci_audits_the_dependencies_without_failing_the_build() -> None:
+    workflow = yaml.safe_load((ROOT / ".github" / "workflows" / "ci.yml").read_text())
+    job = workflow["jobs"]["audit"]
+    assert job["continue-on-error"] is True
+    steps = "\n".join(str(step.get("run", "")) for step in job["steps"])
+    assert "pip-audit -r backend/requirements.txt" in steps
+    assert "npm audit --audit-level=high" in steps

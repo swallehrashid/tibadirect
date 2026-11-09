@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, String, func
+from sqlalchemy import Boolean, DateTime, Index, String, func, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,6 +16,14 @@ class WebhookEvent(db.Model, UUIDPrimaryKeyMixin, CreatedAtMixin):
     """A PayPal webhook delivery, stored once by event ID so replays change nothing."""
 
     __tablename__ = "webhook_events"
+    __table_args__ = (
+        # The sweep that retries events nobody has processed yet looks only at these.
+        Index(
+            "ix_webhook_events_unprocessed",
+            "received_at",
+            postgresql_where=text("status = 'received'"),
+        ),
+    )
 
     paypal_event_id: Mapped[str] = mapped_column(String(60), unique=True)
     event_type: Mapped[str] = mapped_column(String(80), index=True)

@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from typing import Any
 from urllib.parse import urlsplit
 
-from flask import Flask
+from flask import Flask, Response, request
 from flask_cors import CORS
 from flask_smorest import Api
 from flask_talisman import Talisman
@@ -116,6 +116,21 @@ def init_security_headers(app: Flask, talisman: Talisman) -> None:
         session_cookie_samesite="Lax",
     )
     _relax_policy_for_docs(app)
+    _keep_api_answers_out_of_caches(app)
+
+
+def _keep_api_answers_out_of_caches(app: Flask) -> None:
+    """Nothing the API says is stored by the browser or a proxy unless a view asks for it.
+
+    Answers hold a family's case, a hospital's bill or a receipt, and people use shared phones and
+    café computers: after signing out, the Back button must not show them again from disk.
+    """
+
+    @app.after_request
+    def no_store(response: Response) -> Response:
+        if request.path.startswith("/api/") and "Cache-Control" not in response.headers:
+            response.headers["Cache-Control"] = "no-store"
+        return response
 
 
 def _set_view_options(app: Flask, endpoint: str, **options: Any) -> None:

@@ -212,7 +212,7 @@ test("a family, a hospital and three donors, from the bill to the refund", async
   await expect(async () => {
     await pub.goto(`/c/${slug}`);
     await expect(pub.getByText("Payment 1:")).toBeVisible({ timeout: 3000 });
-  }).toPass({ timeout: 420_000, intervals: [5000] }); // a payout is checked every two minutes, so each round of payments takes two to four
+  }).toPass({ timeout: 120_000, intervals: [4000] }); // a payout is checked every few seconds at first
   await expect(pub.getByText("This case is fully funded")).toBeVisible();
   await pub.getByRole("button", { name: "Verify ledger" }).click();
   await expect(pub.getByText("The ledger is intact")).toBeVisible();
@@ -252,14 +252,14 @@ test("a family, a hospital and three donors, from the bill to the refund", async
   await expect(async () => {
     await pub.goto(`/c/${slug}`);
     await expect(pub.getByRole("heading", { name: "This case is closed" })).toBeVisible({ timeout: 3000 });
-  }).toPass({ timeout: 480_000, intervals: [6000] });
+  }).toPass({ timeout: 180_000, intervals: [4000] });
   await expect(pub.getByText("KES 66,700").first()).toBeVisible();
   await shot(pub, "19-case-page-closed");
 
   await expect(async () => {
     await pub.goto(`/receipt/${lastReceipt}`);
     await expect(pub.getByText(/of this donation has been refunded|has been refunded in full/)).toBeVisible({ timeout: 3000 });
-  }).toPass({ timeout: 480_000, intervals: [6000] });
+  }).toPass({ timeout: 180_000, intervals: [4000] });
   await shot(pub, "20-receipt-refunded");
 
   await family.goto(caseUrl);

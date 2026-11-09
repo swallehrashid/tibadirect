@@ -8,6 +8,7 @@ export function publicCase(overrides: Partial<PublicCase> = {}): PublicCase {
     hospital_name: "Kilele Mission Hospital",
     trust_level: "hospital_confirmed",
     status: "live",
+    notice: null,
     story: "Our family is raising money to clear a hospital bill. Every shilling goes to the hospital.",
     photo_url: null,
     is_estimate: true,

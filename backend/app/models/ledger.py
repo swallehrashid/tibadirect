@@ -27,6 +27,8 @@ class LedgerEntry(db.Model, UUIDPrimaryKeyMixin, CreatedAtMixin):
         # The genesis entry is the only one whose prev_hash is 64 zeros.
         Index("uq_ledger_entries_prev_hash", "prev_hash", unique=True),
         Index("ix_ledger_entries_case_seq", "case_id", "seq"),
+        # Finding what was already booked for a donation, tranche or refund before booking again.
+        Index("ix_ledger_entries_ref", "ref_type", "ref_id"),
     )
 
     # BY DEFAULT: the ledger service reads the next value first, because the hash covers seq.

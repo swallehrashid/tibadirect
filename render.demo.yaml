@@ -1,0 +1,80 @@
+# Free demo Blueprint: everything on Render's free plans, no bucket and no mail server.
+# One web service also runs the worker and the scheduler (free plans have no background workers),
+# bill files live in Postgres (STORAGE_BACKEND=database) and sign-in codes show on screen
+# (DEMO_SHOW_LOGIN_CODE). The demo world is seeded on the first start. Not for real patients:
+# render.yaml is the production setup. See docs/DEPLOY.md.
+services:
+  - type: web
+    name: tibadirect
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    dockerCommand: >-
+      sh -c "flask --app wsgi db upgrade
+      && flask --app wsgi storage bootstrap
+      && flask --app wsgi seed
+      && (python -m app.jobs.scheduler & python -m app.jobs.worker &)
+      && exec gunicorn wsgi:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEMO_BANNER
+        value: "true"
+      - key: DEMO_SHOW_LOGIN_CODE
+        value: "true"
+      - key: MAIL_BACKEND
+        value: "off"
+      - key: STORAGE_BACKEND
+        value: database
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: AGENT_ENABLED
+        value: "false"
+      - key: PROXY_FIX_COUNT
+        value: "1"
+      - key: JOBS_ASYNC
+        value: "true"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tibadirect-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: tibadirect-redis
+          property: connectionString
+      - key: APP_BASE_URL
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: PAYPAL_COLLECTOR_EMAIL
+        sync: false
+      - key: SEED_HOSPITAL_PAYOUT_EMAILS
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: HASH_PEPPER
+        generateValue: true
+      - key: DATA_ENCRYPTION_KEY
+        generateValue: true
+
+  - type: keyvalue
+    name: tibadirect-redis
+    plan: free
+    region: frankfurt
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+
+databases:
+  - name: tibadirect-db
+    databaseName: tibadirect
+    user: tiba
+    plan: free
+    region: frankfurt

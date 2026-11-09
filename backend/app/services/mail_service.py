@@ -112,6 +112,10 @@ def send(template: str, to: str, *, language: str = DEFAULT_LANGUAGE, **context:
     backend = current_app.config.get("MAIL_BACKEND", "smtp")
     if backend == "memory":
         outbox.append(message)
+    elif backend == "off":
+        # Demo shortcut with no mail server: nothing is sent (sign-in codes show on screen).
+        logger.info("email skipped", extra={"template": template})
+        return
     else:
         _send_smtp(message)
     logger.info("email sent", extra={"template": template, "language": message.language})

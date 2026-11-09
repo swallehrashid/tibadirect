@@ -181,6 +181,7 @@
     "codeWrong": "That code is not right, or it has expired. Check your email and try again, or ask for a new code.",
     "resend": "Send a new code",
     "resendIn": "Send a new code in {{seconds}}s",
+    "demoCode": "Demo mode, no email needed. Your code is",
     "resent": "We sent a new code.",
     "otherEmail": "Use a different email",
     "backHome": "Back to the home page",

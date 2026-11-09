@@ -35,13 +35,13 @@ def create_app(config_name: str | None = None) -> Flask:
     init_request_id(app)
     register_error_handlers(app)
     register_cli(app)
-    _register_blueprints()
+    _register_blueprints(app)
     web.exempt_health_from_https_redirect(app)
     init_spa(app)
     return app
 
 
-def _register_blueprints() -> None:
+def _register_blueprints(app: Flask) -> None:
     from app.api.admin import blp as admin_blp
     from app.api.agent import blp as agent_blp
     from app.api.auth import blp as auth_blp
@@ -72,3 +72,8 @@ def _register_blueprints() -> None:
         webhooks_blp,
     ):
         extensions.api.register_blueprint(blueprint)
+
+    # Not part of the documented API: it only serves files for the database storage shortcut.
+    from app.api.files import blp as files_blp
+
+    app.register_blueprint(files_blp)

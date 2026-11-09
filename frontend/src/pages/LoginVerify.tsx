@@ -26,6 +26,12 @@ function savedEmail(state: unknown): string | null {
   }
 }
 
+// The DEMO_SHOW_LOGIN_CODE shortcut: the server hands the code back instead of emailing it.
+function stateDemoCode(state: unknown): string | null {
+  if (state && typeof state === "object" && "demoCode" in state && typeof state.demoCode === "string") return state.demoCode;
+  return null;
+}
+
 export function LoginVerify() {
   const { t } = useTranslation();
   usePageTitle(t("auth.verifyTitle"));
@@ -34,7 +40,8 @@ export function LoginVerify() {
   const [params] = useSearchParams();
   const { user, signedIn } = useAuth();
   const email = savedEmail(location.state);
-  const [code, setCode] = useState("");
+  const [demoCode, setDemoCode] = useState(() => stateDemoCode(location.state));
+  const [code, setCode] = useState(demoCode ?? "");
   const [attempt, setAttempt] = useState(0); // remounts the boxes after a wrong code, so focus returns to the first
   const [cooldown, setCooldown] = useState(RESEND_SECONDS);
   const next = params.get("next");
@@ -69,7 +76,11 @@ export function LoginVerify() {
 
   const resend = useMutation({
     mutationFn: async () => unwrap(await api.POST("/api/auth/request-code", { body: { email: email ?? "" } })),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data.demo_code) {
+        setDemoCode(data.demo_code);
+        setCode(data.demo_code);
+      }
       setCooldown(RESEND_SECONDS);
       toast.success(t("auth.resent"));
     },
@@ -94,6 +105,13 @@ export function LoginVerify() {
           <CardDescription>{t("auth.verifyIntro", { email })}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {demoCode ? (
+            <Alert tone="info">
+              <AlertDescription>
+                {t("auth.demoCode")} <code className="font-semibold">{demoCode}</code>
+              </AlertDescription>
+            </Alert>
+          ) : null}
           <form
             onSubmit={(event) => {
               event.preventDefault();

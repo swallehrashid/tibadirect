@@ -3537,6 +3537,9 @@
         "properties": {
           "message": {
             "type": "string"
+          },
+          "demo_code": {
+            "type": "string"
           }
         },
         "additionalProperties": false

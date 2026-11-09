@@ -3456,6 +3456,7 @@ export interface components {
         };
         Accepted: {
             message?: string;
+            demo_code?: string;
         };
         VerifyCode: {
             /** Format: email */

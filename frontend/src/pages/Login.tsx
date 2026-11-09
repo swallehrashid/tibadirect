@@ -32,13 +32,13 @@ export function Login() {
 
   const request = useMutation({
     mutationFn: async (values: Values) => unwrap(await api.POST("/api/auth/request-code", { body: { email: values.email } })),
-    onSuccess: (_data, values) => {
+    onSuccess: (data, values) => {
       try {
         sessionStorage.setItem(LOGIN_EMAIL_KEY, values.email);
       } catch {
         // Without storage the code screen is reached by navigation state only.
       }
-      navigate(`/login/verify${next ? `?next=${encodeURIComponent(next)}` : ""}`, { state: { email: values.email } });
+      navigate(`/login/verify${next ? `?next=${encodeURIComponent(next)}` : ""}`, { state: { email: values.email, demoCode: data.demo_code } });
     },
   });
 

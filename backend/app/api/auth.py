@@ -1,6 +1,6 @@
 """Authentication routes: email-code sign-in, session and profile."""
 
-from flask import Response, make_response, request, session
+from flask import Response, current_app, make_response, request, session
 from flask.views import MethodView
 from flask_limiter.util import get_remote_address
 from flask_login import current_user, login_user, logout_user
@@ -78,8 +78,12 @@ class RequestCode(MethodView):
     @blp.response(202, AcceptedSchema)
     def post(self, payload: dict) -> dict:
         """Email a six-digit sign-in code. The answer never reveals whether an account exists."""
-        auth_service.request_code(db.session, payload["email"], ip=get_remote_address())
-        return {"message": "If that address can receive email, a sign-in code is on its way."}
+        issued = auth_service.request_code(db.session, payload["email"], ip=get_remote_address())
+        body = {"message": "If that address can receive email, a sign-in code is on its way."}
+        config = current_app.config
+        if config["DEMO_BANNER"] and config["DEMO_SHOW_LOGIN_CODE"] and issued.code:
+            body["demo_code"] = issued.code
+        return body
 
 
 @blp.route("/verify")

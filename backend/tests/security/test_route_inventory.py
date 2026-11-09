@@ -50,6 +50,8 @@ POLICY: dict[tuple[str, str], str] = {
     ("POST", "/api/donations/orders"): PUBLIC,
     ("POST", "/api/donations/orders/<string:order_id>/capture"): PUBLIC,
     ("GET", "/api/donations/receipts/<string:receipt_token>"): PUBLIC,
+    # The signed token is the permission (the database storage shortcut's stand-in for S3 links)
+    ("GET", "/api/files/<token>"): PUBLIC,
     ("POST", "/api/webhooks/paypal"): WEBHOOK,
     # --- A family's own cases --------------------------------------------------------------------
     ("GET", "/api/cases"): FAMILY,
@@ -137,8 +139,8 @@ def test_the_documented_gates_match_the_policy(client) -> None:  # type: ignore[
     """What the OpenAPI document tells integrators matches what this table says."""
     spec = client.get("/api/openapi.json").get_json()
     for (method, rule), gate in POLICY.items():
-        if rule.startswith("/api/docs") or rule == "/api/openapi.json":
-            continue
+        if rule.startswith(("/api/docs", "/api/files/")) or rule == "/api/openapi.json":
+            continue  # the files route is a demo shortcut, left out of the API document
         path = re.sub(r"<(?:\w+:)?(\w+)>", r"{\1}", rule)
         operation = spec["paths"][path][method.lower()]
         assert bool(operation.get("security")) == (gate in (LOGIN, FAMILY, STAFF, ADMIN)), (

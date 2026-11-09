@@ -17,6 +17,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 from flask import current_app
 
 from app.errors import AppError
+from app.services import database_storage
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +78,10 @@ def _signing_client() -> BaseClient:
     return client
 
 
+def _in_database() -> bool:
+    return current_app.config.get("STORAGE_BACKEND") == "database"
+
+
 def _bucket() -> str:
     return current_app.config["S3_BUCKET"]
 
@@ -90,6 +95,9 @@ def _fail(action: str, exc: Exception) -> StorageError:
 
 def put_object(key: str, data: bytes, content_type: str) -> None:
     """Store ``data`` under ``key``, encrypted at rest when ``S3_SERVER_SIDE_ENCRYPTION`` is set."""
+    if _in_database():
+        database_storage.put_object(key, data, content_type)
+        return
     extra: dict[str, Any] = {}
     if encryption := current_app.config["S3_SERVER_SIDE_ENCRYPTION"]:
         extra["ServerSideEncryption"] = encryption
@@ -103,6 +111,11 @@ def put_object(key: str, data: bytes, content_type: str) -> None:
 
 def get_object(key: str) -> bytes:
     """Read an object. Raises ``StorageError`` if it is missing or the store is down."""
+    if _in_database():
+        found = database_storage.get(key)
+        if found is None:
+            raise StorageError()
+        return found[0]
     try:
         return _client().get_object(Bucket=_bucket(), Key=key)["Body"].read()  # type: ignore[no-any-return]
     except (ClientError, BotoCoreError) as exc:
@@ -110,6 +123,8 @@ def get_object(key: str) -> bytes:
 
 
 def object_exists(key: str) -> bool:
+    if _in_database():
+        return database_storage.get(key) is not None
     try:
         _client().head_object(Bucket=_bucket(), Key=key)
     except ClientError as exc:
@@ -123,6 +138,9 @@ def object_exists(key: str) -> bool:
 
 def delete_object(key: str) -> None:
     """Delete one object. Deleting one that is already gone is not an error."""
+    if _in_database():
+        database_storage.delete_object(key)
+        return
     try:
         _client().delete_object(Bucket=_bucket(), Key=key)
     except (ClientError, BotoCoreError) as exc:
@@ -140,6 +158,8 @@ def delete_prefix(prefix: str) -> int:
     """Delete every object whose key starts with ``prefix`` and return how many."""
     if not prefix:
         raise ValueError("Refusing to delete with an empty prefix")
+    if _in_database():
+        return database_storage.delete_prefix(prefix)
     removed = 0
     try:
         batch: list[dict[str, str]] = []
@@ -159,6 +179,8 @@ def delete_prefix(prefix: str) -> int:
 
 def signed_url(key: str, *, expires_seconds: int = SIGNED_URL_SECONDS) -> str:
     """A link that lets a browser read ``key`` for five minutes, shown inline, with no file name."""
+    if _in_database():
+        return database_storage.signed_url(key)
     try:
         return _signing_client().generate_presigned_url(  # type: ignore[no-any-return]
             "get_object",
@@ -179,6 +201,8 @@ def ensure_bucket() -> bool:
     Encryption and the public-access block are best effort: MinIO has no key service locally and
     refuses the former, and R2 manages both itself.
     """
+    if _in_database():
+        return database_storage.ensure_table()
     created = False
     client = _client()
     try:

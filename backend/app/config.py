@@ -128,6 +128,9 @@ class BaseConfig:
         self.SECRET_KEY = _env("SECRET_KEY", "change-me")
         self.APP_BASE_URL = _env("APP_BASE_URL", "http://localhost:5173")
         self.DEMO_BANNER = _env_bool("DEMO_BANNER", True)
+        # Demo shortcut: the sign-in code comes back in the response and shows on screen, so a
+        # demo runs with no mail server. Only honoured while DEMO_BANNER is on.
+        self.DEMO_SHOW_LOGIN_CODE = _env_bool("DEMO_SHOW_LOGIN_CODE", False)
         self.LOG_LEVEL = _env("LOG_LEVEL", "INFO").upper()
         self.APP_VERSION = _env("APP_VERSION", "0.1.0")
 
@@ -145,6 +148,8 @@ class BaseConfig:
         self.DATA_ENCRYPTION_KEY = _env("DATA_ENCRYPTION_KEY")
         self.HASH_PEPPER = _env("HASH_PEPPER", "change-me-too")
 
+        # "s3" (MinIO, R2 or S3) or "database", a demo shortcut that keeps files in Postgres.
+        self.STORAGE_BACKEND = _env("STORAGE_BACKEND", "s3").lower()
         self.S3_ENDPOINT_URL = _env("S3_ENDPOINT_URL", "http://localhost:9000")
         self.S3_BUCKET = _env("S3_BUCKET", "tibadirect-uploads")
         # The defaults match docker-compose's MinIO, which is local only.
@@ -261,7 +266,10 @@ class ProductionConfig(BaseConfig):
 
     def __init__(self) -> None:
         super().__init__()
-        unsafe = [name for name, bad in INSECURE_DEFAULTS.items() if getattr(self, name, "") in bad]
+        checked = list(INSECURE_DEFAULTS.items())
+        if self.STORAGE_BACKEND == "database":
+            checked = [(name, bad) for name, bad in checked if not name.startswith("S3_")]
+        unsafe = [name for name, bad in checked if getattr(self, name, "") in bad]
         if unsafe:
             raise ConfigError(
                 "Refusing to start in production with default or empty values for: "

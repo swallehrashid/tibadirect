@@ -17,6 +17,8 @@ class RequestCodeSchema(ma.Schema):
 
 class AcceptedSchema(ma.Schema):
     message = ma.fields.String()
+    # Only present with the DEMO_SHOW_LOGIN_CODE shortcut, so a demo signs in without email.
+    demo_code = ma.fields.String()
 
 
 class VerifyCodeSchema(ma.Schema):

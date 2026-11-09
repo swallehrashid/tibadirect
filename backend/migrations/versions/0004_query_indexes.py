@@ -4,9 +4,9 @@ Found by loading twenty thousand cases, fifty thousand donations and a quarter o
 entries into a scratch database and reading the plans: the audit log and case list sort by time,
 the review queue filters by status and sorts by time, and the payout poll and the webhook sweep
 look at a small open part of tables that grow without end, the hospital's queue asks which bills
-have no confirmation yet and which wait for a second approval, booking a payment checks the ledger by what it is
-for, and the hourly sweep that deletes original files reads only the ones still held. The partial
-indexes hold only the open part.
+have no confirmation yet and which wait for a second approval, booking a payment checks the
+ledger by what it is for, and the hourly sweep that deletes original files reads only the ones
+still held. The partial indexes hold only the open part.
 
 Revision ID: 0004
 Revises: 0003

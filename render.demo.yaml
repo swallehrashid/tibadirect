@@ -12,12 +12,8 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /api/health
-    dockerCommand: >-
-      sh -c "flask --app wsgi db upgrade
-      && flask --app wsgi storage bootstrap
-      && flask --app wsgi seed
-      && (python -m app.jobs.scheduler & python -m app.jobs.worker &)
-      && exec gunicorn wsgi:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT"
+    # Migrate, seed once, start the worker and the scheduler, then serve (backend/scripts).
+    dockerCommand: sh scripts/demo_start.sh
     envVars:
       - key: APP_ENV
         value: production

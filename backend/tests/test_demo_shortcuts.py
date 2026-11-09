@@ -113,5 +113,8 @@ def test_the_demo_blueprint_only_names_settings_the_app_reads_and_keeps_secrets_
     assert env["STORAGE_BACKEND"]["value"] == "database"
     for name in ("PAYPAL_CLIENT_SECRET", "PAYPAL_CLIENT_ID"):
         assert env[name] == {"key": name, "sync": False}
+    # Render keeps the quotes of an inline `sh -c "..."`, so the steps live in a script
+    assert web["dockerCommand"] == "sh scripts/demo_start.sh"
+    script = (root / "backend" / "scripts" / "demo_start.sh").read_text()
     for command in ("db upgrade", "seed", "app.jobs.scheduler", "app.jobs.worker", "gunicorn"):
-        assert command in web["dockerCommand"]
+        assert command in script

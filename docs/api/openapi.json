@@ -5623,6 +5623,9 @@
           "expires_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "demo_code": {
+            "type": "string"
           }
         },
         "additionalProperties": false

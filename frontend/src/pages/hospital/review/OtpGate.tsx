@@ -30,6 +30,8 @@ export function OtpGate({ caseId, purpose, destinationMasked, code, onCode, onRe
   const { t, i18n } = useTranslation();
   const [expires, setExpires] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(0);
+  // The DEMO_SHOW_LOGIN_CODE shortcut: the server hands the code back instead of emailing it.
+  const [demoCode, setDemoCode] = useState<string | null>(null);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -40,7 +42,8 @@ export function OtpGate({ caseId, purpose, destinationMasked, code, onCode, onRe
   const send = useMutation({
     mutationFn: () => hospitalApi.sendOtp(caseId, purpose),
     onSuccess: (sent) => {
-      onCode("");
+      setDemoCode(sent.demo_code ?? null);
+      onCode(sent.demo_code ?? "");
       onRequest(sent.request_id);
       setExpires(sent.expires_at);
       setCooldown(RESEND_SECONDS);
@@ -76,6 +79,13 @@ export function OtpGate({ caseId, purpose, destinationMasked, code, onCode, onRe
       <p className="text-sm" aria-live="polite">
         {t("hospital.otp.sent", { address: destinationMasked, time })}
       </p>
+      {demoCode ? (
+        <Alert tone="info">
+          <AlertDescription>
+            {t("auth.demoCode")} <code className="font-semibold">{demoCode}</code>
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <OtpInput value={code} onChange={onCode} invalid={Boolean(error)} describedBy={error ? `otp-error-${purpose}` : undefined} disabled={disabled} label={t("hospital.otp.label")} />
       {error ? (
         <p id={`otp-error-${purpose}`} role="alert" className="text-sm font-semibold text-danger-700">

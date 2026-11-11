@@ -28,6 +28,8 @@ class OtpSentSchema(ma.Schema):
         metadata={"description": "The register's official address, masked. Codes go nowhere else."}
     )
     expires_at = ma.fields.DateTime()
+    # Only with the DEMO_SHOW_LOGIN_CODE shortcut, so a demo hospital confirms without email.
+    demo_code = ma.fields.String()
 
 
 class DecisionSchema(ma.Schema):

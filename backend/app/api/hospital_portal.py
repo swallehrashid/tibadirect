@@ -2,7 +2,7 @@
 
 import uuid
 
-from flask import request
+from flask import current_app, request
 from flask.views import MethodView
 from sqlalchemy import and_, exists, or_, select
 from sqlalchemy.orm import selectinload
@@ -135,11 +135,15 @@ class SendOtp(MethodView):
         issued = confirmation_service.send_otp(db.session, case, staff, payload["purpose"])
         db.session.commit()
         request = issued.request
-        return {
+        body = {
             "request_id": request.id,
             "destination_masked": request.destination_masked,
             "expires_at": request.expires_at,
         }
+        config = current_app.config
+        if config["DEMO_BANNER"] and config["DEMO_SHOW_LOGIN_CODE"]:
+            body["demo_code"] = issued.code
+        return body
 
 
 def _after_decision(confirmation: Confirmation, status_before: CaseStatus) -> None:

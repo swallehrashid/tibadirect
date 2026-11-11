@@ -4186,6 +4186,7 @@ export interface components {
             destination_masked?: string;
             /** Format: date-time */
             expires_at?: string;
+            demo_code?: string;
         };
         Decision: {
             /** Format: uuid */

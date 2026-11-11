@@ -3,7 +3,7 @@
 Verified medical fundraising that pays the hospital, not a stranger's phone number.
 
 > **Hackathon prototype.** All people, hospitals and bills are made up and all money is PayPal
-> sandbox money. Hosted demo: _(hosted URL: add before submission)_. Demo video: _(video URL: add before submission)_.
+> sandbox money. Hosted demo: **<https://tibadirect.onrender.com>** (free plan: the first visit after a quiet spell takes about a minute to wake).  Demo video: _(video URL: add before submission)_.
 
 ## The problem
 
@@ -96,7 +96,7 @@ flowchart LR
 | PayPal | **Real sandbox code path** with keys set (`PAYPAL_MODE=sandbox`); without keys a built-in simulation answers the same calls, so every flow runs offline (the button then says "simulated") |
 | Hospitals, patients, bills, donors, the facility register, WhatsApp appeals | **Simulated**: fictional, with reserved `.test` email addresses; no real facility is named |
 | Hospital payouts | **Simulated by design**: the hospital's PayPal address is a sandbox account. A real service would pay a hospital's bank or paybill through a licensed partner (adapters are in place) |
-| Sign-in codes | Emailed for real; locally they land in Mailpit |
+| Sign-in codes | Emailed for real; locally they land in Mailpit. On the hosted demo they **show on screen** (and the hospital's confirmation code too), because the demo accounts use made-up addresses and the free plan cannot send mail |
 | Swahili text | Complete but **not yet reviewed by a native speaker** (`docs/i18n/swahili-review.csv` lists what to check first) |
 
 ## PayPal APIs used
@@ -116,11 +116,11 @@ flowchart LR
 |---|---|---|---|
 | Reading bills | `pypdf` text layer, **Tesseract** OCR (photos and scans) | Gets text and amounts from an uploaded bill | Local, no outside call |
 | Privacy | Rule-based redaction with medical and name lexicons | Removes names, phones, ID numbers, the patient number and medical terms **before** anything is stored or sent anywhere | Tested on every synthetic bill and across the whole database |
-| Extraction | Anthropic **Claude** through the Messages API with a tool schema; model name set by `LLM_MODEL` (_model name: add before submission_) | Fills in fields the local reader missed, only with the family's consent and only from redacted text | Output is schema-checked and cross-checked against the local reading; the local amount always wins |
+| Extraction | **Google Gemini** (`gemini-flash-lite-latest`, free tier) on the hosted demo, with a tool schema; Claude is also supported (`LLM_PROVIDER`, `LLM_MODEL`) | Fills in fields the local reader missed, only with the family's consent and only from redacted text | Output is schema-checked and cross-checked against the local reading; the local amount always wins |
 | Tamper and duplicate checks | PDF structure, fonts, metadata, error-level analysis, perceptual hash, text fingerprint | Raise signals with fixed weights | Explainable: every flag has a reason in plain words |
 | Risk score and routing | Fixed weights, three bands | Sends a bill to the hospital or to a person | Never approves or rejects anyone |
 | Appeal checker | scikit-learn TF-IDF + logistic regression with rule features | Scores a forwarded WhatsApp appeal | Trained on 100 synthetic appeals; input is hashed and not stored |
-| Treasurer agent (admin only) | Claude with read tools | Answers questions about the money and **proposes** actions | A person approves every action; nothing moves on its own |
+| Treasurer agent (admin only) | Gemini (or Claude) with read tools | Answers questions about the money and **proposes** actions | A person approves every action; nothing moves on its own |
 | Building the project | **Claude Code** (Anthropic) as a pair-programming tool | Wrote and refactored code and tests under the team's specification and review | Every change is a small commit with its own tests |
 
 Bills that contain instructions aimed at software ("ignore previous instructions...") are held for a person, and
@@ -177,7 +177,12 @@ Working documents (design, decision log, test scripts, compliance drafts, phase 
 
 ## Sandbox accounts
 
-Sign in with an emailed code (Mailpit locally): `admin@tibadirect.test`, `family1@example.test` to `family4@example.test`,
+**On the hosted demo** (<https://tibadirect.onrender.com>): sign in with any address below; the code appears on screen and is
+filled in for you. To donate, log in to PayPal's sandbox window with a **PayPal sandbox Personal account** (your own from
+developer.paypal.com works). Sandbox buyers registered in some countries, Kenya included, get their payments held for review
+by PayPal; a US sandbox buyer clears at once.
+
+Locally, sign in with an emailed code (Mailpit locally): `admin@tibadirect.test`, `family1@example.test` to `family4@example.test`,
 `clerk@kilele-hospital.test` and `supervisor@kilele-hospital.test` (also `mtomwema-` and `ziwabluu-` hospitals). The hospital's
 one-time code goes to its register address, `billing@kilele-hospital.test`. Any other address becomes a family account.
 `make reset-demo` wipes the demo database and loads the seed again; it only runs where `DEMO_BANNER` is on.

@@ -1,7 +1,7 @@
 """The demo shortcuts: sign-in code on screen, no mail server, and bill files kept in Postgres."""
 
 import re
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 import pytest
@@ -13,6 +13,7 @@ from app.config import ConfigError, get_config
 from app.extensions import db
 from app.services import database_storage, mail_service, storage_service
 from tests.browser import Browser
+from tests.hospital_helpers import REGISTER_EMAIL, last_code_sent_to, make_ward
 from tests.test_config import GOOD_PRODUCTION_ENV
 
 
@@ -125,3 +126,16 @@ def test_the_demo_blueprint_only_names_settings_the_app_reads_and_keeps_secrets_
     script = (root / "backend" / "scripts" / "demo_start.sh").read_text()
     for command in ("db upgrade", "seed", "reset-demo", "app.jobs.worker --with-periodic"):
         assert command in script
+
+
+def test_the_hospital_code_comes_back_only_with_the_shortcut(
+    app: Flask, browser_for: Callable[..., Browser], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ward = make_ward()
+    clerk = browser_for(ward.clerk.user)
+    path = f"/api/hospital/cases/{ward.case.id}/otp"
+    assert "demo_code" not in clerk.post(path, {"purpose": "decision"}).get_json()
+
+    monkeypatch.setitem(app.config, "DEMO_SHOW_LOGIN_CODE", True)
+    sent = clerk.post(path, {"purpose": "decision"}).get_json()
+    assert sent["demo_code"] == last_code_sent_to(REGISTER_EMAIL)

@@ -53,8 +53,19 @@ services:
         sync: false
       - key: PAYPAL_MODE
         value: sandbox
+      # Google Gemini's free tier reads bills, explains appeal warnings and runs the treasurer agent.
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: LLM_MODEL
+        value: gemini-flash-lite-latest
+      - key: LLM_TIMEOUT_SECONDS
+        value: "60"
+      - key: LLM_API_KEY
+        sync: false
       - key: AGENT_ENABLED
-        value: "false"
+        value: "true"
+      - key: APPEAL_CHECKER_USE_LLM
+        value: "true"
       - key: PROXY_FIX_COUNT
         value: "1"
       - key: JOBS_ASYNC

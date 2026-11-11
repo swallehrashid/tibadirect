@@ -117,6 +117,7 @@ def test_the_demo_blueprint_only_names_settings_the_app_reads_and_keeps_secrets_
         "S3_ACCESS_KEY_ID",
         "S3_SECRET_ACCESS_KEY",
         "SMTP_PASSWORD",
+        "LLM_API_KEY",
     ):
         assert env[name] == {"key": name, "sync": False}
     # Render keeps the quotes of an inline `sh -c "..."`, so the steps live in a script

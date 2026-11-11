@@ -250,8 +250,17 @@ class TestConfig(BaseConfig):
         self.S3_BUCKET = "tibadirect-test-uploads"
         self.S3_PUBLIC_ENDPOINT_URL = ""
         self.S3_SERVER_SIDE_ENCRYPTION = ""
+        self.S3_REGION = "us-east-1"
+        self.STORAGE_BACKEND = "s3"
+        # A developer's .env may point at a real mail server or language model; tests never do.
         self.MAIL_BACKEND = "memory"
+        self.SMTP_HOST = "localhost"
+        self.SMTP_PORT = 1025
+        self.SMTP_USERNAME = ""
+        self.SMTP_PASSWORD = ""
+        self.LLM_PROVIDER = "anthropic"
         self.LLM_API_KEY = ""
+        self.LLM_MODEL = ""
         self.DATA_ENCRYPTION_KEY = self.DATA_ENCRYPTION_KEY or DEV_DATA_ENCRYPTION_KEY
         self.LOG_LEVEL = _env("LOG_LEVEL", "WARNING").upper()
         self.SECRET_KEY = "test-secret-key"

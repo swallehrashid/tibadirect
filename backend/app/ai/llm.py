@@ -64,10 +64,17 @@ class ModelBill(BaseModel):
 ClientFactory = Callable[[], Any]
 
 
+PROVIDERS = ("anthropic", "gemini")
+
+
 def _real_client() -> Any:
+    config = current_app.config
+    if config.get("LLM_PROVIDER") == "gemini":
+        from app.ai.gemini import GeminiClient
+
+        return GeminiClient(config["LLM_API_KEY"], timeout=config["LLM_TIMEOUT_SECONDS"])
     import anthropic
 
-    config = current_app.config
     return anthropic.Anthropic(
         api_key=config["LLM_API_KEY"], timeout=config["LLM_TIMEOUT_SECONDS"], max_retries=0
     )
@@ -80,7 +87,7 @@ def available() -> bool:
     """True if a model call is configured: a supported provider, a key and a model name."""
     config = current_app.config
     return bool(
-        config.get("LLM_PROVIDER") == "anthropic"
+        config.get("LLM_PROVIDER") in PROVIDERS
         and config.get("LLM_API_KEY")
         and config.get("LLM_MODEL")
     )

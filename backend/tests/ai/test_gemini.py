@@ -11,17 +11,17 @@ from app.ai.gemini import GeminiClient, GeminiError
 
 
 class FakePost:
-    def __init__(self, *answers: dict[str, Any], status: int = 200) -> None:
+    def __init__(self, *answers: dict[str, Any], statuses: tuple[int, ...] = (200,)) -> None:
         self.answers = list(answers)
-        self.status = status
+        self.statuses = list(statuses)
         self.bodies: list[dict[str, Any]] = []
 
     def __call__(self, url: str, *, headers: dict, json: dict, timeout: float) -> Any:  # noqa: A002
         assert url.endswith("/chat/completions")
         assert headers["Authorization"] == "Bearer key-for-tests"
         self.bodies.append(json)
-        answer = self.answers.pop(0) if self.answers else {}
-        status = self.status
+        status = self.statuses.pop(0) if len(self.statuses) > 1 else self.statuses[0]
+        answer = (self.answers.pop(0) if self.answers else {}) if status < 400 else {}
 
         class Reply:
             ok = status < 400
@@ -109,12 +109,26 @@ def test_a_tool_round_trip_sends_the_raw_call_and_the_result_back(post: FakePost
     assert sent[2] == {"role": "tool", "tool_call_id": "c1", "content": "ok"}
 
 
-def test_a_refusal_raises(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(gemini.requests, "post", FakePost(status=503))
+def test_busy_answers_are_retried_then_given_up_on(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(gemini.time, "sleep", lambda _seconds: None)
+    busy_then_fine = FakePost(_choice(content="ok"), statuses=(503, 429, 200))
+    monkeypatch.setattr(gemini.requests, "post", busy_then_fine)
+    client = GeminiClient("key-for-tests", timeout=5)
+    hi = [{"role": "user", "content": "hi"}]
+    assert client.messages.create(model="m", max_tokens=10, messages=hi).content[0].text == "ok"
+    assert len(busy_then_fine.bodies) == 3
+
+    always_busy = FakePost(statuses=(503,))
+    monkeypatch.setattr(gemini.requests, "post", always_busy)
     with pytest.raises(GeminiError, match="503"):
-        GeminiClient("key-for-tests", timeout=5).messages.create(
-            model="m", max_tokens=10, messages=[{"role": "user", "content": "hi"}]
-        )
+        client.messages.create(model="m", max_tokens=10, messages=hi)
+    assert len(always_busy.bodies) == 3
+
+    refused = FakePost(statuses=(400,))
+    monkeypatch.setattr(gemini.requests, "post", refused)
+    with pytest.raises(GeminiError, match="400"):
+        client.messages.create(model="m", max_tokens=10, messages=hi)
+    assert len(refused.bodies) == 1  # a bad request is not worth repeating
 
 
 def test_gemini_is_a_supported_provider(app: Flask, monkeypatch: pytest.MonkeyPatch) -> None:

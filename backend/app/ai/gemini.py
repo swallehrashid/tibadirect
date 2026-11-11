@@ -8,12 +8,16 @@ tool. Answers come back as ``text`` and ``tool_use`` blocks with an ``input`` di
 """
 
 import json
+import time
 from dataclasses import dataclass, field
 from typing import Any
 
 import requests
 
 BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
+# The free tier answers "busy" (429, 503) now and then; a short wait usually clears it.
+RETRY_STATUSES = frozenset({429, 500, 503})
+RETRY_WAITS_SECONDS = (2, 5)
 
 
 class GeminiError(RuntimeError):
@@ -103,12 +107,16 @@ class GeminiClient:
             body["tools"] = [_tool(spec) for spec in tools]
         if tool_choice and tool_choice.get("type") == "tool":
             body["tool_choice"] = {"type": "function", "function": {"name": tool_choice["name"]}}
-        response = requests.post(
-            f"{self.base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {self.api_key}"},
-            json=body,
-            timeout=self.timeout,
-        )
+        for wait in (*RETRY_WAITS_SECONDS, None):
+            response = requests.post(
+                f"{self.base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {self.api_key}"},
+                json=body,
+                timeout=self.timeout,
+            )
+            if response.status_code not in RETRY_STATUSES or wait is None:
+                break
+            time.sleep(wait)
         if not response.ok:
             raise GeminiError(f"HTTP {response.status_code}")
         try:

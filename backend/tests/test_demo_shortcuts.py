@@ -123,5 +123,5 @@ def test_the_demo_blueprint_only_names_settings_the_app_reads_and_keeps_secrets_
     # Render keeps the quotes of an inline `sh -c "..."`, so the steps live in a script
     assert web["dockerCommand"] == "sh scripts/demo_start.sh"
     script = (root / "backend" / "scripts" / "demo_start.sh").read_text()
-    for command in ("db upgrade", "seed", "reset-demo", "app.jobs.scheduler", "gunicorn"):
+    for command in ("db upgrade", "seed", "reset-demo", "app.jobs.worker --with-periodic"):
         assert command in script

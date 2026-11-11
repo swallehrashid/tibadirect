@@ -1,10 +1,13 @@
-"""The worker process: ``python -m app.jobs.worker [queue ...]``.
+"""The worker process: ``python -m app.jobs.worker [--with-periodic] [queue ...]``.
 
 Runs every job inside an application context and hands the database connection back after each
 one. It starts RQ's own scheduler thread too, which is what delivers the delayed retries.
+``--with-periodic`` also runs the periodic scheduler (``app.jobs.scheduler``) in a thread, so a
+small host such as the free demo needs one process for both instead of two.
 """
 
 import sys
+import threading
 from typing import Any
 
 from flask import Flask
@@ -34,6 +37,9 @@ class AppWorker(SimpleWorker):
                 db.session.remove()
 
 
+PERIODIC_FLAG = "--with-periodic"
+
+
 def make_worker(app: Flask, names: tuple[str, ...] = QUEUE_NAMES) -> AppWorker:
     with app.app_context():
         queues = [get_queue(name) for name in names]
@@ -43,12 +49,19 @@ def make_worker(app: Flask, names: tuple[str, ...] = QUEUE_NAMES) -> AppWorker:
 def main(argv: list[str] | None = None) -> None:
     from app import create_app
 
-    names = tuple(argv if argv is not None else sys.argv[1:]) or QUEUE_NAMES
+    args = list(argv if argv is not None else sys.argv[1:])
+    with_periodic = PERIODIC_FLAG in args
+    names = tuple(a for a in args if a != PERIODIC_FLAG) or QUEUE_NAMES
     unknown = [name for name in names if name not in QUEUE_NAMES]
     if unknown:
         raise SystemExit(f"Unknown queue(s): {', '.join(unknown)}")
     app = create_app()
-    make_worker(app, names).work(with_scheduler=True)
+    worker = make_worker(app, names)
+    if with_periodic:
+        from app.jobs import scheduler
+
+        threading.Thread(target=scheduler.run, args=(app,), daemon=True, name="periodic").start()
+    worker.work(with_scheduler=True)
 
 
 if __name__ == "__main__":

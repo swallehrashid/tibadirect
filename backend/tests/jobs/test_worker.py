@@ -1,12 +1,14 @@
 """The worker runs jobs in an application context and handles failure and retry."""
 
+import threading
+
 import pytest
 from flask import Flask
 from rq import Retry
 from rq.job import JobStatus
 
 from app.jobs import queue as jobs
-from app.jobs import worker
+from app.jobs import scheduler, worker
 from app.jobs.worker import AppWorker, make_worker
 
 FIXTURES = "tests.job_fixtures"
@@ -94,3 +96,35 @@ def test_make_worker_returns_an_app_worker_on_the_given_queues(app: Flask) -> No
 def test_main_rejects_an_unknown_queue_name() -> None:
     with pytest.raises(SystemExit, match="Unknown queue"):
         worker.main(["triage", "urgent"])
+
+
+def test_with_periodic_runs_the_scheduler_in_a_thread_beside_the_worker(
+    app: Flask, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls: list[str] = []
+    started = threading.Event()
+
+    class FakeWorker:
+        def work(self, **kwargs: object) -> None:
+            started.wait(5)
+            calls.append(f"work queues={sorted(seen)}")
+
+    seen: list[str] = []
+    monkeypatch.setattr("app.create_app", lambda: app)
+
+    def fake_make_worker(_app: Flask, names: tuple[str, ...]) -> FakeWorker:
+        seen.extend(names)
+        return FakeWorker()
+
+    monkeypatch.setattr(worker, "make_worker", fake_make_worker)
+    monkeypatch.setattr(scheduler, "run", lambda _app: (calls.append("periodic"), started.set()))
+
+    worker.main(["--with-periodic", jobs.QUEUE_TRIAGE])
+    assert calls == ["periodic", f"work queues={[jobs.QUEUE_TRIAGE]}"]
+
+    calls.clear()
+    seen.clear()
+    started.clear()
+    started.set()  # without the flag nothing else runs; the worker should not wait
+    worker.main([jobs.QUEUE_TRIAGE])
+    assert calls == [f"work queues={[jobs.QUEUE_TRIAGE]}"]
